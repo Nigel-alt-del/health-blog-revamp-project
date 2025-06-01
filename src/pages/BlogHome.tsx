@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, Clock, ArrowRight, Calculator, TrendingUp, FileText } from "lucide-react";
@@ -33,7 +34,7 @@ const BlogHome = () => {
       >
         <div className="max-w-4xl mx-auto text-center text-white">
           <h1 className="text-5xl font-bold mb-6 leading-tight">
-            UK Employee Benefits <span className="text-[#22aee1]">Intelligence</span>
+            The Health <span className="text-[#22aee1]">Compass</span>
           </h1>
           <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
             Analysis, market intelligence, and compliance guidance for UK small 
@@ -49,7 +50,7 @@ const BlogHome = () => {
             <Button asChild size="lg" className="bg-[#22aee1] hover:bg-[#20466d] text-white transition-colors">
               <Link to="/compliance-tools">
                 <FileText className="mr-2 h-5 w-5" />
-                HR Helper Tools
+                Compliance Tools
               </Link>
             </Button>
           </div>

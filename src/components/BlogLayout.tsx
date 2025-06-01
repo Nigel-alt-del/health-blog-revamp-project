@@ -15,7 +15,7 @@ const BlogLayout = ({ children }: { children: React.ReactNode }) => {
     if (path.includes('/category/pmi-insights')) return 'Private Medical Insurance Intelligence';
     if (path.includes('/category/industry-news')) return 'Industry News';
     if (path.includes('/about')) return 'About Insure My Health';
-    return 'UK Employee Benefits Intelligence';
+    return 'The Health Compass';
   };
 
   return (
@@ -28,11 +28,11 @@ const BlogLayout = ({ children }: { children: React.ReactNode }) => {
               <Link to="/" className="flex items-center">
                 <img 
                   src="/lovable-uploads/b61ae919-b75e-409d-a884-8437e2befc15.png" 
-                  alt="InsureMyHealth Logo" 
+                  alt="The Health Compass Logo" 
                   className="h-10 w-auto mr-3"
                 />
                 <span className="text-2xl font-bold text-[#20466d]">
-                  InsureMyHealth
+                  The Health Compass
                 </span>
               </Link>
             </div>
