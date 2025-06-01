@@ -34,11 +34,11 @@ const BlogHome = () => {
       >
         <div className="max-w-4xl mx-auto text-center text-white">
           <h1 className="text-5xl font-bold mb-6 leading-tight">
-            UK Health Insurance <span className="text-[#22aee1]">Intelligence</span>
+            UK Employee Benefits <span className="text-[#22aee1]">Intelligence</span>
           </h1>
           <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-            Expert analysis, market intelligence, and compliance guidance specifically 
-            designed for UK small and medium enterprises
+            Expert analysis, market intelligence, and compliance guidance for UK small 
+            and medium enterprises on employee benefits and private medical insurance
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <Button asChild size="lg" className="bg-[#22aee1] hover:bg-[#20466d] text-white transition-colors">
@@ -50,7 +50,7 @@ const BlogHome = () => {
             <Button asChild size="lg" className="bg-[#22aee1] hover:bg-[#20466d] text-white transition-colors">
               <Link to="/compliance-tools">
                 <FileText className="mr-2 h-5 w-5" />
-                Compliance Tools
+                HR Helper Tools
               </Link>
             </Button>
           </div>
@@ -59,7 +59,7 @@ const BlogHome = () => {
             <span>•</span>
             <span>SME-Focused Intelligence</span>
             <span>•</span>
-            <span>Regulatory Guidance</span>
+            <span>Employee Benefits Guidance</span>
           </div>
         </div>
       </section>
@@ -71,7 +71,7 @@ const BlogHome = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#79858D] h-5 w-5" />
             <Input
               type="text"
-              placeholder="Search UK health insurance insights..."
+              placeholder="Search UK employee benefits insights..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 py-3 text-lg border-[#79858D] focus:border-[#22aee1] focus:ring-[#22aee1]"
@@ -91,7 +91,7 @@ const BlogHome = () => {
       {/* Recent Posts Grid */}
       <section className="py-12 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-[#20466d] mb-8 text-center">Latest UK Market Insights</h2>
+          <h2 className="text-3xl font-bold text-[#20466d] mb-8 text-center">Latest UK Employee Benefits Insights</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredPosts.map((post) => (
               <BlogCard key={post.id} post={post} />

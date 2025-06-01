@@ -1,7 +1,7 @@
 
 import BlogLayout from "@/components/BlogLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, Users, TrendingUp, CheckCircle } from "lucide-react";
+import { Users, Target, Award, TrendingUp, Shield, Heart } from "lucide-react";
 
 const AboutPage = () => {
   return (
@@ -15,59 +15,64 @@ const AboutPage = () => {
       >
         <div className="max-w-4xl mx-auto text-center text-white">
           <h1 className="text-5xl font-bold mb-6 leading-tight">
-            About <span className="text-[#22aee1]">InsureMyHealth</span>
+            About <span className="text-[#22aee1]">InsureMyHealth Reports</span>
           </h1>
           <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-            Empowering UK SMEs with expert health insurance insights, analysis, and practical guidance
+            Your trusted source for UK employee benefits intelligence, market analysis, and strategic insights for small and medium enterprises.
           </p>
         </div>
       </section>
 
       {/* Mission Section */}
-      <section className="py-16 px-4">
+      <section className="py-16 px-4 bg-white">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-[#20466d] mb-6">Our Mission</h2>
             <p className="text-lg text-[#79858D] max-w-3xl mx-auto">
-              We exist to demystify the complex world of health insurance for UK small and medium enterprises. 
-              Through rigorous analysis, practical tools, and expert insights, we help business owners make 
-              informed decisions that protect their teams and their bottom line.
+              We empower UK small and medium enterprises with expert analysis, practical tools, and strategic insights 
+              to make informed decisions about employee benefits and private medical insurance.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
-            <Card className="text-center border-[#79858D]/20">
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="text-center border-[#79858D]/20 hover:shadow-lg transition-shadow">
               <CardHeader>
-                <Shield className="h-12 w-12 text-[#22aee1] mx-auto mb-4" />
-                <CardTitle className="text-[#20466d]">Expert Analysis</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-[#79858D]">
-                  In-depth market analysis and policy breakdowns from industry professionals
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center border-[#79858D]/20">
-              <CardHeader>
-                <Users className="h-12 w-12 text-[#22aee1] mx-auto mb-4" />
-                <CardTitle className="text-[#20466d]">SME Focused</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-[#79858D]">
-                  Tailored specifically for the unique challenges facing UK small businesses
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center border-[#79858D]/20">
-              <CardHeader>
-                <TrendingUp className="h-12 w-12 text-[#22aee1] mx-auto mb-4" />
+                <div className="w-16 h-16 bg-[#22aee1] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <TrendingUp className="h-8 w-8 text-white" />
+                </div>
                 <CardTitle className="text-[#20466d]">Market Intelligence</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-[#79858D]">
-                  Real-time insights on industry trends, regulatory changes, and best practices
+                  In-depth analysis of UK employee benefits trends, pricing, and regulatory changes affecting SMEs.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center border-[#79858D]/20 hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-16 h-16 bg-[#20466d] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Shield className="h-8 w-8 text-white" />
+                </div>
+                <CardTitle className="text-[#20466d]">Compliance Guidance</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-[#79858D]">
+                  Clear guidance on regulatory requirements, deadlines, and best practices for employee benefits administration.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center border-[#79858D]/20 hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-16 h-16 bg-[#22aee1] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Heart className="h-8 w-8 text-white" />
+                </div>
+                <CardTitle className="text-[#20466d]">SME Focus</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-[#79858D]">
+                  Tailored insights specifically designed for the unique needs and challenges of small and medium businesses.
                 </p>
               </CardContent>
             </Card>
@@ -75,57 +80,84 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Our Approach */}
+      {/* Our Approach Section */}
       <section className="py-16 px-4 bg-gray-50">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-[#20466d] mb-12 text-center">Our Approach</h2>
+          <h2 className="text-3xl font-bold text-[#20466d] mb-8 text-center">Our Approach</h2>
           
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h3 className="text-2xl font-semibold text-[#20466d] mb-6">Data-Driven Insights</h3>
-              <div className="space-y-4">
-                <div className="flex items-start">
-                  <CheckCircle className="h-6 w-6 text-[#22aee1] mr-3 mt-1 flex-shrink-0" />
-                  <div>
-                    <h4 className="font-semibold text-[#20466d]">Market Research</h4>
-                    <p className="text-[#79858D]">Regular surveys and analysis of UK health insurance trends</p>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <CheckCircle className="h-6 w-6 text-[#22aee1] mr-3 mt-1 flex-shrink-0" />
-                  <div>
-                    <h4 className="font-semibold text-[#20466d]">Industry Partnerships</h4>
-                    <p className="text-[#79858D]">Collaborations with leading insurers and brokers</p>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <CheckCircle className="h-6 w-6 text-[#22aee1] mr-3 mt-1 flex-shrink-0" />
-                  <div>
-                    <h4 className="font-semibold text-[#20466d]">Regulatory Monitoring</h4>
-                    <p className="text-[#79858D]">Continuous tracking of UK health insurance regulations</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            <Card className="border-[#79858D]/20">
+              <CardHeader>
+                <CardTitle className="text-[#20466d] flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  Expert Analysis
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-[#79858D]">
+                  Our team of industry experts provides comprehensive analysis of employee benefits trends, 
+                  regulatory changes, and market developments affecting UK SMEs.
+                </p>
+              </CardContent>
+            </Card>
 
+            <Card className="border-[#79858D]/20">
+              <CardHeader>
+                <CardTitle className="text-[#20466d] flex items-center gap-2">
+                  <Target className="h-5 w-5" />
+                  Practical Tools
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-[#79858D]">
+                  Interactive calculators and compliance tools help you make data-driven decisions 
+                  about employee benefits investments and implementation strategies.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="text-center">
+            <Card className="border-[#79858D]/20 max-w-2xl mx-auto">
+              <CardHeader>
+                <CardTitle className="text-[#20466d] flex items-center justify-center gap-2">
+                  <Award className="h-5 w-5" />
+                  Quality Commitment
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-[#79858D]">
+                  We maintain the highest standards of accuracy and relevance in our reporting, 
+                  ensuring you receive reliable intelligence to support your business decisions.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Values Section */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-[#20466d] mb-8">Our Values</h2>
+          <div className="grid md:grid-cols-3 gap-8">
             <div>
-              <h3 className="text-2xl font-semibold text-[#20466d] mb-6">Practical Tools</h3>
-              <div className="space-y-4">
-                <div className="flex items-start">
-                  <CheckCircle className="h-6 w-6 text-[#22aee1] mr-3 mt-1 flex-shrink-0" />
-                  <div>
-                    <h4 className="font-semibold text-[#20466d]">Cost Calculators</h4>
-                    <p className="text-[#79858D]">Interactive tools to estimate insurance costs and savings</p>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <CheckCircle className="h-6 w-6 text-[#22aee1] mr-3 mt-1 flex-shrink-0" />
-                  <div>
-                    <h4 className="font-semibold text-[#20466d]">Resource Library</h4>
-                    <p className="text-[#79858D]">Downloadable guides, templates, and checklists</p>
-                  </div>
-                </div>
-              </div>
+              <h3 className="text-xl font-semibold text-[#20466d] mb-4">Transparency</h3>
+              <p className="text-[#79858D]">
+                Clear, honest reporting with full disclosure of sources, methodologies, and potential conflicts of interest.
+              </p>
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-[#20466d] mb-4">Accuracy</h3>
+              <p className="text-[#79858D]">
+                Rigorous fact-checking and verification processes ensure the reliability of our analysis and recommendations.
+              </p>
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-[#20466d] mb-4">Relevance</h3>
+              <p className="text-[#79858D]">
+                Focus on practical, actionable insights that directly impact UK SME decision-making processes.
+              </p>
             </div>
           </div>
         </div>

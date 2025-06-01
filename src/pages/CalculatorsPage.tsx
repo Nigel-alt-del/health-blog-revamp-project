@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import BlogLayout from "@/components/BlogLayout";
@@ -7,57 +8,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calculator, TrendingUp, FileText } from "lucide-react";
+import { Calculator, TrendingUp, FileText, Mail, ExternalLink } from "lucide-react";
 
 const CalculatorsPage = () => {
-  const [pmiEmployees, setPmiEmployees] = useState(10);
-  const [pmiAgeGroup, setPmiAgeGroup] = useState("25-35");
-  const [pmiCoverageLevel, setPmiCoverageLevel] = useState("standard");
-  const [pmiLocation, setPmiLocation] = useState("london");
-  
   const [taxEmployeeSalary, setTaxEmployeeSalary] = useState(30000);
   const [taxBenefitValue, setTaxBenefitValue] = useState(1200);
   const [taxBandRate, setTaxBandRate] = useState(20);
 
-  // ROI Calculator states
+  // ROI Calculator states - focused on sick days and business cost
   const [roiEmployees, setRoiEmployees] = useState(50);
-  const [roiCurrentSickDays, setRoiCurrentSickDays] = useState(8);
   const [roiAverageSalary, setRoiAverageSalary] = useState(35000);
-  const [roiTurnoverRate, setRoiTurnoverRate] = useState(15);
-  const [roiRecruitmentCost, setRoiRecruitmentCost] = useState(5000);
-
-  const calculatePMICost = () => {
-    let baseCost = pmiEmployees * 850; // Base annual cost per employee
-    
-    // Age group multiplier
-    const ageMultiplier = {
-      "18-25": 0.8,
-      "25-35": 1.0,
-      "35-45": 1.2,
-      "45-55": 1.4,
-      "55+": 1.6
-    }[pmiAgeGroup] || 1.0;
-    
-    const locationMultiplier = {
-      "london": 1.2,
-      "southeast": 1.1,
-      "southwest": 1.0,
-      "midlands": 0.95,
-      "north": 0.9,
-      "scotland": 0.9,
-      "wales": 0.9,
-      "ni": 0.85
-    }[pmiLocation] || 1.0;
-    
-    const coverageMultiplier = {
-      "comprehensive": 1.5,
-      "standard": 1.0,
-      "basic": 0.7
-    }[pmiCoverageLevel] || 1.0;
-    
-    const totalCost = baseCost * ageMultiplier * locationMultiplier * coverageMultiplier;
-    return Math.round(totalCost);
-  };
+  const [roiCurrentSickDays, setRoiCurrentSickDays] = useState(8);
+  const [roiEmployeeBenefitsCost, setRoiEmployeeBenefitsCost] = useState(1200);
+  const [roiProductivityLoss, setRoiProductivityLoss] = useState(25);
 
   const calculateTaxImplications = () => {
     const benefitInKind = taxBenefitValue * (taxBandRate / 100);
@@ -71,36 +34,46 @@ const CalculatorsPage = () => {
     };
   };
 
-  const calculateROI = () => {
-    // Current costs
-    const sickDayCost = (roiAverageSalary / 250) * roiCurrentSickDays * roiEmployees; // Assuming 250 working days
-    const turnoverCost = (roiTurnoverRate / 100) * roiEmployees * roiRecruitmentCost;
-    const currentCosts = sickDayCost + turnoverCost;
-
-    // Estimated improvements with health insurance
-    const reducedSickDays = roiCurrentSickDays * 0.25; // 25% reduction
-    const reducedTurnover = roiTurnoverRate * 0.15; // 15% reduction
+  const calculateBusinessROI = () => {
+    // Calculate current costs from sick days
+    const dailySalaryCost = roiAverageSalary / 250; // 250 working days per year
+    const currentSickDayCosts = roiEmployees * roiCurrentSickDays * dailySalaryCost;
     
-    const improvedSickDayCost = (roiAverageSalary / 250) * (roiCurrentSickDays - reducedSickDays) * roiEmployees;
-    const improvedTurnoverCost = ((roiTurnoverRate - reducedTurnover) / 100) * roiEmployees * roiRecruitmentCost;
-    const improvedCosts = improvedSickDayCost + improvedTurnoverCost;
-
-    const annualSavings = currentCosts - improvedCosts;
-    const healthInsuranceCost = roiEmployees * 1200; // Estimated annual cost
-    const netROI = annualSavings - healthInsuranceCost;
+    // Additional productivity loss (covering work, overtime, temp staff)
+    const productivityLossCost = currentSickDayCosts * (roiProductivityLoss / 100);
+    
+    // Total current annual cost
+    const totalCurrentCost = currentSickDayCosts + productivityLossCost;
+    
+    // Potential improvements with employee benefits (PMI)
+    const expectedSickDayReduction = 30; // 30% reduction with good healthcare
+    const reducedSickDays = roiCurrentSickDays * (1 - expectedSickDayReduction / 100);
+    
+    // Calculate costs with benefits
+    const improvedSickDayCosts = roiEmployees * reducedSickDays * dailySalaryCost;
+    const improvedProductivityLoss = improvedSickDayCosts * (roiProductivityLoss / 100);
+    const totalImprovedCost = improvedSickDayCosts + improvedProductivityLoss;
+    
+    // Calculate savings and ROI
+    const annualSavings = totalCurrentCost - totalImprovedCost;
+    const totalBenefitsCost = roiEmployees * roiEmployeeBenefitsCost;
+    const netROI = annualSavings - totalBenefitsCost;
+    const roiPercentage = totalBenefitsCost > 0 ? (netROI / totalBenefitsCost) * 100 : 0;
 
     return {
-      currentCosts: Math.round(currentCosts),
+      currentSickDayCosts: Math.round(currentSickDayCosts),
+      productivityLossCost: Math.round(productivityLossCost),
+      totalCurrentCost: Math.round(totalCurrentCost),
       annualSavings: Math.round(annualSavings),
-      healthInsuranceCost: Math.round(healthInsuranceCost),
+      totalBenefitsCost: Math.round(totalBenefitsCost),
       netROI: Math.round(netROI),
-      roiPercentage: Math.round((netROI / healthInsuranceCost) * 100)
+      roiPercentage: Math.round(roiPercentage),
+      reducedSickDays: Math.round(reducedSickDays * 10) / 10
     };
   };
 
-  const pmiCost = calculatePMICost();
   const taxCalculation = calculateTaxImplications();
-  const roiCalculation = calculateROI();
+  const roiCalculation = calculateBusinessROI();
 
   return (
     <BlogLayout>
@@ -113,147 +86,172 @@ const CalculatorsPage = () => {
       >
         <div className="max-w-4xl mx-auto text-center text-white">
           <h1 className="text-5xl font-bold mb-6 leading-tight">
-            Health Insurance <span className="text-[#22aee1]">Calculators</span>
+            Employee Benefits <span className="text-[#22aee1]">Calculators</span>
           </h1>
           <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-            Interactive tools to help UK SMEs make informed health insurance decisions
+            Interactive tools to help UK SMEs make informed employee benefits decisions
           </p>
+          
+          {/* Contact Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+            <div className="bg-white/10 p-6 rounded-lg">
+              <div className="flex items-center justify-center mb-4">
+                <Mail className="h-8 w-8 text-[#22aee1]" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">Reports & Analysis</h3>
+              <p className="text-sm opacity-90 mb-4">Get expert insights on employee benefits</p>
+              <Button className="w-full bg-[#22aee1] hover:bg-[#20466d]">
+                Contact Our Team
+              </Button>
+            </div>
+            
+            <div className="bg-white/10 p-6 rounded-lg">
+              <div className="flex items-center justify-center mb-4">
+                <ExternalLink className="h-8 w-8 text-[#22aee1]" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">InsureMyHealth Services</h3>
+              <p className="text-sm opacity-90 mb-4">Compare and purchase insurance</p>
+              <Button 
+                className="w-full bg-[#20466d] hover:bg-[#22aee1]"
+                onClick={() => window.open('https://insure-health-made-simple.lovable.app/', '_blank')}
+              >
+                Visit Platform
+              </Button>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Calculator Tools */}
       <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
-          <Tabs defaultValue="pmi-calculator" className="space-y-8">
-            <TabsList className="grid w-full grid-cols-1 md:grid-cols-3 h-auto">
-              <TabsTrigger value="pmi-calculator" className="flex items-center gap-2 p-4">
-                <Calculator className="h-4 w-4" />
-                <span className="hidden sm:inline">PMI Cost Calculator</span>
-                <span className="sm:hidden">PMI Cost</span>
+          <Tabs defaultValue="roi-calculator" className="space-y-8">
+            <TabsList className="grid w-full grid-cols-1 md:grid-cols-2 h-auto">
+              <TabsTrigger value="roi-calculator" className="flex items-center gap-2 p-4">
+                <TrendingUp className="h-4 w-4" />
+                <span className="hidden sm:inline">Business ROI Calculator</span>
+                <span className="sm:hidden">ROI</span>
               </TabsTrigger>
               <TabsTrigger value="tax-calculator" className="flex items-center gap-2 p-4">
                 <FileText className="h-4 w-4" />
                 <span className="hidden sm:inline">Tax Impact Calculator</span>
                 <span className="sm:hidden">Tax Impact</span>
               </TabsTrigger>
-              <TabsTrigger value="roi-calculator" className="flex items-center gap-2 p-4">
-                <TrendingUp className="h-4 w-4" />
-                <span className="hidden sm:inline">ROI Calculator</span>
-                <span className="sm:hidden">ROI</span>
-              </TabsTrigger>
             </TabsList>
 
-            {/* PMI Cost Calculator */}
-            <TabsContent value="pmi-calculator">
+            {/* Business ROI Calculator */}
+            <TabsContent value="roi-calculator">
               <div className="grid lg:grid-cols-2 gap-8">
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-[#20466d] flex items-center gap-2">
-                      <Calculator className="h-5 w-5" />
-                      PMI Cost Calculator
+                      <TrendingUp className="h-5 w-5" />
+                      Business ROI Calculator
                     </CardTitle>
                     <p className="text-[#79858D]">
-                      Estimate your private medical insurance costs based on workforce demographics and coverage requirements.
+                      Calculate the return on investment for employee benefits based on salary costs, sick days, and productivity.
                     </p>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div>
-                      <Label htmlFor="employees">Number of Employees</Label>
+                      <Label htmlFor="roi-employees">Number of Employees</Label>
                       <Input
-                        id="employees"
+                        id="roi-employees"
                         type="number"
-                        value={pmiEmployees}
-                        onChange={(e) => setPmiEmployees(Number(e.target.value))}
+                        value={roiEmployees}
+                        onChange={(e) => setRoiEmployees(Number(e.target.value))}
                         className="mt-1"
                       />
                     </div>
                     
                     <div>
-                      <Label htmlFor="age-group">Workforce Age Group</Label>
-                      <Select value={pmiAgeGroup} onValueChange={setPmiAgeGroup}>
-                        <SelectTrigger className="mt-1">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="18-25">18-25 years</SelectItem>
-                          <SelectItem value="25-35">25-35 years</SelectItem>
-                          <SelectItem value="35-45">35-45 years</SelectItem>
-                          <SelectItem value="45-55">45-55 years</SelectItem>
-                          <SelectItem value="55+">55+ years</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <Label htmlFor="avg-salary">Average Employee Salary (£)</Label>
+                      <Input
+                        id="avg-salary"
+                        type="number"
+                        value={roiAverageSalary}
+                        onChange={(e) => setRoiAverageSalary(Number(e.target.value))}
+                        className="mt-1"
+                      />
                     </div>
 
                     <div>
-                      <Label htmlFor="coverage">Coverage Level</Label>
-                      <Select value={pmiCoverageLevel} onValueChange={setPmiCoverageLevel}>
-                        <SelectTrigger className="mt-1">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="basic">Basic Coverage</SelectItem>
-                          <SelectItem value="standard">Standard Coverage</SelectItem>
-                          <SelectItem value="comprehensive">Comprehensive Coverage</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <Label htmlFor="sick-days">Current Average Sick Days per Employee/Year</Label>
+                      <Input
+                        id="sick-days"
+                        type="number"
+                        value={roiCurrentSickDays}
+                        onChange={(e) => setRoiCurrentSickDays(Number(e.target.value))}
+                        className="mt-1"
+                      />
                     </div>
 
                     <div>
-                      <Label htmlFor="location">Business Location</Label>
-                      <Select value={pmiLocation} onValueChange={setPmiLocation}>
-                        <SelectTrigger className="mt-1">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="london">London</SelectItem>
-                          <SelectItem value="southeast">South East</SelectItem>
-                          <SelectItem value="southwest">South West</SelectItem>
-                          <SelectItem value="midlands">Midlands</SelectItem>
-                          <SelectItem value="north">North England</SelectItem>
-                          <SelectItem value="scotland">Scotland</SelectItem>
-                          <SelectItem value="wales">Wales</SelectItem>
-                          <SelectItem value="ni">Northern Ireland</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <Label htmlFor="benefits-cost">Annual Employee Benefits Cost per Employee (£)</Label>
+                      <Input
+                        id="benefits-cost"
+                        type="number"
+                        value={roiEmployeeBenefitsCost}
+                        onChange={(e) => setRoiEmployeeBenefitsCost(Number(e.target.value))}
+                        className="mt-1"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="productivity-loss">Additional Productivity Loss (%)</Label>
+                      <Input
+                        id="productivity-loss"
+                        type="number"
+                        value={roiProductivityLoss}
+                        onChange={(e) => setRoiProductivityLoss(Number(e.target.value))}
+                        className="mt-1"
+                        placeholder="25"
+                      />
+                      <p className="text-sm text-[#79858D] mt-1">Covering work, overtime, temporary staff costs</p>
                     </div>
                   </CardContent>
                 </Card>
 
                 <Card className="bg-gradient-to-br from-[#22aee1] to-[#20466d] text-white">
                   <CardHeader>
-                    <CardTitle>Estimated Annual Cost</CardTitle>
-                    <p className="text-blue-100">Based on current UK market rates</p>
+                    <CardTitle>Business Impact Analysis</CardTitle>
+                    <p className="text-blue-100">Annual costs and potential savings</p>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    <div className="text-center">
-                      <div className="text-4xl font-bold text-white mb-2">
-                        £{pmiCost.toLocaleString()}
+                    <div className="grid grid-cols-1 gap-4">
+                      <div className="p-4 bg-white/10 rounded-lg">
+                        <div className="text-2xl font-bold">£{roiCalculation.currentSickDayCosts.toLocaleString()}</div>
+                        <p className="text-sm text-blue-100">Current Sick Day Salary Costs</p>
                       </div>
-                      <p className="text-blue-100">Total Annual Premium</p>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="text-center p-4 bg-white/10 rounded-lg">
-                        <div className="text-2xl font-bold text-white">
-                          £{Math.round(pmiCost / pmiEmployees).toLocaleString()}
-                        </div>
-                        <p className="text-sm text-blue-100">Per Employee</p>
+                      <div className="p-4 bg-white/10 rounded-lg">
+                        <div className="text-2xl font-bold">£{roiCalculation.productivityLossCost.toLocaleString()}</div>
+                        <p className="text-sm text-blue-100">Additional Productivity Costs</p>
                       </div>
-                      <div className="text-center p-4 bg-white/10 rounded-lg">
-                        <div className="text-2xl font-bold text-white">
-                          £{Math.round(pmiCost / 12).toLocaleString()}
+                      <div className="p-4 bg-white/10 rounded-lg">
+                        <div className="text-2xl font-bold">£{roiCalculation.totalCurrentCost.toLocaleString()}</div>
+                        <p className="text-sm text-blue-100">Total Current Annual Cost</p>
+                      </div>
+                      <div className="p-4 bg-white/10 rounded-lg">
+                        <div className="text-2xl font-bold">£{roiCalculation.annualSavings.toLocaleString()}</div>
+                        <p className="text-sm text-blue-100">Potential Annual Savings</p>
+                      </div>
+                      <div className="p-4 bg-white/20 rounded-lg border-2 border-white/30">
+                        <div className="text-3xl font-bold">
+                          {roiCalculation.netROI >= 0 ? '+' : ''}£{roiCalculation.netROI.toLocaleString()}
                         </div>
-                        <p className="text-sm text-blue-100">Monthly Cost</p>
+                        <p className="text-sm text-blue-100">Net Annual ROI</p>
+                        <p className="text-xs text-blue-200 mt-1">
+                          {roiCalculation.roiPercentage}% return on investment
+                        </p>
                       </div>
                     </div>
 
                     <div className="space-y-2 text-sm">
-                      <p className="text-blue-100">This estimate includes:</p>
+                      <p className="text-blue-100">Key metrics:</p>
                       <ul className="list-disc list-inside space-y-1 text-blue-200">
-                        <li>Base premium costs</li>
-                        <li>Age group adjustments</li>
-                        <li>Regional pricing variations</li>
-                        <li>Coverage level premiums</li>
+                        <li>Projected sick days: {roiCalculation.reducedSickDays} per employee</li>
+                        <li>30% reduction in sick leave expected</li>
+                        <li>Improved employee satisfaction & retention</li>
                       </ul>
                     </div>
                   </CardContent>
@@ -268,10 +266,10 @@ const CalculatorsPage = () => {
                   <CardHeader>
                     <CardTitle className="text-[#20466d] flex items-center gap-2">
                       <FileText className="h-5 w-5" />
-                      Tax Impact Calculator
+                      Employee Benefits Tax Calculator
                     </CardTitle>
                     <p className="text-[#79858D]">
-                      Calculate the tax implications of providing health insurance as a benefit-in-kind.
+                      Calculate the tax implications of providing employee benefits as benefit-in-kind.
                     </p>
                   </CardHeader>
                   <CardContent className="space-y-6">
@@ -316,7 +314,7 @@ const CalculatorsPage = () => {
                 <Card className="bg-gradient-to-br from-[#22aee1] to-[#20466d] text-white">
                   <CardHeader>
                     <CardTitle>Tax Calculation Results</CardTitle>
-                    <p className="text-blue-100">Annual tax implications</p>
+                    <p className="text-blue-100">Annual tax implications for employee benefits</p>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="grid grid-cols-1 gap-4">
@@ -346,143 +344,46 @@ const CalculatorsPage = () => {
                 </Card>
               </div>
             </TabsContent>
-
-            {/* ROI Calculator */}
-            <TabsContent value="roi-calculator">
-              <div className="grid lg:grid-cols-2 gap-8">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-[#20466d] flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5" />
-                      ROI Calculator
-                    </CardTitle>
-                    <p className="text-[#79858D]">
-                      Calculate the return on investment for your health insurance benefits package.
-                    </p>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div>
-                      <Label htmlFor="roi-employees">Number of Employees</Label>
-                      <Input
-                        id="roi-employees"
-                        type="number"
-                        value={roiEmployees}
-                        onChange={(e) => setRoiEmployees(Number(e.target.value))}
-                        className="mt-1"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="sick-days">Average Annual Sick Days per Employee</Label>
-                      <Input
-                        id="sick-days"
-                        type="number"
-                        value={roiCurrentSickDays}
-                        onChange={(e) => setRoiCurrentSickDays(Number(e.target.value))}
-                        className="mt-1"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="avg-salary">Average Employee Salary (£)</Label>
-                      <Input
-                        id="avg-salary"
-                        type="number"
-                        value={roiAverageSalary}
-                        onChange={(e) => setRoiAverageSalary(Number(e.target.value))}
-                        className="mt-1"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="turnover">Annual Turnover Rate (%)</Label>
-                      <Input
-                        id="turnover"
-                        type="number"
-                        value={roiTurnoverRate}
-                        onChange={(e) => setRoiTurnoverRate(Number(e.target.value))}
-                        className="mt-1"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="recruitment">Average Recruitment Cost per Employee (£)</Label>
-                      <Input
-                        id="recruitment"
-                        type="number"
-                        value={roiRecruitmentCost}
-                        onChange={(e) => setRoiRecruitmentCost(Number(e.target.value))}
-                        className="mt-1"
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-gradient-to-br from-[#22aee1] to-[#20466d] text-white">
-                  <CardHeader>
-                    <CardTitle>ROI Analysis Results</CardTitle>
-                    <p className="text-blue-100">Annual impact of health insurance benefits</p>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="grid grid-cols-1 gap-4">
-                      <div className="p-4 bg-white/10 rounded-lg">
-                        <div className="text-2xl font-bold">£{roiCalculation.currentCosts.toLocaleString()}</div>
-                        <p className="text-sm text-blue-100">Current Annual Costs</p>
-                      </div>
-                      <div className="p-4 bg-white/10 rounded-lg">
-                        <div className="text-2xl font-bold">£{roiCalculation.annualSavings.toLocaleString()}</div>
-                        <p className="text-sm text-blue-100">Potential Annual Savings</p>
-                      </div>
-                      <div className="p-4 bg-white/10 rounded-lg">
-                        <div className="text-2xl font-bold">£{roiCalculation.healthInsuranceCost.toLocaleString()}</div>
-                        <p className="text-sm text-blue-100">Health Insurance Investment</p>
-                      </div>
-                      <div className="p-4 bg-white/20 rounded-lg border-2 border-white/30">
-                        <div className="text-3xl font-bold">
-                          {roiCalculation.netROI >= 0 ? '+' : ''}£{roiCalculation.netROI.toLocaleString()}
-                        </div>
-                        <p className="text-sm text-blue-100">Net Annual ROI</p>
-                        <p className="text-xs text-blue-200 mt-1">
-                          {roiCalculation.roiPercentage}% return on investment
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2 text-sm">
-                      <p className="text-blue-100">Assumptions:</p>
-                      <ul className="list-disc list-inside space-y-1 text-blue-200">
-                        <li>25% reduction in sick days</li>
-                        <li>15% reduction in staff turnover</li>
-                        <li>Improved employee satisfaction</li>
-                      </ul>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
           </Tabs>
-        </div>
-      </section>
 
-      {/* CTA Section */}
-      <section className="py-16 px-4 bg-gray-50">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-[#20466d] mb-4">Need More Detailed Analysis?</h2>
-          <p className="text-lg text-[#79858D] mb-8">
-            Our calculators provide estimates based on market averages. For personalised quotes and detailed analysis, 
-            explore our comprehensive insights or use our compliance tools.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" className="bg-[#22aee1] hover:bg-[#20466d]">
-              <Link to="/compliance-tools">
-                Check Compliance
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link to="/">
-                View Latest Insights
-              </Link>
-            </Button>
+          {/* Contact Section */}
+          <div className="mt-16 grid md:grid-cols-2 gap-8">
+            <Card className="text-center p-8 border-[#79858D]/20 hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-16 h-16 bg-[#22aee1] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Mail className="h-8 w-8 text-white" />
+                </div>
+                <CardTitle className="text-[#20466d] text-2xl mb-4">Reports & Insights</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-[#79858D] mb-6">
+                  Questions about our employee benefits analysis, reports, or want expert guidance?
+                </p>
+                <Button className="w-full bg-[#22aee1] hover:bg-[#20466d]">
+                  Contact Reports Team
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center p-8 border-[#79858D]/20 hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="w-16 h-16 bg-[#20466d] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <ExternalLink className="h-8 w-8 text-white" />
+                </div>
+                <CardTitle className="text-[#20466d] text-2xl mb-4">InsureMyHealth Services</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-[#79858D] mb-6">
+                  Ready to compare and purchase employee benefits packages?
+                </p>
+                <Button 
+                  className="w-full bg-[#20466d] hover:bg-[#22aee1]"
+                  onClick={() => window.open('https://insure-health-made-simple.lovable.app/', '_blank')}
+                >
+                  Visit InsureMyHealth
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
