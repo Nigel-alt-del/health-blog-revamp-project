@@ -27,8 +27,8 @@ const BlogLayout = ({ children }: { children: React.ReactNode }) => {
             <div className="flex items-center">
               <Link to="/" className="flex items-center">
                 <img 
-                  src="/lovable-uploads/b61ae919-b75e-409d-a884-8437e2befc15.png" 
-                  alt="The Health Compass Logo" 
+                  src="/lovable-uploads/7e735a1d-1775-4265-95b3-6d72ae392f04.png" 
+                  alt="InsureMyHealth Logo" 
                   className="h-10 w-auto mr-3"
                 />
                 <span className="text-2xl font-bold text-[#20466d]">
