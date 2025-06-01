@@ -1,4 +1,3 @@
-
 import { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Home, User, Search, Menu, Settings, Mail, ExternalLink } from "lucide-react";
@@ -19,7 +18,6 @@ const BlogLayout = ({ children }: BlogLayoutProps) => {
     { name: "Our Expertise", href: "/expertise" },
     { name: "Calculators", href: "/calculators" },
     { name: "Compliance Tools", href: "/compliance-tools" },
-    { name: "Resources", href: "/resources" },
     { name: "Contact", href: "/contact" },
     { name: "Admin", href: "/admin", icon: Settings },
   ];
@@ -287,7 +285,6 @@ const BlogLayout = ({ children }: BlogLayoutProps) => {
               <ul className="space-y-2 text-gray-300">
                 <li><Link to="/calculators" className="hover:text-[#22aee1]">Cost Calculators</Link></li>
                 <li><Link to="/compliance-tools" className="hover:text-[#22aee1]">Compliance Tools</Link></li>
-                <li><Link to="/resources" className="hover:text-[#22aee1]">Resource Library</Link></li>
                 <li><Link to="/expertise" className="hover:text-[#22aee1]">Our Expertise</Link></li>
               </ul>
             </div>
