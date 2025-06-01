@@ -8,8 +8,14 @@ import { CreatePostForm } from "./CreatePostForm";
 import { blogPosts } from "@/data/blogPosts";
 
 const AdminDashboard = () => {
+  console.log("AdminDashboard rendering");
+  console.log("Blog posts:", blogPosts);
+  
   const [posts, setPosts] = useState(blogPosts);
   const [isCreating, setIsCreating] = useState(false);
+
+  console.log("Current posts state:", posts);
+  console.log("Is creating:", isCreating);
 
   const handleCreatePost = (newPost: any) => {
     const post = {
@@ -65,10 +71,15 @@ const AdminDashboard = () => {
           </Button>
         </div>
 
-        <PostListView 
-          posts={posts}
-          onDeletePost={handleDeletePost}
-        />
+        <div className="bg-white p-4 rounded-lg shadow">
+          <p className="text-sm text-gray-600 mb-4">
+            Debug Info: {posts.length} posts loaded
+          </p>
+          <PostListView 
+            posts={posts}
+            onDeletePost={handleDeletePost}
+          />
+        </div>
       </div>
     </BlogLayout>
   );
