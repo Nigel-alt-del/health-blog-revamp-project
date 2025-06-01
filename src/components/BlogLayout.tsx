@@ -31,12 +31,12 @@ const BlogLayout = ({ children }: BlogLayoutProps) => {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">IH</span>
+              <div className="w-10 h-10 bg-[#20466d] rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-lg">IMH</span>
               </div>
               <div>
-                <h1 className="font-bold text-xl text-gray-900">InsureMyHealth</h1>
-                <p className="text-sm text-gray-500">Expert Insights</p>
+                <h1 className="font-bold text-xl text-[#20466d]">InsureMyHealth</h1>
+                <p className="text-sm text-[#79858D]">Expert Insights</p>
               </div>
             </Link>
 
@@ -46,8 +46,8 @@ const BlogLayout = ({ children }: BlogLayoutProps) => {
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`text-sm font-medium transition-colors hover:text-blue-600 ${
-                    isActive(item.href) ? "text-blue-600" : "text-gray-700"
+                  className={`text-sm font-medium transition-colors hover:text-[#22aee1] ${
+                    isActive(item.href) ? "text-[#22aee1]" : "text-[#20466d]"
                   }`}
                 >
                   {item.name}
@@ -68,8 +68,8 @@ const BlogLayout = ({ children }: BlogLayoutProps) => {
                     <Link
                       key={item.name}
                       to={item.href}
-                      className={`text-lg font-medium transition-colors hover:text-blue-600 ${
-                        isActive(item.href) ? "text-blue-600" : "text-gray-700"
+                      className={`text-lg font-medium transition-colors hover:text-[#22aee1] ${
+                        isActive(item.href) ? "text-[#22aee1]" : "text-[#20466d]"
                       }`}
                     >
                       {item.name}
@@ -86,20 +86,20 @@ const BlogLayout = ({ children }: BlogLayoutProps) => {
       <main>{children}</main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 px-4">
+      <footer className="bg-[#20466d] text-white py-12 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">IH</span>
+                <div className="w-10 h-10 bg-[#22aee1] rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">IMH</span>
                 </div>
                 <div>
                   <h3 className="font-bold text-xl">InsureMyHealth Blog</h3>
-                  <p className="text-gray-400">Expert Health Insurance Insights</p>
+                  <p className="text-[#22aee1]">Expert Health Insurance Insights</p>
                 </div>
               </div>
-              <p className="text-gray-400 max-w-md">
+              <p className="text-gray-300 max-w-md">
                 Providing expert analysis and insights on health insurance trends, 
                 policy changes, and best practices for consumers and industry professionals.
               </p>
@@ -107,24 +107,24 @@ const BlogLayout = ({ children }: BlogLayoutProps) => {
             
             <div>
               <h4 className="font-semibold mb-4">Categories</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link to="/category/health-policy" className="hover:text-white">Health Policy</Link></li>
-                <li><Link to="/category/insurance-tips" className="hover:text-white">Insurance Tips</Link></li>
-                <li><Link to="/category/industry-news" className="hover:text-white">Industry News</Link></li>
+              <ul className="space-y-2 text-gray-300">
+                <li><Link to="/category/health-policy" className="hover:text-[#22aee1]">Health Policy</Link></li>
+                <li><Link to="/category/insurance-tips" className="hover:text-[#22aee1]">Insurance Tips</Link></li>
+                <li><Link to="/category/industry-news" className="hover:text-[#22aee1]">Industry News</Link></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold mb-4">Connect</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link to="/about" className="hover:text-white">About Us</Link></li>
-                <li><a href="https://insure-health-made-simple.lovable.app/" className="hover:text-white">Main Website</a></li>
-                <li><a href="#" className="hover:text-white">Contact</a></li>
+              <ul className="space-y-2 text-gray-300">
+                <li><Link to="/about" className="hover:text-[#22aee1]">About Us</Link></li>
+                <li><a href="https://insure-health-made-simple.lovable.app/" className="hover:text-[#22aee1]">Main Website</a></li>
+                <li><a href="#" className="hover:text-[#22aee1]">Contact</a></li>
               </ul>
             </div>
           </div>
           
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+          <div className="border-t border-[#79858D] mt-8 pt-8 text-center text-gray-300">
             <p>&copy; 2024 InsureMyHealth. All rights reserved.</p>
           </div>
         </div>

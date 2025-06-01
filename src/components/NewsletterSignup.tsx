@@ -26,13 +26,13 @@ const NewsletterSignup = () => {
 
   if (isSubscribed) {
     return (
-      <section className="py-16 px-4 bg-blue-600">
+      <section className="py-16 px-4 bg-[#20466d]">
         <div className="max-w-4xl mx-auto text-center">
           <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="h-8 w-8 text-blue-600" />
+            <CheckCircle className="h-8 w-8 text-[#22aee1]" />
           </div>
           <h2 className="text-3xl font-bold text-white mb-4">You're all set!</h2>
-          <p className="text-blue-100 text-lg">
+          <p className="text-[#22aee1] text-lg">
             Thank you for subscribing to our newsletter. You'll receive the latest insights directly in your inbox.
           </p>
         </div>
@@ -41,13 +41,13 @@ const NewsletterSignup = () => {
   }
 
   return (
-    <section className="py-16 px-4 bg-blue-600">
+    <section className="py-16 px-4 bg-[#20466d]">
       <div className="max-w-4xl mx-auto text-center">
         <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
-          <Mail className="h-8 w-8 text-blue-600" />
+          <Mail className="h-8 w-8 text-[#22aee1]" />
         </div>
         <h2 className="text-3xl font-bold text-white mb-4">Stay Informed</h2>
-        <p className="text-blue-100 text-lg mb-8 max-w-2xl mx-auto">
+        <p className="text-[#22aee1] text-lg mb-8 max-w-2xl mx-auto">
           Get the latest health insurance insights, policy updates, and expert analysis 
           delivered directly to your inbox.
         </p>
@@ -61,13 +61,13 @@ const NewsletterSignup = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="text-center"
+                className="text-center border-[#79858D] focus:border-[#22aee1] focus:ring-[#22aee1]"
               />
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full bg-[#22aee1] hover:bg-[#20466d]">
                 Subscribe to Newsletter
               </Button>
             </form>
-            <p className="text-xs text-gray-500 mt-4">
+            <p className="text-xs text-[#79858D] mt-4">
               We respect your privacy. Unsubscribe at any time.
             </p>
           </CardContent>

@@ -22,35 +22,35 @@ interface BlogCardProps {
 
 const BlogCard = ({ post }: BlogCardProps) => {
   return (
-    <Card className="h-full hover:shadow-lg transition-shadow duration-300 group">
+    <Card className="h-full hover:shadow-lg transition-shadow duration-300 group border-[#79858D]/20">
       <CardHeader className="pb-4">
-        <div className="w-full h-48 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg mb-4 flex items-center justify-center">
+        <div className="w-full h-48 bg-gradient-to-br from-[#22aee1] to-[#20466d] rounded-lg mb-4 flex items-center justify-center">
           <div className="text-center">
-            <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-2">
-              <span className="text-white font-bold">IH</span>
+            <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center mx-auto mb-2">
+              <span className="text-[#20466d] font-bold">IMH</span>
             </div>
-            <p className="text-blue-700 text-sm font-medium">{post.category}</p>
+            <p className="text-white text-sm font-medium">{post.category}</p>
           </div>
         </div>
-        <Badge variant="secondary" className="w-fit">
+        <Badge variant="secondary" className="w-fit bg-[#22aee1] text-white">
           {post.category}
         </Badge>
       </CardHeader>
       
       <CardContent className="pt-0">
         <Link to={`/post/${post.id}`} className="block">
-          <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors leading-tight">
+          <h3 className="text-xl font-bold text-[#20466d] mb-3 group-hover:text-[#22aee1] transition-colors leading-tight">
             {post.title}
           </h3>
-          <p className="text-gray-600 mb-4 leading-relaxed line-clamp-3">
+          <p className="text-[#79858D] mb-4 leading-relaxed line-clamp-3">
             {post.excerpt}
           </p>
         </Link>
         
-        <div className="flex items-center justify-between text-sm text-gray-500">
+        <div className="flex items-center justify-between text-sm text-[#79858D]">
           <div className="flex items-center space-x-2">
-            <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center">
-              <User className="h-3 w-3 text-gray-600" />
+            <div className="w-6 h-6 bg-[#79858D] rounded-full flex items-center justify-center">
+              <User className="h-3 w-3 text-white" />
             </div>
             <span className="font-medium">{post.author}</span>
           </div>
