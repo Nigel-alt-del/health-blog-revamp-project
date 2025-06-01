@@ -5,6 +5,16 @@ import { Menu, X } from "lucide-react";
 
 const BlogNavigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [logoError, setLogoError] = useState(false);
+
+  const handleLogoError = () => {
+    console.log("Logo failed to load from: /lovable-uploads/136e3191-2c26-49ed-a729-90454a8efcce.png");
+    setLogoError(true);
+  };
+
+  const handleLogoLoad = () => {
+    console.log("Logo loaded successfully");
+  };
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
@@ -12,11 +22,19 @@ const BlogNavigation = () => {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
-              <img 
-                src="/lovable-uploads/136e3191-2c26-49ed-a729-90454a8efcce.png" 
-                alt="InsureMyHealth Logo" 
-                className="h-10 w-auto mr-3"
-              />
+              {!logoError ? (
+                <img 
+                  src="/lovable-uploads/136e3191-2c26-49ed-a729-90454a8efcce.png" 
+                  alt="InsureMyHealth Logo" 
+                  className="h-10 w-auto mr-3"
+                  onError={handleLogoError}
+                  onLoad={handleLogoLoad}
+                />
+              ) : (
+                <div className="h-10 w-10 bg-[#20466d] rounded mr-3 flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">IMH</span>
+                </div>
+              )}
               <span className="text-2xl font-bold text-[#20466d]">
                 The Health Compass
               </span>
