@@ -1,4 +1,3 @@
-
 import { useParams } from "react-router-dom";
 import { Filter } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +18,13 @@ const BlogCategory = () => {
   // Update category display names
   const displayCategoryName = categoryName === "Health Policy" ? "Healthcare" : categoryName;
 
+  const getHeroTitle = () => {
+    if (category === 'industry-news') return 'Industry News';
+    if (category === 'pmi-insights') return 'PMI Insights';
+    if (category === 'healthcare') return 'Healthcare Intelligence';
+    return `${displayCategoryName} Intelligence`;
+  };
+
   return (
     <BlogLayout>
       {/* Banner Section */}
@@ -34,7 +40,7 @@ const BlogCategory = () => {
             Category
           </Badge>
           <h1 className="text-5xl font-bold mb-6 leading-tight">
-            {displayCategoryName} <span className="text-[#22aee1]">Intelligence</span>
+            {getHeroTitle()}
           </h1>
           <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
             {categoryPosts.length} insight{categoryPosts.length !== 1 ? 's' : ''} in this category
