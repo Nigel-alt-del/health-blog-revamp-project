@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, Clock, ArrowRight, Calculator, Shield, FileText } from "lucide-react";
+import { Search, Clock, ArrowRight, Calculator, TrendingUp, FileText } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -41,20 +41,20 @@ const BlogHome = () => {
             designed for UK small and medium enterprises
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-            <Button asChild size="lg" className="bg-[#22aee1] hover:bg-white hover:text-[#22aee1]">
-              <Link to="/resources">
-                <FileText className="mr-2 h-5 w-5" />
-                Browse Resources
+            <Button asChild size="lg" className="bg-[#22aee1] hover:bg-[#20466d] text-white transition-colors">
+              <Link to="/calculators">
+                <Calculator className="mr-2 h-5 w-5" />
+                Try Our Calculators
               </Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="text-white border-white hover:bg-white hover:text-[#20466d]">
-              <Link to="/expertise">
-                <Shield className="mr-2 h-5 w-5" />
-                Our Expertise
+            <Button asChild size="lg" className="bg-[#22aee1] hover:bg-[#20466d] text-white transition-colors">
+              <Link to="/compliance-tools">
+                <FileText className="mr-2 h-5 w-5" />
+                Compliance Tools
               </Link>
             </Button>
           </div>
-          <div className="flex items-center justify-centre space-x-4 text-sm text-gray-200">
+          <div className="flex items-center justify-center space-x-4 text-sm text-gray-200">
             <span>UK Market Analysis</span>
             <span>•</span>
             <span>SME-Focused Intelligence</span>

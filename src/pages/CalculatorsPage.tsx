@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import BlogLayout from "@/components/BlogLayout";
@@ -220,37 +219,37 @@ const CalculatorsPage = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-[#20466d] text-white">
+                <Card className="bg-gradient-to-br from-[#22aee1] to-[#20466d] text-white">
                   <CardHeader>
                     <CardTitle>Estimated Annual Cost</CardTitle>
-                    <p className="text-gray-200">Based on current UK market rates</p>
+                    <p className="text-blue-100">Based on current UK market rates</p>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="text-center">
-                      <div className="text-4xl font-bold text-[#22aee1] mb-2">
+                      <div className="text-4xl font-bold text-white mb-2">
                         £{pmiCost.toLocaleString()}
                       </div>
-                      <p className="text-gray-200">Total Annual Premium</p>
+                      <p className="text-blue-100">Total Annual Premium</p>
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div className="text-center p-4 bg-white/10 rounded-lg">
-                        <div className="text-2xl font-bold text-[#22aee1]">
+                        <div className="text-2xl font-bold text-white">
                           £{Math.round(pmiCost / pmiEmployees).toLocaleString()}
                         </div>
-                        <p className="text-sm text-gray-200">Per Employee</p>
+                        <p className="text-sm text-blue-100">Per Employee</p>
                       </div>
                       <div className="text-center p-4 bg-white/10 rounded-lg">
-                        <div className="text-2xl font-bold text-[#22aee1]">
+                        <div className="text-2xl font-bold text-white">
                           £{Math.round(pmiCost / 12).toLocaleString()}
                         </div>
-                        <p className="text-sm text-gray-200">Monthly Cost</p>
+                        <p className="text-sm text-blue-100">Monthly Cost</p>
                       </div>
                     </div>
 
                     <div className="space-y-2 text-sm">
-                      <p className="text-gray-200">This estimate includes:</p>
-                      <ul className="list-disc list-inside space-y-1 text-gray-300">
+                      <p className="text-blue-100">This estimate includes:</p>
+                      <ul className="list-disc list-inside space-y-1 text-blue-200">
                         <li>Base premium costs</li>
                         <li>Age group adjustments</li>
                         <li>Regional pricing variations</li>
@@ -314,7 +313,7 @@ const CalculatorsPage = () => {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-[#22aee1] text-white">
+                <Card className="bg-gradient-to-br from-[#22aee1] to-[#20466d] text-white">
                   <CardHeader>
                     <CardTitle>Tax Calculation Results</CardTitle>
                     <p className="text-blue-100">Annual tax implications</p>
@@ -471,17 +470,17 @@ const CalculatorsPage = () => {
           <h2 className="text-3xl font-bold text-[#20466d] mb-4">Need More Detailed Analysis?</h2>
           <p className="text-lg text-[#79858D] mb-8">
             Our calculators provide estimates based on market averages. For personalised quotes and detailed analysis, 
-            explore our comprehensive resources or use our compliance tools.
+            explore our comprehensive insights or use our compliance tools.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-centre">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="bg-[#22aee1] hover:bg-[#20466d]">
               <Link to="/compliance-tools">
                 Check Compliance
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg">
-              <Link to="/resources">
-                Download Resources
+              <Link to="/">
+                View Latest Insights
               </Link>
             </Button>
           </div>
