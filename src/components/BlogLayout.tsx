@@ -15,9 +15,11 @@ const BlogLayout = ({ children }: BlogLayoutProps) => {
   
   const navigation = [
     { name: "Home", href: "/", icon: Home },
-    { name: "Healthcare", href: "/category/health-policy" },
-    { name: "PMI Insights", href: "/category/insurance-tips" },
-    { name: "Industry News", href: "/category/industry-news" },
+    { name: "About", href: "/about" },
+    { name: "Our Expertise", href: "/expertise" },
+    { name: "Calculators", href: "/calculators" },
+    { name: "Compliance Tools", href: "/compliance-tools" },
+    { name: "Resources", href: "/resources" },
     { name: "Contact", href: "/contact" },
     { name: "Admin", href: "/admin", icon: Settings },
   ];
@@ -211,12 +213,12 @@ const BlogLayout = ({ children }: BlogLayoutProps) => {
               </div>
               <div>
                 <h1 className="font-bold text-xl text-[#20466d]">InsureMyHealth</h1>
-                <p className="text-sm text-[#79858D]">Health Insurance Insights</p>
+                <p className="text-sm text-[#79858D]">UK Health Insurance Insights</p>
               </div>
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-8">
+            <nav className="hidden lg:flex items-center space-x-6">
               {navigation.map((item) => (
                 <Link
                   key={item.name}
@@ -232,7 +234,7 @@ const BlogLayout = ({ children }: BlogLayoutProps) => {
 
             {/* Mobile Menu */}
             <Sheet>
-              <SheetTrigger asChild className="md:hidden">
+              <SheetTrigger asChild className="lg:hidden">
                 <Button variant="ghost" size="sm">
                   <Menu className="h-5 w-5" />
                 </Button>
@@ -271,35 +273,37 @@ const BlogLayout = ({ children }: BlogLayoutProps) => {
                 </div>
                 <div>
                   <h3 className="font-bold text-xl">InsureMyHealth Reports</h3>
-                  <p className="text-[#22aee1]">Health Insurance Insights</p>
+                  <p className="text-[#22aee1]">UK Health Insurance Insights</p>
                 </div>
               </div>
               <p className="text-gray-300 max-w-md">
-                Providing analysis and insights on health insurance trends, 
-                policy changes, and best practices for consumers and industry professionals.
+                Empowering UK SMEs with expert health insurance analysis, interactive tools, 
+                and practical guidance for informed decision-making.
               </p>
             </div>
             
             <div>
-              <h4 className="font-semibold mb-4">Categories</h4>
+              <h4 className="font-semibold mb-4">Tools & Resources</h4>
               <ul className="space-y-2 text-gray-300">
-                <li><Link to="/category/health-policy" className="hover:text-[#22aee1]">Healthcare</Link></li>
-                <li><Link to="/category/insurance-tips" className="hover:text-[#22aee1]">PMI Insights</Link></li>
-                <li><Link to="/category/industry-news" className="hover:text-[#22aee1]">Industry News</Link></li>
+                <li><Link to="/calculators" className="hover:text-[#22aee1]">Cost Calculators</Link></li>
+                <li><Link to="/compliance-tools" className="hover:text-[#22aee1]">Compliance Tools</Link></li>
+                <li><Link to="/resources" className="hover:text-[#22aee1]">Resource Library</Link></li>
+                <li><Link to="/expertise" className="hover:text-[#22aee1]">Our Expertise</Link></li>
               </ul>
             </div>
             
             <div>
-              <h4 className="font-semibold mb-4">Connect</h4>
+              <h4 className="font-semibold mb-4">Company</h4>
               <ul className="space-y-2 text-gray-300">
-                <li><Link to="/contact" className="hover:text-[#22aee1]">Contact Us</Link></li>
-                <li><a href="https://insure-health-made-simple.lovable.app/" className="hover:text-[#22aee1]">Main Website</a></li>
+                <li><Link to="/about" className="hover:text-[#22aee1]">About Us</Link></li>
+                <li><Link to="/contact" className="hover:text-[#22aee1]">Contact</Link></li>
+                <li><a href="https://insure-health-made-simple.lovable.app/" className="hover:text-[#22aee1]">InsureMyHealth Platform</a></li>
               </ul>
             </div>
           </div>
           
           <div className="border-t border-[#79858D] mt-8 pt-8 text-center text-gray-300">
-            <p>&copy; 2024 InsureMyHealth. All rights reserved.</p>
+            <p>&copy; 2024 InsureMyHealth. All rights reserved. | Empowering UK SMEs with health insurance expertise.</p>
           </div>
         </div>
       </footer>
