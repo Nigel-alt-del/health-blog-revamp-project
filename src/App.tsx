@@ -8,6 +8,7 @@ import BlogHome from "./pages/BlogHome";
 import BlogPost from "./pages/BlogPost";
 import BlogCategory from "./pages/BlogCategory";
 import AboutBlog from "./pages/AboutBlog";
+import BlogAdmin from "./pages/BlogAdmin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/post/:slug" element={<BlogPost />} />
           <Route path="/category/:category" element={<BlogCategory />} />
           <Route path="/about" element={<AboutBlog />} />
+          <Route path="/admin" element={<BlogAdmin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

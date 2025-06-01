@@ -1,7 +1,7 @@
 
 import { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, User, Search, Menu } from "lucide-react";
+import { Home, User, Search, Menu, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
@@ -18,6 +18,7 @@ const BlogLayout = ({ children }: BlogLayoutProps) => {
     { name: "Insurance Tips", href: "/category/insurance-tips" },
     { name: "Industry News", href: "/category/industry-news" },
     { name: "About", href: "/about", icon: User },
+    { name: "Admin", href: "/admin", icon: Settings },
   ];
 
   const isActive = (href: string) => location.pathname === href;
