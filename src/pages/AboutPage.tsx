@@ -15,7 +15,7 @@ const AboutPage = () => {
       >
         <div className="max-w-4xl mx-auto text-center text-white">
           <h1 className="text-5xl font-bold mb-6 leading-tight">
-            About <span className="text-[#22aee1]">InsureMyHealth Reports</span>
+            About <span className="text-[#22aee1]">Insure My Health</span>
           </h1>
           <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
             Your trusted source for UK employee benefits intelligence, market analysis, and strategic insights for small and medium enterprises.
@@ -29,7 +29,7 @@ const AboutPage = () => {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-[#20466d] mb-6">Our Mission</h2>
             <p className="text-lg text-[#79858D] max-w-3xl mx-auto">
-              We empower UK small and medium enterprises with expert analysis, practical tools, and strategic insights 
+              We empower UK small and medium enterprises with analysis, practical tools, and strategic insights 
               to make informed decisions about employee benefits and private medical insurance.
             </p>
           </div>
@@ -90,12 +90,12 @@ const AboutPage = () => {
               <CardHeader>
                 <CardTitle className="text-[#20466d] flex items-center gap-2">
                   <Users className="h-5 w-5" />
-                  Expert Analysis
+                  Analysis
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-[#79858D]">
-                  Our team of industry experts provides comprehensive analysis of employee benefits trends, 
+                  Our team provides comprehensive analysis of employee benefits trends, 
                   regulatory changes, and market developments affecting UK SMEs.
                 </p>
               </CardContent>

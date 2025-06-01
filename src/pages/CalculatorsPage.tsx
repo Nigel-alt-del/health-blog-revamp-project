@@ -7,20 +7,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calculator, TrendingUp, FileText, Mail, ExternalLink } from "lucide-react";
+import { Calculator, TrendingUp, FileText, Mail, ExternalLink, Info } from "lucide-react";
 
 const CalculatorsPage = () => {
   const [taxEmployeeSalary, setTaxEmployeeSalary] = useState(30000);
   const [taxBenefitValue, setTaxBenefitValue] = useState(1200);
   const [taxBandRate, setTaxBandRate] = useState(20);
 
-  // ROI Calculator states - focused on sick days and business cost
+  // Business ROI Calculator states - based on the correct formula
   const [roiEmployees, setRoiEmployees] = useState(50);
   const [roiAverageSalary, setRoiAverageSalary] = useState(35000);
-  const [roiCurrentSickDays, setRoiCurrentSickDays] = useState(8);
-  const [roiEmployeeBenefitsCost, setRoiEmployeeBenefitsCost] = useState(1200);
-  const [roiProductivityLoss, setRoiProductivityLoss] = useState(25);
+  const [roiSickDaysPerEmployee, setRoiSickDaysPerEmployee] = useState(8);
+  const [roiIndirectCostPercentage, setRoiIndirectCostPercentage] = useState([20]);
 
   const calculateTaxImplications = () => {
     const benefitInKind = taxBenefitValue * (taxBandRate / 100);
@@ -35,40 +35,21 @@ const CalculatorsPage = () => {
   };
 
   const calculateBusinessROI = () => {
-    // Calculate current costs from sick days
-    const dailySalaryCost = roiAverageSalary / 250; // 250 working days per year
-    const currentSickDayCosts = roiEmployees * roiCurrentSickDays * dailySalaryCost;
+    // Calculate direct cost of sick days
+    const averageDailySalary = roiAverageSalary / 250; // 250 working days per year
+    const directCostOfSickDays = roiEmployees * averageDailySalary * roiSickDaysPerEmployee;
     
-    // Additional productivity loss (covering work, overtime, temp staff)
-    const productivityLossCost = currentSickDayCosts * (roiProductivityLoss / 100);
-    
-    // Total current annual cost
-    const totalCurrentCost = currentSickDayCosts + productivityLossCost;
-    
-    // Potential improvements with employee benefits (PMI)
-    const expectedSickDayReduction = 30; // 30% reduction with good healthcare
-    const reducedSickDays = roiCurrentSickDays * (1 - expectedSickDayReduction / 100);
-    
-    // Calculate costs with benefits
-    const improvedSickDayCosts = roiEmployees * reducedSickDays * dailySalaryCost;
-    const improvedProductivityLoss = improvedSickDayCosts * (roiProductivityLoss / 100);
-    const totalImprovedCost = improvedSickDayCosts + improvedProductivityLoss;
-    
-    // Calculate savings and ROI
-    const annualSavings = totalCurrentCost - totalImprovedCost;
-    const totalBenefitsCost = roiEmployees * roiEmployeeBenefitsCost;
-    const netROI = annualSavings - totalBenefitsCost;
-    const roiPercentage = totalBenefitsCost > 0 ? (netROI / totalBenefitsCost) * 100 : 0;
+    // Calculate total cost including indirect costs
+    const indirectCostMultiplier = 1 + (roiIndirectCostPercentage[0] / 100);
+    const totalCostOfSickDays = directCostOfSickDays * indirectCostMultiplier;
+    const indirectCosts = totalCostOfSickDays - directCostOfSickDays;
 
     return {
-      currentSickDayCosts: Math.round(currentSickDayCosts),
-      productivityLossCost: Math.round(productivityLossCost),
-      totalCurrentCost: Math.round(totalCurrentCost),
-      annualSavings: Math.round(annualSavings),
-      totalBenefitsCost: Math.round(totalBenefitsCost),
-      netROI: Math.round(netROI),
-      roiPercentage: Math.round(roiPercentage),
-      reducedSickDays: Math.round(reducedSickDays * 10) / 10
+      directCost: Math.round(directCostOfSickDays),
+      indirectCosts: Math.round(indirectCosts),
+      totalCost: Math.round(totalCostOfSickDays),
+      averageDailySalary: Math.round(averageDailySalary),
+      indirectPercentage: roiIndirectCostPercentage[0]
     };
   };
 
@@ -91,34 +72,6 @@ const CalculatorsPage = () => {
           <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
             Interactive tools to help UK SMEs make informed employee benefits decisions
           </p>
-          
-          {/* Contact Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-            <div className="bg-white/10 p-6 rounded-lg">
-              <div className="flex items-center justify-center mb-4">
-                <Mail className="h-8 w-8 text-[#22aee1]" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">Reports & Analysis</h3>
-              <p className="text-sm opacity-90 mb-4">Get expert insights on employee benefits</p>
-              <Button className="w-full bg-[#22aee1] hover:bg-[#20466d]">
-                Contact Our Team
-              </Button>
-            </div>
-            
-            <div className="bg-white/10 p-6 rounded-lg">
-              <div className="flex items-center justify-center mb-4">
-                <ExternalLink className="h-8 w-8 text-[#22aee1]" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">InsureMyHealth Services</h3>
-              <p className="text-sm opacity-90 mb-4">Compare and purchase insurance</p>
-              <Button 
-                className="w-full bg-[#20466d] hover:bg-[#22aee1]"
-                onClick={() => window.open('https://insure-health-made-simple.lovable.app/', '_blank')}
-              >
-                Visit Platform
-              </Button>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -149,7 +102,7 @@ const CalculatorsPage = () => {
                       Business ROI Calculator
                     </CardTitle>
                     <p className="text-[#79858D]">
-                      Calculate the return on investment for employee benefits based on salary costs, sick days, and productivity.
+                      Calculate the direct and indirect costs of sick days to your business.
                     </p>
                   </CardHeader>
                   <CardContent className="space-y-6">
@@ -176,83 +129,85 @@ const CalculatorsPage = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="sick-days">Current Average Sick Days per Employee/Year</Label>
+                      <Label htmlFor="sick-days">Average Sick Days per Employee per Year</Label>
                       <Input
                         id="sick-days"
                         type="number"
-                        value={roiCurrentSickDays}
-                        onChange={(e) => setRoiCurrentSickDays(Number(e.target.value))}
+                        value={roiSickDaysPerEmployee}
+                        onChange={(e) => setRoiSickDaysPerEmployee(Number(e.target.value))}
                         className="mt-1"
                       />
                     </div>
 
                     <div>
-                      <Label htmlFor="benefits-cost">Annual Employee Benefits Cost per Employee (£)</Label>
-                      <Input
-                        id="benefits-cost"
-                        type="number"
-                        value={roiEmployeeBenefitsCost}
-                        onChange={(e) => setRoiEmployeeBenefitsCost(Number(e.target.value))}
-                        className="mt-1"
+                      <Label htmlFor="indirect-costs">Indirect Cost Percentage: {roiIndirectCostPercentage[0]}%</Label>
+                      <Slider
+                        id="indirect-costs"
+                        min={20}
+                        max={100}
+                        step={5}
+                        value={roiIndirectCostPercentage}
+                        onValueChange={setRoiIndirectCostPercentage}
+                        className="mt-2"
                       />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="productivity-loss">Additional Productivity Loss (%)</Label>
-                      <Input
-                        id="productivity-loss"
-                        type="number"
-                        value={roiProductivityLoss}
-                        onChange={(e) => setRoiProductivityLoss(Number(e.target.value))}
-                        className="mt-1"
-                        placeholder="25"
-                      />
-                      <p className="text-sm text-[#79858D] mt-1">Covering work, overtime, temporary staff costs</p>
+                      <div className="flex justify-between text-sm text-[#79858D] mt-1">
+                        <span>20%</span>
+                        <span>100%</span>
+                      </div>
+                      <div className="mt-2 p-3 bg-blue-50 rounded-lg">
+                        <div className="flex items-start gap-2">
+                          <Info className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                          <div className="text-sm text-blue-800">
+                            <p className="font-medium mb-1">Indirect costs include:</p>
+                            <ul className="text-xs space-y-1">
+                              <li>• Loss of productivity, project delays</li>
+                              <li>• Overtime for other staff</li>
+                              <li>• Temporary staffing costs</li>
+                              <li>• Reduced quality, administrative costs</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
 
                 <Card className="bg-gradient-to-br from-[#22aee1] to-[#20466d] text-white">
                   <CardHeader>
-                    <CardTitle>Business Impact Analysis</CardTitle>
-                    <p className="text-blue-100">Annual costs and potential savings</p>
+                    <CardTitle>Cost of Sick Days Analysis</CardTitle>
+                    <p className="text-blue-100">Annual impact on your business</p>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="grid grid-cols-1 gap-4">
                       <div className="p-4 bg-white/10 rounded-lg">
-                        <div className="text-2xl font-bold">£{roiCalculation.currentSickDayCosts.toLocaleString()}</div>
-                        <p className="text-sm text-blue-100">Current Sick Day Salary Costs</p>
+                        <div className="text-lg font-bold">£{roiCalculation.averageDailySalary}</div>
+                        <p className="text-sm text-blue-100">Average Daily Salary Cost</p>
                       </div>
                       <div className="p-4 bg-white/10 rounded-lg">
-                        <div className="text-2xl font-bold">£{roiCalculation.productivityLossCost.toLocaleString()}</div>
-                        <p className="text-sm text-blue-100">Additional Productivity Costs</p>
+                        <div className="text-2xl font-bold">£{roiCalculation.directCost.toLocaleString()}</div>
+                        <p className="text-sm text-blue-100">Direct Cost of Sick Days</p>
+                        <p className="text-xs text-blue-200">
+                          {roiEmployees} employees × £{roiCalculation.averageDailySalary} × {roiSickDaysPerEmployee} days
+                        </p>
                       </div>
                       <div className="p-4 bg-white/10 rounded-lg">
-                        <div className="text-2xl font-bold">£{roiCalculation.totalCurrentCost.toLocaleString()}</div>
-                        <p className="text-sm text-blue-100">Total Current Annual Cost</p>
-                      </div>
-                      <div className="p-4 bg-white/10 rounded-lg">
-                        <div className="text-2xl font-bold">£{roiCalculation.annualSavings.toLocaleString()}</div>
-                        <p className="text-sm text-blue-100">Potential Annual Savings</p>
+                        <div className="text-2xl font-bold">£{roiCalculation.indirectCosts.toLocaleString()}</div>
+                        <p className="text-sm text-blue-100">Indirect Costs ({roiCalculation.indirectPercentage}%)</p>
                       </div>
                       <div className="p-4 bg-white/20 rounded-lg border-2 border-white/30">
-                        <div className="text-3xl font-bold">
-                          {roiCalculation.netROI >= 0 ? '+' : ''}£{roiCalculation.netROI.toLocaleString()}
-                        </div>
-                        <p className="text-sm text-blue-100">Net Annual ROI</p>
-                        <p className="text-xs text-blue-200 mt-1">
-                          {roiCalculation.roiPercentage}% return on investment
+                        <div className="text-3xl font-bold">£{roiCalculation.totalCost.toLocaleString()}</div>
+                        <p className="text-sm text-blue-100">Total Annual Cost</p>
+                        <p className="text-xs text-blue-200">
+                          Direct + Indirect costs
                         </p>
                       </div>
                     </div>
 
                     <div className="space-y-2 text-sm">
-                      <p className="text-blue-100">Key metrics:</p>
-                      <ul className="list-disc list-inside space-y-1 text-blue-200">
-                        <li>Projected sick days: {roiCalculation.reducedSickDays} per employee</li>
-                        <li>30% reduction in sick leave expected</li>
-                        <li>Improved employee satisfaction & retention</li>
-                      </ul>
+                      <p className="text-blue-100">Formula used:</p>
+                      <div className="text-xs text-blue-200 bg-white/10 p-2 rounded">
+                        Total Cost = (Employees × Daily Salary × Sick Days) × (1 + Indirect %)
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -345,46 +300,6 @@ const CalculatorsPage = () => {
               </div>
             </TabsContent>
           </Tabs>
-
-          {/* Contact Section */}
-          <div className="mt-16 grid md:grid-cols-2 gap-8">
-            <Card className="text-center p-8 border-[#79858D]/20 hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="w-16 h-16 bg-[#22aee1] rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Mail className="h-8 w-8 text-white" />
-                </div>
-                <CardTitle className="text-[#20466d] text-2xl mb-4">Reports & Insights</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-[#79858D] mb-6">
-                  Questions about our employee benefits analysis, reports, or want expert guidance?
-                </p>
-                <Button className="w-full bg-[#22aee1] hover:bg-[#20466d]">
-                  Contact Reports Team
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center p-8 border-[#79858D]/20 hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="w-16 h-16 bg-[#20466d] rounded-full flex items-center justify-center mx-auto mb-4">
-                  <ExternalLink className="h-8 w-8 text-white" />
-                </div>
-                <CardTitle className="text-[#20466d] text-2xl mb-4">InsureMyHealth Services</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-[#79858D] mb-6">
-                  Ready to compare and purchase employee benefits packages?
-                </p>
-                <Button 
-                  className="w-full bg-[#20466d] hover:bg-[#22aee1]"
-                  onClick={() => window.open('https://insure-health-made-simple.lovable.app/', '_blank')}
-                >
-                  Visit InsureMyHealth
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </section>
     </BlogLayout>
