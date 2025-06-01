@@ -15,8 +15,8 @@ const BlogLayout = ({ children }: BlogLayoutProps) => {
   
   const navigation = [
     { name: "Home", href: "/", icon: Home },
-    { name: "Healthcare Policy", href: "/category/health-policy" },
-    { name: "Insurance Tips", href: "/category/insurance-tips" },
+    { name: "Healthcare", href: "/category/health-policy" },
+    { name: "PMI Insights", href: "/category/insurance-tips" },
     { name: "Industry News", href: "/category/industry-news" },
     { name: "Contact", href: "/contact" },
     { name: "Admin", href: "/admin", icon: Settings },
@@ -174,8 +174,8 @@ const BlogLayout = ({ children }: BlogLayoutProps) => {
               <div>
                 <h4 className="font-semibold mb-4">Categories</h4>
                 <ul className="space-y-2 text-gray-300">
-                  <li><Link to="/category/health-policy" className="hover:text-[#22aee1]">Healthcare Policy</Link></li>
-                  <li><Link to="/category/insurance-tips" className="hover:text-[#22aee1]">Insurance Tips</Link></li>
+                  <li><Link to="/category/health-policy" className="hover:text-[#22aee1]">Healthcare</Link></li>
+                  <li><Link to="/category/insurance-tips" className="hover:text-[#22aee1]">PMI Insights</Link></li>
                   <li><Link to="/category/industry-news" className="hover:text-[#22aee1]">Industry News</Link></li>
                 </ul>
               </div>
@@ -283,8 +283,8 @@ const BlogLayout = ({ children }: BlogLayoutProps) => {
             <div>
               <h4 className="font-semibold mb-4">Categories</h4>
               <ul className="space-y-2 text-gray-300">
-                <li><Link to="/category/health-policy" className="hover:text-[#22aee1]">Healthcare Policy</Link></li>
-                <li><Link to="/category/insurance-tips" className="hover:text-[#22aee1]">Insurance Tips</Link></li>
+                <li><Link to="/category/health-policy" className="hover:text-[#22aee1]">Healthcare</Link></li>
+                <li><Link to="/category/insurance-tips" className="hover:text-[#22aee1]">PMI Insights</Link></li>
                 <li><Link to="/category/industry-news" className="hover:text-[#22aee1]">Industry News</Link></li>
               </ul>
             </div>

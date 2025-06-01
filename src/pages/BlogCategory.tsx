@@ -17,7 +17,7 @@ const BlogCategory = () => {
   ) || category;
 
   // Update category display names
-  const displayCategoryName = categoryName === "Health Policy" ? "Healthcare Policy" : categoryName;
+  const displayCategoryName = categoryName === "Health Policy" ? "Healthcare" : categoryName;
 
   return (
     <BlogLayout>
