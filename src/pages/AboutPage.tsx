@@ -1,8 +1,7 @@
 
 import BlogLayout from "@/components/BlogLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Shield, Users, TrendingUp, Award, CheckCircle } from "lucide-react";
+import { Shield, Users, TrendingUp, CheckCircle } from "lucide-react";
 
 const AboutPage = () => {
   return (
@@ -122,60 +121,11 @@ const AboutPage = () => {
                 <div className="flex items-start">
                   <CheckCircle className="h-6 w-6 text-[#22aee1] mr-3 mt-1 flex-shrink-0" />
                   <div>
-                    <h4 className="font-semibold text-[#20466d]">Compliance Checkers</h4>
-                    <p className="text-[#79858D]">Tools to ensure your business meets regulatory requirements</p>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <CheckCircle className="h-6 w-6 text-[#22aee1] mr-3 mt-1 flex-shrink-0" />
-                  <div>
                     <h4 className="font-semibold text-[#20466d]">Resource Library</h4>
                     <p className="text-[#79858D]">Downloadable guides, templates, and checklists</p>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Why Trust Us */}
-      <section className="py-16 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-[#20466d] mb-8">Why UK SMEs Trust Our Analysis</h2>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            <div className="p-6">
-              <Award className="h-8 w-8 text-[#22aee1] mx-auto mb-4" />
-              <h3 className="font-semibold text-[#20466d] mb-2">Industry Recognition</h3>
-              <p className="text-[#79858D] text-sm">Cited by leading UK business publications</p>
-            </div>
-            <div className="p-6">
-              <Users className="h-8 w-8 text-[#22aee1] mx-auto mb-4" />
-              <h3 className="font-semibold text-[#20466d] mb-2">10,000+ Readers</h3>
-              <p className="text-[#79858D] text-sm">Monthly readership of UK business owners</p>
-            </div>
-            <div className="p-6">
-              <TrendingUp className="h-8 w-8 text-[#22aee1] mx-auto mb-4" />
-              <h3 className="font-semibold text-[#20466d] mb-2">98% Accuracy</h3>
-              <p className="text-[#79858D] text-sm">Track record in market predictions</p>
-            </div>
-            <div className="p-6">
-              <Shield className="h-8 w-8 text-[#22aee1] mx-auto mb-4" />
-              <h3 className="font-semibold text-[#20466d] mb-2">Independent</h3>
-              <p className="text-[#79858D] text-sm">Unbiased analysis, no insurer affiliations</p>
-            </div>
-          </div>
-
-          <div className="bg-[#20466d] text-white p-8 rounded-lg">
-            <h3 className="text-2xl font-bold mb-4">Ready to Make Informed Decisions?</h3>
-            <p className="text-gray-200 mb-6">
-              Join thousands of UK business owners who rely on our insights to navigate health insurance decisions.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Badge variant="secondary" className="bg-[#22aee1] text-white">Weekly Market Updates</Badge>
-              <Badge variant="secondary" className="bg-[#22aee1] text-white">Interactive Tools</Badge>
-              <Badge variant="secondary" className="bg-[#22aee1] text-white">Expert Analysis</Badge>
             </div>
           </div>
         </div>

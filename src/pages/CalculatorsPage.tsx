@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import BlogLayout from "@/components/BlogLayout";
@@ -7,11 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calculator, TrendingUp, Users, FileText } from "lucide-react";
+import { Calculator, TrendingUp, FileText } from "lucide-react";
 
 const CalculatorsPage = () => {
   const [pmiEmployees, setPmiEmployees] = useState(10);
-  const [pmiAverageAge, setPmiAverageAge] = useState(35);
+  const [pmiAgeGroup, setPmiAgeGroup] = useState("25-35");
   const [pmiCoverageLevel, setPmiCoverageLevel] = useState("standard");
   const [pmiLocation, setPmiLocation] = useState("london");
   
@@ -19,11 +20,41 @@ const CalculatorsPage = () => {
   const [taxBenefitValue, setTaxBenefitValue] = useState(1200);
   const [taxBandRate, setTaxBandRate] = useState(20);
 
+  // ROI Calculator states
+  const [roiEmployees, setRoiEmployees] = useState(50);
+  const [roiCurrentSickDays, setRoiCurrentSickDays] = useState(8);
+  const [roiAverageSalary, setRoiAverageSalary] = useState(35000);
+  const [roiTurnoverRate, setRoiTurnoverRate] = useState(15);
+  const [roiRecruitmentCost, setRoiRecruitmentCost] = useState(5000);
+
   const calculatePMICost = () => {
-    const baseCost = pmiEmployees * 850; // Base annual cost per employee
-    const ageMultiplier = pmiAverageAge > 40 ? 1.3 : pmiAverageAge > 30 ? 1.1 : 1.0;
-    const locationMultiplier = pmiLocation === "london" ? 1.2 : pmiLocation === "southeast" ? 1.1 : 1.0;
-    const coverageMultiplier = pmiCoverageLevel === "comprehensive" ? 1.5 : pmiCoverageLevel === "standard" ? 1.0 : 0.7;
+    let baseCost = pmiEmployees * 850; // Base annual cost per employee
+    
+    // Age group multiplier
+    const ageMultiplier = {
+      "18-25": 0.8,
+      "25-35": 1.0,
+      "35-45": 1.2,
+      "45-55": 1.4,
+      "55+": 1.6
+    }[pmiAgeGroup] || 1.0;
+    
+    const locationMultiplier = {
+      "london": 1.2,
+      "southeast": 1.1,
+      "southwest": 1.0,
+      "midlands": 0.95,
+      "north": 0.9,
+      "scotland": 0.9,
+      "wales": 0.9,
+      "ni": 0.85
+    }[pmiLocation] || 1.0;
+    
+    const coverageMultiplier = {
+      "comprehensive": 1.5,
+      "standard": 1.0,
+      "basic": 0.7
+    }[pmiCoverageLevel] || 1.0;
     
     const totalCost = baseCost * ageMultiplier * locationMultiplier * coverageMultiplier;
     return Math.round(totalCost);
@@ -41,8 +72,36 @@ const CalculatorsPage = () => {
     };
   };
 
+  const calculateROI = () => {
+    // Current costs
+    const sickDayCost = (roiAverageSalary / 250) * roiCurrentSickDays * roiEmployees; // Assuming 250 working days
+    const turnoverCost = (roiTurnoverRate / 100) * roiEmployees * roiRecruitmentCost;
+    const currentCosts = sickDayCost + turnoverCost;
+
+    // Estimated improvements with health insurance
+    const reducedSickDays = roiCurrentSickDays * 0.25; // 25% reduction
+    const reducedTurnover = roiTurnoverRate * 0.15; // 15% reduction
+    
+    const improvedSickDayCost = (roiAverageSalary / 250) * (roiCurrentSickDays - reducedSickDays) * roiEmployees;
+    const improvedTurnoverCost = ((roiTurnoverRate - reducedTurnover) / 100) * roiEmployees * roiRecruitmentCost;
+    const improvedCosts = improvedSickDayCost + improvedTurnoverCost;
+
+    const annualSavings = currentCosts - improvedCosts;
+    const healthInsuranceCost = roiEmployees * 1200; // Estimated annual cost
+    const netROI = annualSavings - healthInsuranceCost;
+
+    return {
+      currentCosts: Math.round(currentCosts),
+      annualSavings: Math.round(annualSavings),
+      healthInsuranceCost: Math.round(healthInsuranceCost),
+      netROI: Math.round(netROI),
+      roiPercentage: Math.round((netROI / healthInsuranceCost) * 100)
+    };
+  };
+
   const pmiCost = calculatePMICost();
   const taxCalculation = calculateTaxImplications();
+  const roiCalculation = calculateROI();
 
   return (
     <BlogLayout>
@@ -67,7 +126,7 @@ const CalculatorsPage = () => {
       <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
           <Tabs defaultValue="pmi-calculator" className="space-y-8">
-            <TabsList className="grid w-full grid-cols-1 md:grid-cols-4 h-auto">
+            <TabsList className="grid w-full grid-cols-1 md:grid-cols-3 h-auto">
               <TabsTrigger value="pmi-calculator" className="flex items-center gap-2 p-4">
                 <Calculator className="h-4 w-4" />
                 <span className="hidden sm:inline">PMI Cost Calculator</span>
@@ -82,11 +141,6 @@ const CalculatorsPage = () => {
                 <TrendingUp className="h-4 w-4" />
                 <span className="hidden sm:inline">ROI Calculator</span>
                 <span className="sm:hidden">ROI</span>
-              </TabsTrigger>
-              <TabsTrigger value="comparison-tool" className="flex items-center gap-2 p-4">
-                <Users className="h-4 w-4" />
-                <span className="hidden sm:inline">Plan Comparison</span>
-                <span className="sm:hidden">Compare</span>
               </TabsTrigger>
             </TabsList>
 
@@ -116,14 +170,19 @@ const CalculatorsPage = () => {
                     </div>
                     
                     <div>
-                      <Label htmlFor="age">Average Employee Age</Label>
-                      <Input
-                        id="age"
-                        type="number"
-                        value={pmiAverageAge}
-                        onChange={(e) => setPmiAverageAge(Number(e.target.value))}
-                        className="mt-1"
-                      />
+                      <Label htmlFor="age-group">Workforce Age Group</Label>
+                      <Select value={pmiAgeGroup} onValueChange={setPmiAgeGroup}>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="18-25">18-25 years</SelectItem>
+                          <SelectItem value="25-35">25-35 years</SelectItem>
+                          <SelectItem value="35-45">35-45 years</SelectItem>
+                          <SelectItem value="45-55">45-55 years</SelectItem>
+                          <SelectItem value="55+">55+ years</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     <div>
@@ -149,7 +208,12 @@ const CalculatorsPage = () => {
                         <SelectContent>
                           <SelectItem value="london">London</SelectItem>
                           <SelectItem value="southeast">South East</SelectItem>
-                          <SelectItem value="other">Other UK Regions</SelectItem>
+                          <SelectItem value="southwest">South West</SelectItem>
+                          <SelectItem value="midlands">Midlands</SelectItem>
+                          <SelectItem value="north">North England</SelectItem>
+                          <SelectItem value="scotland">Scotland</SelectItem>
+                          <SelectItem value="wales">Wales</SelectItem>
+                          <SelectItem value="ni">Northern Ireland</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -188,7 +252,7 @@ const CalculatorsPage = () => {
                       <p className="text-gray-200">This estimate includes:</p>
                       <ul className="list-disc list-inside space-y-1 text-gray-300">
                         <li>Base premium costs</li>
-                        <li>Age-related adjustments</li>
+                        <li>Age group adjustments</li>
                         <li>Regional pricing variations</li>
                         <li>Coverage level premiums</li>
                       </ul>
@@ -286,58 +350,116 @@ const CalculatorsPage = () => {
 
             {/* ROI Calculator */}
             <TabsContent value="roi-calculator">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-[#20466d] flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5" />
-                    ROI Calculator
-                  </CardTitle>
-                  <p className="text-[#79858D]">
-                    Coming soon - Calculate the return on investment for your health insurance benefits package.
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-12">
-                    <TrendingUp className="h-16 w-16 text-[#22aee1] mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-[#20466d] mb-2">ROI Calculator</h3>
-                    <p className="text-[#79858D] mb-6">
-                      This advanced calculator will help you measure the business impact of health insurance benefits, 
-                      including reduced sick days, improved recruitment, and employee retention.
+              <div className="grid lg:grid-cols-2 gap-8">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-[#20466d] flex items-center gap-2">
+                      <TrendingUp className="h-5 w-5" />
+                      ROI Calculator
+                    </CardTitle>
+                    <p className="text-[#79858D]">
+                      Calculate the return on investment for your health insurance benefits package.
                     </p>
-                    <Button className="bg-[#22aee1] hover:bg-[#20466d]">
-                      Notify Me When Available
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div>
+                      <Label htmlFor="roi-employees">Number of Employees</Label>
+                      <Input
+                        id="roi-employees"
+                        type="number"
+                        value={roiEmployees}
+                        onChange={(e) => setRoiEmployees(Number(e.target.value))}
+                        className="mt-1"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="sick-days">Average Annual Sick Days per Employee</Label>
+                      <Input
+                        id="sick-days"
+                        type="number"
+                        value={roiCurrentSickDays}
+                        onChange={(e) => setRoiCurrentSickDays(Number(e.target.value))}
+                        className="mt-1"
+                      />
+                    </div>
 
-            {/* Plan Comparison Tool */}
-            <TabsContent value="comparison-tool">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-[#20466d] flex items-center gap-2">
-                    <Users className="h-5 w-5" />
-                    Plan Comparison Tool
-                  </CardTitle>
-                  <p className="text-[#79858D]">
-                    Coming soon - Compare different health insurance plans side-by-side.
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-12">
-                    <Users className="h-16 w-16 text-[#22aee1] mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-[#20466d] mb-2">Plan Comparison Tool</h3>
-                    <p className="text-[#79858D] mb-6">
-                      Compare coverage levels, costs, and benefits across multiple insurance providers 
-                      to find the best fit for your business.
-                    </p>
-                    <Button className="bg-[#22aee1] hover:bg-[#20466d]">
-                      Notify Me When Available
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                    <div>
+                      <Label htmlFor="avg-salary">Average Employee Salary (£)</Label>
+                      <Input
+                        id="avg-salary"
+                        type="number"
+                        value={roiAverageSalary}
+                        onChange={(e) => setRoiAverageSalary(Number(e.target.value))}
+                        className="mt-1"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="turnover">Annual Turnover Rate (%)</Label>
+                      <Input
+                        id="turnover"
+                        type="number"
+                        value={roiTurnoverRate}
+                        onChange={(e) => setRoiTurnoverRate(Number(e.target.value))}
+                        className="mt-1"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="recruitment">Average Recruitment Cost per Employee (£)</Label>
+                      <Input
+                        id="recruitment"
+                        type="number"
+                        value={roiRecruitmentCost}
+                        onChange={(e) => setRoiRecruitmentCost(Number(e.target.value))}
+                        className="mt-1"
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-[#22aee1] to-[#20466d] text-white">
+                  <CardHeader>
+                    <CardTitle>ROI Analysis Results</CardTitle>
+                    <p className="text-blue-100">Annual impact of health insurance benefits</p>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="grid grid-cols-1 gap-4">
+                      <div className="p-4 bg-white/10 rounded-lg">
+                        <div className="text-2xl font-bold">£{roiCalculation.currentCosts.toLocaleString()}</div>
+                        <p className="text-sm text-blue-100">Current Annual Costs</p>
+                      </div>
+                      <div className="p-4 bg-white/10 rounded-lg">
+                        <div className="text-2xl font-bold">£{roiCalculation.annualSavings.toLocaleString()}</div>
+                        <p className="text-sm text-blue-100">Potential Annual Savings</p>
+                      </div>
+                      <div className="p-4 bg-white/10 rounded-lg">
+                        <div className="text-2xl font-bold">£{roiCalculation.healthInsuranceCost.toLocaleString()}</div>
+                        <p className="text-sm text-blue-100">Health Insurance Investment</p>
+                      </div>
+                      <div className="p-4 bg-white/20 rounded-lg border-2 border-white/30">
+                        <div className="text-3xl font-bold">
+                          {roiCalculation.netROI >= 0 ? '+' : ''}£{roiCalculation.netROI.toLocaleString()}
+                        </div>
+                        <p className="text-sm text-blue-100">Net Annual ROI</p>
+                        <p className="text-xs text-blue-200 mt-1">
+                          {roiCalculation.roiPercentage}% return on investment
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 text-sm">
+                      <p className="text-blue-100">Assumptions:</p>
+                      <ul className="list-disc list-inside space-y-1 text-blue-200">
+                        <li>25% reduction in sick days</li>
+                        <li>15% reduction in staff turnover</li>
+                        <li>Improved employee satisfaction</li>
+                      </ul>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </TabsContent>
           </Tabs>
         </div>
@@ -348,10 +470,10 @@ const CalculatorsPage = () => {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-[#20466d] mb-4">Need More Detailed Analysis?</h2>
           <p className="text-lg text-[#79858D] mb-8">
-            Our calculators provide estimates based on market averages. For personalized quotes and detailed analysis, 
+            Our calculators provide estimates based on market averages. For personalised quotes and detailed analysis, 
             explore our comprehensive resources or use our compliance tools.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-centre">
             <Button asChild size="lg" className="bg-[#22aee1] hover:bg-[#20466d]">
               <Link to="/compliance-tools">
                 Check Compliance

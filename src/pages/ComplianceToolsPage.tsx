@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import BlogLayout from "@/components/BlogLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,93 +8,13 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { 
-  Shield, 
-  CheckCircle, 
-  AlertTriangle, 
-  FileText, 
   Calendar,
-  Users,
-  Calculator,
-  Clock
+  FileText, 
+  Calculator
 } from "lucide-react";
 
 const ComplianceToolsPage = () => {
-  const [companySize, setCompanySize] = useState("");
-  const [hasP11D, setHasP11D] = useState(false);
-  const [hasPayroll, setHasPayroll] = useState(false);
-  const [hasHR, setHasHR] = useState(false);
-  const [benefitValue, setBenefitValue] = useState(0);
-
-  const complianceChecks = [
-    {
-      id: 1,
-      title: "P11D Reporting Requirements",
-      description: "Ensure you're correctly reporting health insurance benefits",
-      status: hasP11D ? "compliant" : "action-needed",
-      priority: "high",
-      deadline: "July 6, 2024"
-    },
-    {
-      id: 2,
-      title: "Class 1A National Insurance",
-      description: "Calculate and pay employer National Insurance on benefits",
-      status: benefitValue > 0 ? "compliant" : "pending",
-      priority: "high",
-      deadline: "July 19, 2024"
-    },
-    {
-      id: 3,
-      title: "Employee Communication",
-      description: "Inform employees about benefit-in-kind taxation",
-      status: hasHR ? "compliant" : "action-needed",
-      priority: "medium",
-      deadline: "Ongoing"
-    },
-    {
-      id: 4,
-      title: "Payroll Integration",
-      description: "Ensure benefits are correctly integrated into payroll systems",
-      status: hasPayroll ? "compliant" : "action-needed",
-      priority: "medium",
-      deadline: "Before first payment"
-    }
-  ];
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'compliant':
-        return <CheckCircle className="h-5 w-5 text-green-600" />;
-      case 'action-needed':
-        return <AlertTriangle className="h-5 w-5 text-red-600" />;
-      default:
-        return <Clock className="h-5 w-5 text-yellow-600" />;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'compliant':
-        return 'bg-green-100 text-green-800';
-      case 'action-needed':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-yellow-100 text-yellow-800';
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high':
-        return 'bg-red-100 text-red-800';
-      case 'medium':
-        return 'bg-orange-100 text-orange-800';
-      default:
-        return 'bg-blue-100 text-blue-800';
-    }
-  };
-
   return (
     <BlogLayout>
       {/* Hero Section */}
@@ -108,7 +29,7 @@ const ComplianceToolsPage = () => {
             Compliance <span className="text-[#22aee1]">Tools</span>
           </h1>
           <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-            Ensure your health insurance benefits meet all UK regulatory requirements with our comprehensive compliance toolkit
+            Stay on top of UK regulatory requirements with our compliance resources and deadline tracking
           </p>
         </div>
       </section>
@@ -116,13 +37,8 @@ const ComplianceToolsPage = () => {
       {/* Compliance Tools */}
       <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
-          <Tabs defaultValue="checker" className="space-y-8">
-            <TabsList className="grid w-full grid-cols-1 md:grid-cols-4 h-auto">
-              <TabsTrigger value="checker" className="flex items-center gap-2 p-4">
-                <Shield className="h-4 w-4" />
-                <span className="hidden sm:inline">Compliance Checker</span>
-                <span className="sm:hidden">Checker</span>
-              </TabsTrigger>
+          <Tabs defaultValue="calendar" className="space-y-8">
+            <TabsList className="grid w-full grid-cols-1 md:grid-cols-3 h-auto">
               <TabsTrigger value="calendar" className="flex items-center gap-2 p-4">
                 <Calendar className="h-4 w-4" />
                 <span className="hidden sm:inline">Deadline Calendar</span>
@@ -140,133 +56,13 @@ const ComplianceToolsPage = () => {
               </TabsTrigger>
             </TabsList>
 
-            {/* Compliance Checker */}
-            <TabsContent value="checker">
-              <div className="grid lg:grid-cols-2 gap-8">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-[#20466d] flex items-center gap-2">
-                      <Shield className="h-5 w-5" />
-                      Compliance Health Check
-                    </CardTitle>
-                    <p className="text-[#79858D]">
-                      Answer a few questions to assess your current compliance status and get personalized recommendations.
-                    </p>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div>
-                      <Label htmlFor="company-size">Company Size</Label>
-                      <Select value={companySize} onValueChange={setCompanySize}>
-                        <SelectTrigger className="mt-1">
-                          <SelectValue placeholder="Select company size" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1-10">1-10 employees</SelectItem>
-                          <SelectItem value="11-50">11-50 employees</SelectItem>
-                          <SelectItem value="51-250">51-250 employees</SelectItem>
-                          <SelectItem value="250+">250+ employees</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label>Current Compliance Status</Label>
-                      <div className="space-y-3 mt-2">
-                        <div className="flex items-center space-x-2">
-                          <Checkbox 
-                            id="p11d" 
-                            checked={hasP11D}
-                            onCheckedChange={(checked) => setHasP11D(checked as boolean)}
-                          />
-                          <Label htmlFor="p11d" className="text-sm">
-                            We submit P11D forms for employee benefits
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Checkbox 
-                            id="payroll" 
-                            checked={hasPayroll}
-                            onCheckedChange={(checked) => setHasPayroll(checked as boolean)}
-                          />
-                          <Label htmlFor="payroll" className="text-sm">
-                            Benefits are integrated into our payroll system
-                          </Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Checkbox 
-                            id="hr" 
-                            checked={hasHR}
-                            onCheckedChange={(checked) => setHasHR(checked as boolean)}
-                          />
-                          <Label htmlFor="hr" className="text-sm">
-                            Employees are informed about benefit taxation
-                          </Label>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="benefit-value">Annual Benefit Value per Employee (£)</Label>
-                      <Input
-                        id="benefit-value"
-                        type="number"
-                        value={benefitValue}
-                        onChange={(e) => setBenefitValue(Number(e.target.value))}
-                        className="mt-1"
-                        placeholder="e.g., 1200"
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-gray-50">
-                  <CardHeader>
-                    <CardTitle className="text-[#20466d]">Compliance Status</CardTitle>
-                    <p className="text-[#79858D]">Based on your current setup</p>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {complianceChecks.map((check) => (
-                      <div key={check.id} className="flex items-start gap-3 p-4 bg-white rounded-lg border">
-                        {getStatusIcon(check.status)}
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h4 className="font-semibold text-[#20466d] text-sm">{check.title}</h4>
-                            <Badge className={getPriorityColor(check.priority)} variant="secondary">
-                              {check.priority}
-                            </Badge>
-                          </div>
-                          <p className="text-[#79858D] text-xs mb-2">{check.description}</p>
-                          <div className="flex items-center gap-2">
-                            <Badge className={getStatusColor(check.status)} variant="secondary">
-                              {check.status.replace('-', ' ')}
-                            </Badge>
-                            <span className="text-xs text-[#79858D]">Due: {check.deadline}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-
-                    <div className="mt-6 p-4 bg-[#20466d] text-white rounded-lg">
-                      <h4 className="font-semibold mb-2">Overall Compliance Score</h4>
-                      <div className="text-2xl font-bold text-[#22aee1]">
-                        {Math.round((complianceChecks.filter(c => c.status === 'compliant').length / complianceChecks.length) * 100)}%
-                      </div>
-                      <p className="text-sm text-gray-200 mt-1">
-                        {complianceChecks.filter(c => c.status === 'action-needed').length} items need attention
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-
             {/* Deadline Calendar */}
             <TabsContent value="calendar">
               <Card>
                 <CardHeader>
                   <CardTitle className="text-[#20466d] flex items-center gap-2">
                     <Calendar className="h-5 w-5" />
-                    2024 Compliance Calendar
+                    2024/25 UK Compliance Calendar
                   </CardTitle>
                   <p className="text-[#79858D]">
                     Key dates and deadlines for health insurance compliance in the UK.
@@ -276,43 +72,43 @@ const ComplianceToolsPage = () => {
                   <div className="space-y-6">
                     {[
                       {
-                        date: "April 19, 2024",
+                        date: "19 April 2025",
                         title: "Class 1A National Insurance Payment Due",
-                        description: "Final deadline for paying employer National Insurance on benefits provided in the previous tax year.",
+                        description: "Final deadline for paying employer National Insurance on benefits provided in the previous tax year (2023-24).",
                         type: "payment",
-                        status: "past"
+                        status: "upcoming"
                       },
                       {
-                        date: "May 31, 2024",
+                        date: "31 May 2025",
                         title: "P60 Issue Deadline",
                         description: "Provide P60s to all employees, including benefit-in-kind information if processed through payroll.",
-                        type: "reporting",
-                        status: "past"
-                      },
-                      {
-                        date: "July 6, 2024",
-                        title: "P11D Submission Deadline",
-                        description: "Submit P11D forms to HMRC for all employees who received benefits-in-kind during 2023-24.",
                         type: "reporting",
                         status: "upcoming"
                       },
                       {
-                        date: "July 6, 2024",
+                        date: "6 July 2025",
+                        title: "P11D Submission Deadline",
+                        description: "Submit P11D forms to HMRC for all employees who received benefits-in-kind during 2024-25.",
+                        type: "reporting",
+                        status: "upcoming"
+                      },
+                      {
+                        date: "6 July 2025",
                         title: "P11D Copy to Employees",
                         description: "Provide copies of P11D forms to employees who received benefits-in-kind.",
                         type: "communication",
                         status: "upcoming"
                       },
                       {
-                        date: "July 19, 2024",
+                        date: "19 July 2025",
                         title: "Class 1A NI Return Deadline",
-                        description: "Submit Class 1A National Insurance return for benefits provided during 2023-24.",
+                        description: "Submit Class 1A National Insurance return for benefits provided during 2024-25.",
                         type: "reporting",
                         status: "upcoming"
                       }
                     ].map((item, index) => (
                       <div key={index} className="flex items-start gap-4 p-4 border rounded-lg">
-                        <div className="w-20 h-20 bg-[#22aee1] rounded-lg flex flex-col items-center justify-center text-white text-center flex-shrink-0">
+                        <div className="w-20 h-20 bg-[#22aee1] rounded-lg flex flex-col items-center justify-centre text-white text-center flex-shrink-0">
                           <div className="text-xs font-semibold">
                             {new Date(item.date).toLocaleDateString('en-GB', { month: 'short' })}
                           </div>
@@ -323,12 +119,6 @@ const ComplianceToolsPage = () => {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <h4 className="font-semibold text-[#20466d]">{item.title}</h4>
-                            <Badge 
-                              className={item.status === 'past' ? 'bg-gray-100 text-gray-800' : 'bg-orange-100 text-orange-800'}
-                              variant="secondary"
-                            >
-                              {item.status}
-                            </Badge>
                             <Badge 
                               className={
                                 item.type === 'payment' ? 'bg-red-100 text-red-800' :
@@ -358,20 +148,35 @@ const ComplianceToolsPage = () => {
                     P11D Form Helper
                   </CardTitle>
                   <p className="text-[#79858D]">
-                    Guidance and templates for completing P11D forms for health insurance benefits.
+                    Step-by-step guidance for completing P11D forms for health insurance benefits.
                   </p>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-12">
-                    <FileText className="h-16 w-16 text-[#22aee1] mx-auto mb-6" />
-                    <h3 className="text-xl font-semibold text-[#20466d] mb-4">P11D Form Helper</h3>
-                    <p className="text-[#79858D] mb-6 max-w-2xl mx-auto">
-                      Coming soon - Step-by-step guidance for completing P11D forms, including which sections to complete 
-                      for different types of health insurance benefits and automatic calculations.
-                    </p>
-                    <Button className="bg-[#22aee1] hover:bg-[#20466d]">
-                      Notify Me When Available
-                    </Button>
+                  <div className="space-y-6">
+                    <div className="bg-[#22aee1]/10 p-6 rounded-lg">
+                      <h3 className="text-lg font-semibold text-[#20466d] mb-3">P11D Completion Guide</h3>
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="font-medium text-[#20466d] mb-2">Section A - Assets transferred</h4>
+                          <p className="text-sm text-[#79858D]">Not applicable for health insurance benefits</p>
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-[#20466d] mb-2">Section I - Medical treatment</h4>
+                          <p className="text-sm text-[#79858D]">Enter the total annual cost of private medical insurance premiums paid by your company for each employee</p>
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-[#20466d] mb-2">Cash equivalent calculation</h4>
+                          <p className="text-sm text-[#79858D]">For PMI, the cash equivalent is typically the gross premium cost</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
+                      <h4 className="font-medium text-amber-800 mb-2">Important Reminder</h4>
+                      <p className="text-sm text-amber-700">
+                        P11D forms must be submitted to HMRC and copies provided to employees by 6 July following the end of the tax year.
+                      </p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -383,71 +188,42 @@ const ComplianceToolsPage = () => {
                 <CardHeader>
                   <CardTitle className="text-[#20466d] flex items-center gap-2">
                     <Calculator className="h-5 w-5" />
-                    National Insurance Calculator
+                    Class 1A National Insurance Calculator
                   </CardTitle>
                   <p className="text-[#79858D]">
-                    Calculate Class 1A National Insurance liability on health insurance benefits.
+                    Calculate your Class 1A National Insurance liability on health insurance benefits.
                   </p>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-12">
-                    <Calculator className="h-16 w-16 text-[#22aee1] mx-auto mb-6" />
-                    <h3 className="text-xl font-semibold text-[#20466d] mb-4">NI Calculator</h3>
-                    <p className="text-[#79858D] mb-6 max-w-2xl mx-auto">
-                      Calculate your exact Class 1A National Insurance liability based on the benefits you provide. 
-                      This tool will be available soon with automatic rate updates and detailed breakdowns.
-                    </p>
-                    <Button className="bg-[#22aee1] hover:bg-[#20466d]">
-                      Notify Me When Available
-                    </Button>
+                  <div className="space-y-6">
+                    <div className="bg-[#20466d]/5 p-6 rounded-lg">
+                      <h3 className="text-lg font-semibold text-[#20466d] mb-3">Class 1A NI Rate for 2024-25</h3>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="bg-white p-4 rounded-lg border">
+                          <div className="text-2xl font-bold text-[#22aee1]">13.8%</div>
+                          <p className="text-sm text-[#79858D]">Standard rate for all benefit values</p>
+                        </div>
+                        <div className="bg-white p-4 rounded-lg border">
+                          <div className="text-2xl font-bold text-[#22aee1]">Annual</div>
+                          <p className="text-sm text-[#79858D]">Payment due by 19 July 2025</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                      <h4 className="font-medium text-blue-800 mb-2">Quick Calculation</h4>
+                      <p className="text-sm text-blue-700 mb-2">
+                        Class 1A NI = Total benefit value × 13.8%
+                      </p>
+                      <p className="text-xs text-blue-600">
+                        Example: £1,000 health insurance benefit = £138 Class 1A NI liability
+                      </p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             </TabsContent>
           </Tabs>
-        </div>
-      </section>
-
-      {/* Quick Actions */}
-      <section className="py-16 px-4 bg-gray-50">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-[#20466d] mb-8 text-center">Need Immediate Help?</h2>
-          
-          <div className="grid md:grid-cols-2 gap-6">
-            <Card className="border-[#79858D]/20">
-              <CardHeader>
-                <CardTitle className="text-[#20466d] flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
-                  Download Compliance Checklist
-                </CardTitle>
-                <p className="text-[#79858D]">
-                  Get our comprehensive compliance checklist covering all aspects of health insurance regulation.
-                </p>
-              </CardHeader>
-              <CardContent>
-                <Button className="w-full bg-[#22aee1] hover:bg-[#20466d]">
-                  Download Free Checklist
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="border-[#79858D]/20">
-              <CardHeader>
-                <CardTitle className="text-[#20466d] flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  Book Compliance Consultation
-                </CardTitle>
-                <p className="text-[#79858D]">
-                  Schedule a free 30-minute consultation with our compliance experts.
-                </p>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" className="w-full">
-                  Book Free Consultation
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </section>
     </BlogLayout>

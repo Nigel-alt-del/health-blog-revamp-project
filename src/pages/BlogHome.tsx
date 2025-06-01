@@ -37,100 +37,29 @@ const BlogHome = () => {
             UK Health Insurance <span className="text-[#22aee1]">Intelligence</span>
           </h1>
           <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-            Expert analysis, interactive tools, and compliance guidance specifically 
+            Expert analysis, market intelligence, and compliance guidance specifically 
             designed for UK small and medium enterprises
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <Button asChild size="lg" className="bg-[#22aee1] hover:bg-white hover:text-[#22aee1]">
-              <Link to="/calculators">
-                <Calculator className="mr-2 h-5 w-5" />
-                Try Our Calculators
+              <Link to="/resources">
+                <FileText className="mr-2 h-5 w-5" />
+                Browse Resources
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="text-white border-white hover:bg-white hover:text-[#20466d]">
-              <Link to="/compliance-tools">
+              <Link to="/expertise">
                 <Shield className="mr-2 h-5 w-5" />
-                Check Compliance
+                Our Expertise
               </Link>
             </Button>
           </div>
-          <div className="flex items-center justify-center space-x-4 text-sm text-gray-200">
+          <div className="flex items-center justify-centre space-x-4 text-sm text-gray-200">
             <span>UK Market Analysis</span>
             <span>•</span>
-            <span>SME-Focused Tools</span>
+            <span>SME-Focused Intelligence</span>
             <span>•</span>
-            <span>Compliance Guidance</span>
-          </div>
-        </div>
-      </section>
-
-      {/* Interactive Tools Preview */}
-      <section className="py-16 px-4 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-[#20466d] mb-4">Interactive Tools for UK SMEs</h2>
-            <p className="text-lg text-[#79858D] max-w-3xl mx-auto">
-              Make informed decisions with our suite of calculators and compliance tools designed specifically for UK businesses
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="text-center border-[#79858D]/20 hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="w-16 h-16 bg-[#22aee1] rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Calculator className="h-8 w-8 text-white" />
-                </div>
-                <CardTitle className="text-[#20466d]">PMI Cost Calculator</CardTitle>
-                <p className="text-[#79858D]">
-                  Estimate private medical insurance costs based on your workforce size and requirements
-                </p>
-              </CardHeader>
-              <CardContent>
-                <Button asChild className="w-full bg-[#22aee1] hover:bg-[#20466d]">
-                  <Link to="/calculators">
-                    Calculate Costs <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center border-[#79858D]/20 hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="w-16 h-16 bg-[#20466d] rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Shield className="h-8 w-8 text-white" />
-                </div>
-                <CardTitle className="text-[#20466d]">Compliance Checker</CardTitle>
-                <p className="text-[#79858D]">
-                  Ensure your health benefits meet UK regulatory requirements and tax obligations
-                </p>
-              </CardHeader>
-              <CardContent>
-                <Button asChild className="w-full bg-[#20466d] hover:bg-[#22aee1]">
-                  <Link to="/compliance-tools">
-                    Check Compliance <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center border-[#79858D]/20 hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="w-16 h-16 bg-[#22aee1] rounded-full flex items-center justify-center mx-auto mb-4">
-                  <FileText className="h-8 w-8 text-white" />
-                </div>
-                <CardTitle className="text-[#20466d]">Resource Library</CardTitle>
-                <p className="text-[#79858D]">
-                  Access guides, templates, and tools to navigate UK health insurance decisions
-                </p>
-              </CardHeader>
-              <CardContent>
-                <Button asChild variant="outline" className="w-full">
-                  <Link to="/resources">
-                    Browse Resources <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
+            <span>Regulatory Guidance</span>
           </div>
         </div>
       </section>
