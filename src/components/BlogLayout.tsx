@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Calculator, Users, TrendingUp, FileText, Mail, ExternalLink } from "lucide-react";
@@ -24,8 +25,15 @@ const BlogLayout = ({ children }: { children: React.ReactNode }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <Link to="/" className="text-2xl font-bold text-[#20466d]">
-                InsureMyHealth Reports
+              <Link to="/" className="flex items-center">
+                <img 
+                  src="/lovable-uploads/b61ae919-b75e-409d-a884-8437e2befc15.png" 
+                  alt="InsureMyHealth Logo" 
+                  className="h-10 w-auto mr-3"
+                />
+                <span className="text-2xl font-bold text-[#20466d]">
+                  InsureMyHealth
+                </span>
               </Link>
             </div>
             
@@ -67,12 +75,6 @@ const BlogLayout = ({ children }: { children: React.ReactNode }) => {
                   className="text-[#79858D] hover:text-[#20466d] px-3 py-2 text-sm font-medium transition-colors"
                 >
                   CALCULATORS
-                </Link>
-                <Link 
-                  to="/hr-helper" 
-                  className="text-[#79858D] hover:text-[#20466d] px-3 py-2 text-sm font-medium transition-colors"
-                >
-                  HR HELPER
                 </Link>
               </div>
             </div>
@@ -135,13 +137,6 @@ const BlogLayout = ({ children }: { children: React.ReactNode }) => {
               >
                 CALCULATORS
               </Link>
-              <Link 
-                to="/hr-helper" 
-                className="text-[#79858D] hover:text-[#20466d] block px-3 py-2 text-base font-medium transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                HR HELPER
-              </Link>
             </div>
           </div>
         )}
@@ -159,14 +154,14 @@ const BlogLayout = ({ children }: { children: React.ReactNode }) => {
                 <div className="w-16 h-16 bg-[#22aee1] rounded-full flex items-center justify-center mx-auto mb-4">
                   <Mail className="h-8 w-8 text-white" />
                 </div>
-                <CardTitle className="text-[#20466d] text-2xl mb-4">Reports & Analysis</CardTitle>
+                <CardTitle className="text-[#20466d] text-2xl mb-4">Analysis & Information</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-[#79858D] mb-6">
-                  Get insights on employee benefits analysis, reports, or need guidance?
+                  Get insights on employee benefits analysis, information, or need guidance?
                 </p>
                 <Button className="w-full bg-[#22aee1] hover:bg-[#20466d]">
-                  Contact Reports Team
+                  Contact Information Team
                 </Button>
               </CardContent>
             </Card>
@@ -199,7 +194,7 @@ const BlogLayout = ({ children }: { children: React.ReactNode }) => {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <h3 className="text-xl font-bold mb-4 text-[#22aee1]">InsureMyHealth Reports</h3>
+              <h3 className="text-xl font-bold mb-4 text-[#22aee1]">InsureMyHealth</h3>
               <p className="text-gray-300 text-sm">
                 Your trusted source for UK employee benefits intelligence and market analysis.
               </p>
@@ -210,7 +205,6 @@ const BlogLayout = ({ children }: { children: React.ReactNode }) => {
                 <li><Link to="/" className="hover:text-[#22aee1] transition-colors">Home</Link></li>
                 <li><Link to="/about" className="hover:text-[#22aee1] transition-colors">About</Link></li>
                 <li><Link to="/calculators" className="hover:text-[#22aee1] transition-colors">Calculators</Link></li>
-                <li><Link to="/hr-helper" className="hover:text-[#22aee1] transition-colors">HR Helper</Link></li>
               </ul>
             </div>
             <div>
@@ -224,14 +218,14 @@ const BlogLayout = ({ children }: { children: React.ReactNode }) => {
             <div>
               <h4 className="font-semibold mb-4">Legal</h4>
               <ul className="space-y-2 text-sm text-gray-300">
-                <li><a href="#" className="hover:text-[#22aee1] transition-colors">Cookies</a></li>
-                <li><a href="#" className="hover:text-[#22aee1] transition-colors">Terms</a></li>
-                <li><a href="#" className="hover:text-[#22aee1] transition-colors">Privacy</a></li>
+                <li><a href="https://insure-health-made-simple.lovable.app/cookies" target="_blank" rel="noopener noreferrer" className="hover:text-[#22aee1] transition-colors">Cookies</a></li>
+                <li><a href="https://insure-health-made-simple.lovable.app/terms" target="_blank" rel="noopener noreferrer" className="hover:text-[#22aee1] transition-colors">Terms</a></li>
+                <li><a href="https://insure-health-made-simple.lovable.app/privacy" target="_blank" rel="noopener noreferrer" className="hover:text-[#22aee1] transition-colors">Privacy</a></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-gray-600 pt-8 text-center text-sm text-gray-300">
-            <p>&copy; 2024 InsureMyHealth Reports. All rights reserved.</p>
+            <p>&copy; 2024 InsureMyHealth. All rights reserved.</p>
           </div>
         </div>
       </footer>

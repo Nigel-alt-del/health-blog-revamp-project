@@ -34,10 +34,10 @@ const BlogCategory = () => {
             Category
           </Badge>
           <h1 className="text-5xl font-bold mb-6 leading-tight">
-            {displayCategoryName} <span className="text-[#22aee1]">Reports</span>
+            {displayCategoryName} <span className="text-[#22aee1]">Intelligence</span>
           </h1>
           <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-            {categoryPosts.length} report{categoryPosts.length !== 1 ? 's' : ''} in this category
+            {categoryPosts.length} insight{categoryPosts.length !== 1 ? 's' : ''} in this category
           </p>
         </div>
       </section>
@@ -52,7 +52,7 @@ const BlogCategory = () => {
             </div>
           ) : (
             <div className="text-center py-12">
-              <p className="text-[#79858D] text-lg">No reports found in this category.</p>
+              <p className="text-[#79858D] text-lg">No insights found in this category.</p>
             </div>
           )}
         </div>

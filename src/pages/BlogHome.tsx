@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, Clock, ArrowRight, Calculator, TrendingUp, FileText } from "lucide-react";
@@ -37,7 +36,7 @@ const BlogHome = () => {
             UK Employee Benefits <span className="text-[#22aee1]">Intelligence</span>
           </h1>
           <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-            Expert analysis, market intelligence, and compliance guidance for UK small 
+            Analysis, market intelligence, and compliance guidance for UK small 
             and medium enterprises on employee benefits and private medical insurance
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
