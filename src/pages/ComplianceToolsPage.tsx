@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import BlogLayout from "@/components/BlogLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,7 +15,7 @@ import {
   FileText, 
   Calendar,
   Users,
-  Pound,
+  Calculator,
   Clock
 } from "lucide-react";
 
@@ -135,7 +134,7 @@ const ComplianceToolsPage = () => {
                 <span className="sm:hidden">P11D</span>
               </TabsTrigger>
               <TabsTrigger value="ni-calculator" className="flex items-center gap-2 p-4">
-                <Pound className="h-4 w-4" />
+                <Calculator className="h-4 w-4" />
                 <span className="hidden sm:inline">NI Calculator</span>
                 <span className="sm:hidden">NI Calc</span>
               </TabsTrigger>
@@ -383,7 +382,7 @@ const ComplianceToolsPage = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="text-[#20466d] flex items-center gap-2">
-                    <Pound className="h-5 w-5" />
+                    <Calculator className="h-5 w-5" />
                     National Insurance Calculator
                   </CardTitle>
                   <p className="text-[#79858D]">
@@ -392,7 +391,7 @@ const ComplianceToolsPage = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-center py-12">
-                    <Pound className="h-16 w-16 text-[#22aee1] mx-auto mb-6" />
+                    <Calculator className="h-16 w-16 text-[#22aee1] mx-auto mb-6" />
                     <h3 className="text-xl font-semibold text-[#20466d] mb-4">NI Calculator</h3>
                     <p className="text-[#79858D] mb-6 max-w-2xl mx-auto">
                       Calculate your exact Class 1A National Insurance liability based on the benefits you provide. 

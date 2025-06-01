@@ -1,5 +1,5 @@
-
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import BlogLayout from "@/components/BlogLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calculator, TrendingUp, Users, Pound } from "lucide-react";
+import { Calculator, TrendingUp, Users, FileText } from "lucide-react";
 
 const CalculatorsPage = () => {
   const [pmiEmployees, setPmiEmployees] = useState(10);
@@ -74,7 +74,7 @@ const CalculatorsPage = () => {
                 <span className="sm:hidden">PMI Cost</span>
               </TabsTrigger>
               <TabsTrigger value="tax-calculator" className="flex items-center gap-2 p-4">
-                <Pound className="h-4 w-4" />
+                <FileText className="h-4 w-4" />
                 <span className="hidden sm:inline">Tax Impact Calculator</span>
                 <span className="sm:hidden">Tax Impact</span>
               </TabsTrigger>
@@ -204,7 +204,7 @@ const CalculatorsPage = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-[#20466d] flex items-center gap-2">
-                      <Pound className="h-5 w-5" />
+                      <FileText className="h-5 w-5" />
                       Tax Impact Calculator
                     </CardTitle>
                     <p className="text-[#79858D]">
