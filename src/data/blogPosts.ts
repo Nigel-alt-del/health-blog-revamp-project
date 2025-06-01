@@ -1,5 +1,7 @@
+import { smeInsurancePosts } from './smeInsurancePosts';
 
 export const blogPosts = [
+  ...smeInsurancePosts,
   {
     id: "understanding-aca-2024",
     title: "Understanding the Affordable Care Act: 2024 Updates and Implications",
