@@ -36,13 +36,13 @@ const BlogHome = () => {
             Health Insurance <span className="text-[#22aee1]">Insights</span>
           </h1>
           <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-            Expert analysis, industry trends, and thought leadership on navigating 
+            Analysis, industry trends, and thought leadership on navigating 
             the complex world of health insurance
           </p>
           <div className="flex items-center justify-center space-x-4 text-sm text-gray-200">
             <span>Latest insights</span>
             <span>•</span>
-            <span>Expert analysis</span>
+            <span>Analysis</span>
             <span>•</span>
             <span>Industry trends</span>
           </div>
@@ -56,7 +56,7 @@ const BlogHome = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#79858D] h-5 w-5" />
             <Input
               type="text"
-              placeholder="Search articles..."
+              placeholder="Search reports..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 py-3 text-lg border-[#79858D] focus:border-[#22aee1] focus:ring-[#22aee1]"
@@ -68,7 +68,7 @@ const BlogHome = () => {
       {/* Featured Post */}
       <section className="py-12 px-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-[#20466d] mb-8 text-center">Featured Article</h2>
+          <h2 className="text-3xl font-bold text-[#20466d] mb-8 text-center">Featured Report</h2>
           <FeaturedPost post={featuredPost} />
         </div>
       </section>
@@ -84,7 +84,7 @@ const BlogHome = () => {
           </div>
           {filteredPosts.length === 0 && searchTerm && (
             <div className="text-center py-12">
-              <p className="text-[#79858D] text-lg">No articles found matching "{searchTerm}"</p>
+              <p className="text-[#79858D] text-lg">No reports found matching "{searchTerm}"</p>
             </div>
           )}
         </div>

@@ -16,19 +16,28 @@ const BlogCategory = () => {
     cat => cat.toLowerCase().replace(/\s+/g, '-') === category
   ) || category;
 
+  // Update category display names
+  const displayCategoryName = categoryName === "Health Policy" ? "Healthcare Policy" : categoryName;
+
   return (
     <BlogLayout>
-      <section className="py-16 px-4 bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="max-w-4xl mx-auto text-center">
-          <Badge variant="secondary" className="mb-4">
+      {/* Banner Section */}
+      <section 
+        className="relative py-20 px-4 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `linear-gradient(rgba(32, 70, 109, 0.8), rgba(32, 70, 109, 0.8)), url('/lovable-uploads/b61ae919-b75e-409d-a884-8437e2befc15.png')`
+        }}
+      >
+        <div className="max-w-4xl mx-auto text-center text-white">
+          <Badge variant="secondary" className="mb-4 bg-[#22aee1] text-white">
             <Filter className="mr-2 h-4 w-4" />
             Category
           </Badge>
-          <h1 className="text-4xl font-bold text-gray-900 mb-6">
-            {categoryName}
+          <h1 className="text-5xl font-bold mb-6 leading-tight">
+            {displayCategoryName} <span className="text-[#22aee1]">Reports</span>
           </h1>
-          <p className="text-xl text-gray-600">
-            {categoryPosts.length} article{categoryPosts.length !== 1 ? 's' : ''} in this category
+          <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
+            {categoryPosts.length} report{categoryPosts.length !== 1 ? 's' : ''} in this category
           </p>
         </div>
       </section>
@@ -43,7 +52,7 @@ const BlogCategory = () => {
             </div>
           ) : (
             <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">No articles found in this category.</p>
+              <p className="text-[#79858D] text-lg">No reports found in this category.</p>
             </div>
           )}
         </div>

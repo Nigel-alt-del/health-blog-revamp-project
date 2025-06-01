@@ -7,7 +7,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import BlogHome from "./pages/BlogHome";
 import BlogPost from "./pages/BlogPost";
 import BlogCategory from "./pages/BlogCategory";
-import AboutBlog from "./pages/AboutBlog";
 import BlogAdmin from "./pages/BlogAdmin";
 import NotFound from "./pages/NotFound";
 
@@ -23,7 +22,7 @@ const App = () => (
           <Route path="/" element={<BlogHome />} />
           <Route path="/post/:slug" element={<BlogPost />} />
           <Route path="/category/:category" element={<BlogCategory />} />
-          <Route path="/about" element={<AboutBlog />} />
+          <Route path="/contact" element={<BlogHome />} />
           <Route path="/admin" element={<BlogAdmin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

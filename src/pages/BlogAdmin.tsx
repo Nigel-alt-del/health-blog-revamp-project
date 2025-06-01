@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Plus, Edit, Trash2, Save, ArrowLeft } from "lucide-react";
+import { Plus, Edit, Trash2, Save, ArrowLeft, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,6 +16,7 @@ const BlogAdmin = () => {
   const [posts, setPosts] = useState(blogPosts);
   const [isCreating, setIsCreating] = useState(false);
   const [editingPost, setEditingPost] = useState<string | null>(null);
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -27,8 +28,27 @@ const BlogAdmin = () => {
     authorRole: "",
     category: "Insurance Tips",
     tags: "",
-    readTime: "5 min read"
+    readTime: "5 min read",
+    image: ""
   });
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageUrl = e.target?.result as string;
+        setUploadedImage(imageUrl);
+        setNewPost({ ...newPost, image: imageUrl });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setUploadedImage(null);
+    setNewPost({ ...newPost, image: "" });
+  };
 
   const handleCreatePost = () => {
     if (!newPost.title || !newPost.excerpt || !newPost.content) {
@@ -53,7 +73,7 @@ const BlogAdmin = () => {
       category: newPost.category,
       tags: newPost.tags.split(',').map(tag => tag.trim()),
       featured: false,
-      image: "/placeholder.svg"
+      image: newPost.image || "/placeholder.svg"
     };
 
     setPosts([post, ...posts]);
@@ -65,13 +85,15 @@ const BlogAdmin = () => {
       authorRole: "",
       category: "Insurance Tips",
       tags: "",
-      readTime: "5 min read"
+      readTime: "5 min read",
+      image: ""
     });
+    setUploadedImage(null);
     setIsCreating(false);
 
     toast({
       title: "Success",
-      description: "Blog post created successfully!"
+      description: "Report created successfully!"
     });
   };
 
@@ -79,7 +101,7 @@ const BlogAdmin = () => {
     setPosts(posts.filter(post => post.id !== postId));
     toast({
       title: "Success",
-      description: "Blog post deleted successfully!"
+      description: "Report deleted successfully!"
     });
   };
 
@@ -96,12 +118,12 @@ const BlogAdmin = () => {
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Admin
             </Button>
-            <h1 className="text-3xl font-bold text-gray-900">Create New Blog Post</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Create New Report</h1>
           </div>
 
           <Card>
             <CardHeader>
-              <CardTitle>Post Details</CardTitle>
+              <CardTitle>Report Details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
@@ -109,8 +131,38 @@ const BlogAdmin = () => {
                 <Input
                   value={newPost.title}
                   onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
-                  placeholder="Enter post title"
+                  placeholder="Enter report title"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Featured Image</label>
+                <div className="space-y-4">
+                  {uploadedImage ? (
+                    <div className="relative inline-block">
+                      <img src={uploadedImage} alt="Preview" className="w-full max-w-md h-48 object-cover rounded-lg" />
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-2 right-2"
+                        onClick={removeImage}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                      <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                      <p className="text-gray-600 mb-4">Upload an image for your report</p>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="max-w-xs mx-auto"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div>
@@ -118,7 +170,7 @@ const BlogAdmin = () => {
                 <Textarea
                   value={newPost.excerpt}
                   onChange={(e) => setNewPost({ ...newPost, excerpt: e.target.value })}
-                  placeholder="Brief description of the post"
+                  placeholder="Brief description of the report"
                   rows={3}
                 />
               </div>
@@ -128,7 +180,7 @@ const BlogAdmin = () => {
                 <Textarea
                   value={newPost.content}
                   onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
-                  placeholder="Write your blog post content here..."
+                  placeholder="Write your report content here..."
                   rows={12}
                 />
               </div>
@@ -147,7 +199,7 @@ const BlogAdmin = () => {
                   <Input
                     value={newPost.authorRole}
                     onChange={(e) => setNewPost({ ...newPost, authorRole: e.target.value })}
-                    placeholder="e.g., Healthcare Policy Expert"
+                    placeholder="e.g., Healthcare Policy Analyst"
                   />
                 </div>
               </div>
@@ -187,7 +239,7 @@ const BlogAdmin = () => {
               <div className="flex space-x-4">
                 <Button onClick={handleCreatePost} className="flex-1">
                   <Save className="mr-2 h-4 w-4" />
-                  Publish Post
+                  Publish Report
                 </Button>
                 <Button variant="outline" onClick={() => setIsCreating(false)}>
                   Cancel
@@ -204,10 +256,10 @@ const BlogAdmin = () => {
     <BlogLayout>
       <div className="max-w-6xl mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Blog Administration</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Reports Administration</h1>
           <Button onClick={() => setIsCreating(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Create New Post
+            Create New Report
           </Button>
         </div>
 

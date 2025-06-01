@@ -17,12 +17,12 @@ const BlogPost = () => {
     return (
       <BlogLayout>
         <div className="max-w-4xl mx-auto px-4 py-12 text-center">
-          <h1 className="text-3xl font-bold text-[#20466d] mb-4">Post Not Found</h1>
-          <p className="text-[#79858D] mb-8">The article you're looking for doesn't exist.</p>
+          <h1 className="text-3xl font-bold text-[#20466d] mb-4">Report Not Found</h1>
+          <p className="text-[#79858D] mb-8">The report you're looking for doesn't exist.</p>
           <Link to="/">
             <Button className="bg-[#22aee1] hover:bg-[#20466d]">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Blog
+              Back to Reports
             </Button>
           </Link>
         </div>
@@ -41,7 +41,7 @@ const BlogPost = () => {
         <div className="mb-8">
           <Link to="/" className="inline-flex items-center text-[#22aee1] hover:text-[#20466d] mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Blog
+            Back to Reports
           </Link>
           
           <Badge variant="secondary" className="mb-4 bg-[#22aee1] text-white">
@@ -84,14 +84,18 @@ const BlogPost = () => {
           </div>
         </div>
 
-        {/* Featured Image Placeholder */}
+        {/* Featured Image */}
         <div className="w-full h-64 bg-gradient-to-br from-[#22aee1] to-[#20466d] rounded-lg mb-12 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center mx-auto mb-4">
-              <span className="text-[#20466d] font-bold text-xl">IMH</span>
+          {post.image && post.image !== "/placeholder.svg" ? (
+            <img src={post.image} alt={post.title} className="w-full h-full object-cover rounded-lg" />
+          ) : (
+            <div className="text-center">
+              <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center mx-auto mb-4">
+                <span className="text-[#20466d] font-bold text-xl">IMH</span>
+              </div>
+              <p className="text-white font-medium">{post.category}</p>
             </div>
-            <p className="text-white font-medium">{post.category}</p>
-          </div>
+          )}
         </div>
 
         {/* Article Content */}
@@ -126,7 +130,7 @@ const BlogPost = () => {
           </CardHeader>
           <CardContent>
             <p className="text-[#79858D]">
-              {post.author} is a leading expert in health insurance policy and consumer advocacy. 
+              {post.author} is a leading analyst in health insurance policy and consumer advocacy. 
               With over a decade of experience in the healthcare industry, they provide insights 
               that help consumers navigate the complex world of health insurance.
             </p>
@@ -136,7 +140,7 @@ const BlogPost = () => {
         {/* Related Articles */}
         {relatedPosts.length > 0 && (
           <section>
-            <h2 className="text-3xl font-bold text-[#20466d] mb-8">Related Articles</h2>
+            <h2 className="text-3xl font-bold text-[#20466d] mb-8">Related Reports</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {relatedPosts.map((relatedPost) => (
                 <BlogCard key={relatedPost.id} post={relatedPost} />

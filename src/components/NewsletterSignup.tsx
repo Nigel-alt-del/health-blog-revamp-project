@@ -48,7 +48,7 @@ const NewsletterSignup = () => {
         </div>
         <h2 className="text-3xl font-bold text-white mb-4">Stay Informed</h2>
         <p className="text-[#22aee1] text-lg mb-8 max-w-2xl mx-auto">
-          Get the latest health insurance insights, policy updates, and expert analysis 
+          Get the latest health insurance insights, policy updates, and analysis 
           delivered directly to your inbox.
         </p>
         
