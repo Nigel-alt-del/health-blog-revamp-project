@@ -13,6 +13,7 @@ import ExpertisePage from "./pages/ExpertisePage";
 import CalculatorsPage from "./pages/CalculatorsPage";
 import ComplianceToolsPage from "./pages/ComplianceToolsPage";
 import NotFound from "./pages/NotFound";
+import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 
 const queryClient = new QueryClient();
 
@@ -31,7 +32,14 @@ const App = () => (
           <Route path="/calculators" element={<CalculatorsPage />} />
           <Route path="/compliance-tools" element={<ComplianceToolsPage />} />
           <Route path="/contact" element={<BlogHome />} />
-          <Route path="/admin" element={<BlogAdmin />} />
+          <Route 
+            path="/admin" 
+            element={
+              <ProtectedAdminRoute>
+                <BlogAdmin />
+              </ProtectedAdminRoute>
+            } 
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

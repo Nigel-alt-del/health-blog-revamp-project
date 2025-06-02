@@ -1,7 +1,7 @@
-
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
+import AdminAccess from "./AdminAccess";
 
 const BlogNavigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -42,8 +42,8 @@ const BlogNavigation = () => {
           </div>
           
           {/* Desktop Navigation */}
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-8">
+          <div className="hidden md:flex items-center space-x-8">
+            <div className="flex items-baseline space-x-8">
               <Link 
                 to="/" 
                 className="text-[#79858D] hover:text-[#20466d] px-3 py-2 text-sm font-medium transition-colors"
@@ -81,10 +81,14 @@ const BlogNavigation = () => {
                 CALCULATORS
               </Link>
             </div>
+            
+            {/* Admin Access - Discreet settings icon */}
+            <AdminAccess />
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
+          {/* Mobile menu button and admin access */}
+          <div className="md:hidden flex items-center space-x-2">
+            <AdminAccess />
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="text-[#79858D] hover:text-[#20466d] inline-flex items-center justify-center p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#22aee1]"
