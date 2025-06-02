@@ -32,18 +32,6 @@ const BlogHome = () => {
         }}
       >
         <div className="max-w-4xl mx-auto text-center text-white">
-          {/* Logo */}
-          <div className="mb-8">
-            <img 
-              src="/lovable-uploads/7e735a1d-1775-4265-95b3-6d72ae392f04.png" 
-              alt="The Health Compass Logo" 
-              className="h-32 w-auto mx-auto"
-              onError={(e) => {
-                console.log("Logo failed to load:", e.currentTarget.src);
-              }}
-            />
-          </div>
-          
           <h1 className="text-5xl font-bold mb-6 leading-tight">
             The Health <span className="text-[#22aee1]">Compass</span>
           </h1>
