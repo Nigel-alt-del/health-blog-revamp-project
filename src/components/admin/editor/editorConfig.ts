@@ -17,16 +17,16 @@ export const createQuillModules = () => ({
     ],
     handlers: {
       font: function(value: string) {
-        if (value) {
+        if (this.quill && value) {
           this.quill.format('font', value);
-        } else {
+        } else if (this.quill) {
           this.quill.format('font', false);
         }
       },
       size: function(value: string) {
-        if (value) {
+        if (this.quill && value) {
           this.quill.format('size', value);
-        } else {
+        } else if (this.quill) {
           this.quill.format('size', false);
         }
       }

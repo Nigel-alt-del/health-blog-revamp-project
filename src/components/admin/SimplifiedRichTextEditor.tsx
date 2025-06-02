@@ -25,29 +25,39 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
 
   const insertTemplate = (templateKey: keyof typeof sectionTemplates) => {
     const template = sectionTemplates[templateKey];
-    onChange(value + '\n\n' + template);
+    const currentValue = value || '';
+    onChange(currentValue + '\n\n' + template);
   };
 
   const insertChart = (chartData: any) => {
     const chartHtml = createChartHtml(chartData);
-    onChange(value + chartHtml);
+    const currentValue = value || '';
+    onChange(currentValue + chartHtml);
     setShowChartBuilder(false);
   };
 
   const insertImage = (imageUrl: string, caption?: string) => {
     const imageHtml = createImageHtml(imageUrl, caption);
-    onChange(value + imageHtml);
+    const currentValue = value || '';
+    onChange(currentValue + imageHtml);
     setShowMediaGallery(false);
   };
 
   const insertTable = () => {
     const tableHtml = insertTableHtml();
-    onChange(value + tableHtml);
+    const currentValue = value || '';
+    onChange(currentValue + tableHtml);
   };
 
   const insertCallout = () => {
     const calloutHtml = insertCalloutHtml();
-    onChange(value + calloutHtml);
+    const currentValue = value || '';
+    onChange(currentValue + calloutHtml);
+  };
+
+  const handleChange = (content: string) => {
+    // Ensure we always pass a string to onChange
+    onChange(content || '');
   };
 
   return (
@@ -68,8 +78,8 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
       <CardContent>
         <ReactQuill
           theme="snow"
-          value={value}
-          onChange={onChange}
+          value={value || ''}
+          onChange={handleChange}
           modules={modules}
           formats={quillFormats}
           placeholder={placeholder}
