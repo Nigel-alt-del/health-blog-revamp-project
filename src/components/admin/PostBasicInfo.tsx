@@ -14,12 +14,8 @@ interface PostBasicInfoProps {
   formData: {
     title: string;
     excerpt: string;
-    author: string;
-    authorRole: string;
-    authorLinkedin: string;
     category: string;
     tags: string;
-    readTime: string;
   };
   onChange: (formData: any) => void;
 }
@@ -68,51 +64,13 @@ export const PostBasicInfo = ({ formData, onChange }: PostBasicInfoProps) => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">Read Time</label>
+            <label className="block text-sm font-medium mb-2">Tags (comma-separated)</label>
             <Input
-              value={formData.readTime}
-              onChange={(e) => updateField('readTime', e.target.value)}
-              placeholder="e.g., 5 min read"
+              value={formData.tags}
+              onChange={(e) => updateField('tags', e.target.value)}
+              placeholder="e.g., Healthcare Policy, Insurance Reform, PMI"
             />
           </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">Author Name</label>
-            <Input
-              value={formData.author}
-              onChange={(e) => updateField('author', e.target.value)}
-              placeholder="Author name"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">Author Role</label>
-            <Input
-              value={formData.authorRole}
-              onChange={(e) => updateField('authorRole', e.target.value)}
-              placeholder="e.g., Healthcare Policy Analyst"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-2">Author LinkedIn URL</label>
-          <Input
-            value={formData.authorLinkedin}
-            onChange={(e) => updateField('authorLinkedin', e.target.value)}
-            placeholder="https://linkedin.com/in/username"
-            type="url"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-2">Tags (comma-separated)</label>
-          <Input
-            value={formData.tags}
-            onChange={(e) => updateField('tags', e.target.value)}
-            placeholder="e.g., Healthcare Policy, Insurance Reform, PMI"
-          />
         </div>
       </CardContent>
     </Card>

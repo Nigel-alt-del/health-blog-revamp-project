@@ -5,6 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 
 const ContactSection = () => {
+  const handleContactClick = () => {
+    // Ensure we scroll to top when navigating to contact page
+    window.scrollTo(0, 0);
+  };
+
   return (
     <section className="py-16 px-4 bg-gray-50">
       <div className="max-w-4xl mx-auto">
@@ -21,7 +26,7 @@ const ContactSection = () => {
               <p className="text-[#79858D] mb-6">
                 Get insights on employee benefits analysis, information, or need guidance?
               </p>
-              <Link to="/contact">
+              <Link to="/contact" onClick={handleContactClick}>
                 <Button className="w-full bg-[#22aee1] hover:bg-[#20466d]">
                   Contact Information Team
                 </Button>

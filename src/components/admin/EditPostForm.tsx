@@ -25,12 +25,8 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
     title: "",
     excerpt: "",
     content: "",
-    author: "",
-    authorRole: "",
-    authorLinkedin: "",
     category: "Healthcare",
     tags: "",
-    readTime: "5 min read",
     image: ""
   });
 
@@ -42,12 +38,8 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
         title: post.title || "",
         excerpt: post.excerpt || "",
         content: post.content || "",
-        author: post.author || "",
-        authorRole: post.authorRole || "",
-        authorLinkedin: post.authorLinkedin || "",
         category: post.category || "Healthcare",
         tags: Array.isArray(post.tags) ? post.tags.join(', ') : (post.tags || ""),
-        readTime: post.readTime || "5 min read",
         image: post.image || ""
       });
     }
@@ -77,6 +69,11 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
   const formatPostData = (data: typeof formData) => ({
     ...post, // Keep original post properties like id, publishedAt, etc.
     ...data,
+    // Preserve existing author data or use defaults
+    author: post.author || "InsureMyHealth Team",
+    authorRole: post.authorRole || "Healthcare Policy Analyst",
+    authorLinkedin: post.authorLinkedin || "",
+    readTime: post.readTime || "5 min read",
     tags: data.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
   });
 
@@ -180,7 +177,7 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
           <SimplifiedRichTextEditor
             value={formData.content}
             onChange={(content) => handleFormDataChange({ ...formData, content })}
-            placeholder="Edit your report content here. Use the section templates above to add new sections..."
+            placeholder="Edit your report content here. Use the formatting tools above to style your text and add images..."
           />
         </div>
 

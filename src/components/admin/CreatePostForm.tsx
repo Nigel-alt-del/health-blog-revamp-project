@@ -24,12 +24,8 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
     title: "",
     excerpt: "",
     content: "",
-    author: "",
-    authorRole: "",
-    authorLinkedin: "",
     category: "Healthcare",
     tags: "",
-    readTime: "5 min read",
     image: ""
   });
 
@@ -59,6 +55,11 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
 
   const formatPostData = (data: typeof formData) => ({
     ...data,
+    // Add default values for removed fields
+    author: "InsureMyHealth Team",
+    authorRole: "Healthcare Policy Analyst",
+    authorLinkedin: "",
+    readTime: "5 min read",
     tags: data.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
   });
 
@@ -163,7 +164,7 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
           <SimplifiedRichTextEditor
             value={formData.content}
             onChange={(content) => handleFormDataChange({ ...formData, content })}
-            placeholder="Write your report content here. Use the section templates above to get started..."
+            placeholder="Write your report content here. Use the formatting tools above to style your text and add images..."
           />
         </div>
 
