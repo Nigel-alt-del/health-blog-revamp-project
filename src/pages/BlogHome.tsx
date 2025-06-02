@@ -35,9 +35,12 @@ const BlogHome = () => {
           {/* Logo */}
           <div className="mb-8">
             <img 
-              src="/lovable-uploads/06828512-2dab-4a11-8779-5f96f5b9ceb5.png" 
+              src="/lovable-uploads/f5da3d69-3075-4169-a063-c6c6d00a1482.png" 
               alt="The Health Compass Logo" 
               className="h-32 w-auto mx-auto"
+              onError={(e) => {
+                console.log("Logo failed to load:", e.currentTarget.src);
+              }}
             />
           </div>
           
