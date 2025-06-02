@@ -4,17 +4,8 @@ import { useToast } from "@/hooks/use-toast";
 import { PostBasicInfo } from "./PostBasicInfo";
 import { FeaturedImageUpload } from "./FeaturedImageUpload";
 import { AdminSidebar } from "./AdminSidebar";
-import { SectionManager } from "../SectionManager";
-import RichTextEditor from "../RichTextEditor";
+import SimplifiedRichTextEditor from "./SimplifiedRichTextEditor";
 import { ReportPreview } from "../ReportPreview";
-
-interface Section {
-  id: string;
-  title: string;
-  content: string;
-  type: 'introduction' | 'key-findings' | 'analysis' | 'conclusion' | 'custom';
-  collapsed: boolean;
-}
 
 interface CreatePostFormProps {
   onSubmit: (post: any) => void;
@@ -23,7 +14,6 @@ interface CreatePostFormProps {
 
 export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
   const [showPreview, setShowPreview] = useState(false);
-  const [sections, setSections] = useState<Section[]>([]);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -32,17 +22,17 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
     content: "",
     author: "",
     authorRole: "",
-    category: "Insurance Tips",
+    authorBio: "",
+    authorLinkedin: "",
+    category: "Healthcare",
     tags: "",
     readTime: "5 min read",
     image: ""
   });
 
-  const compileSections = () => {
-    return sections.map(section => section.content).join('\n\n');
-  };
-
   const handleSubmit = () => {
+    console.log("Submit clicked with data:", formData);
+    
     if (!formData.title || !formData.excerpt) {
       toast({
         title: "Error",
@@ -52,13 +42,12 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
       return;
     }
 
-    const finalContent = sections.length > 0 ? compileSections() : formData.content;
     const postData = {
       ...formData,
-      content: finalContent,
       tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
     };
 
+    console.log("Submitting post data:", postData);
     onSubmit(postData);
     toast({
       title: "Success",
@@ -66,11 +55,13 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
     });
   };
 
-  const currentPostForPreview = {
-    ...formData,
-    content: sections.length > 0 ? compileSections() : formData.content,
-    tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
+  const handlePreview = () => {
+    console.log("Preview clicked");
+    setShowPreview(true);
   };
+
+  const canPreview = !!(formData.title && formData.excerpt);
+  console.log("Can preview:", canPreview);
 
   return (
     <>
@@ -86,34 +77,24 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
             onImageChange={(image) => setFormData({ ...formData, image })}
           />
 
-          <SectionManager
-            sections={sections}
-            onSectionsChange={setSections}
-            onSectionContentChange={(sectionId, content) => {
-              setSections(sections.map(section =>
-                section.id === sectionId ? { ...section, content } : section
-              ));
-            }}
-          />
-
-          <RichTextEditor
+          <SimplifiedRichTextEditor
             value={formData.content}
             onChange={(content) => setFormData({ ...formData, content })}
-            placeholder="Write your report content here..."
+            placeholder="Write your report content here. Use the section templates above to get started..."
           />
         </div>
 
         <AdminSidebar
-          onPreview={() => setShowPreview(true)}
+          onPreview={handlePreview}
           onPublish={handleSubmit}
           onCancel={onCancel}
-          canPreview={!!(formData.title && formData.excerpt)}
+          canPreview={canPreview}
         />
       </div>
 
       {showPreview && (
         <ReportPreview
-          post={currentPostForPreview}
+          post={formData}
           onClose={() => setShowPreview(false)}
           onPublish={handleSubmit}
         />

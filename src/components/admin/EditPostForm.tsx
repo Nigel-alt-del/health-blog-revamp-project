@@ -4,17 +4,8 @@ import { useToast } from "@/hooks/use-toast";
 import { PostBasicInfo } from "./PostBasicInfo";
 import { FeaturedImageUpload } from "./FeaturedImageUpload";
 import { AdminSidebar } from "./AdminSidebar";
-import { SectionManager } from "../SectionManager";
-import RichTextEditor from "../RichTextEditor";
+import SimplifiedRichTextEditor from "./SimplifiedRichTextEditor";
 import { ReportPreview } from "../ReportPreview";
-
-interface Section {
-  id: string;
-  title: string;
-  content: string;
-  type: 'introduction' | 'key-findings' | 'analysis' | 'conclusion' | 'custom';
-  collapsed: boolean;
-}
 
 interface EditPostFormProps {
   post: any;
@@ -24,7 +15,6 @@ interface EditPostFormProps {
 
 export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) => {
   const [showPreview, setShowPreview] = useState(false);
-  const [sections, setSections] = useState<Section[]>([]);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -33,7 +23,9 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
     content: "",
     author: "",
     authorRole: "",
-    category: "Insurance Tips",
+    authorBio: "",
+    authorLinkedin: "",
+    category: "Healthcare",
     tags: "",
     readTime: "5 min read",
     image: ""
@@ -41,6 +33,7 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
 
   // Load existing post data when component mounts or post changes
   useEffect(() => {
+    console.log("Loading post data:", post);
     if (post) {
       setFormData({
         title: post.title || "",
@@ -48,7 +41,9 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
         content: post.content || "",
         author: post.author || "",
         authorRole: post.authorRole || "",
-        category: post.category || "Insurance Tips",
+        authorBio: post.authorBio || "",
+        authorLinkedin: post.authorLinkedin || "",
+        category: post.category || "Healthcare",
         tags: Array.isArray(post.tags) ? post.tags.join(', ') : (post.tags || ""),
         readTime: post.readTime || "5 min read",
         image: post.image || ""
@@ -56,11 +51,9 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
     }
   }, [post]);
 
-  const compileSections = () => {
-    return sections.map(section => section.content).join('\n\n');
-  };
-
   const handleSubmit = () => {
+    console.log("Update clicked with data:", formData);
+    
     if (!formData.title || !formData.excerpt) {
       toast({
         title: "Error",
@@ -70,14 +63,13 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
       return;
     }
 
-    const finalContent = sections.length > 0 ? compileSections() : formData.content;
     const updatedPost = {
       ...post, // Keep original post properties like id, publishedAt, etc.
       ...formData,
-      content: finalContent,
       tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
     };
 
+    console.log("Submitting updated post:", updatedPost);
     onSubmit(updatedPost);
     toast({
       title: "Success",
@@ -85,10 +77,17 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
     });
   };
 
+  const handlePreview = () => {
+    console.log("Preview clicked");
+    setShowPreview(true);
+  };
+
+  const canPreview = !!(formData.title && formData.excerpt);
+  console.log("Can preview:", canPreview);
+
   const currentPostForPreview = {
     ...post,
     ...formData,
-    content: sections.length > 0 ? compileSections() : formData.content,
     tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
   };
 
@@ -106,28 +105,18 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
             onImageChange={(image) => setFormData({ ...formData, image })}
           />
 
-          <SectionManager
-            sections={sections}
-            onSectionsChange={setSections}
-            onSectionContentChange={(sectionId, content) => {
-              setSections(sections.map(section =>
-                section.id === sectionId ? { ...section, content } : section
-              ));
-            }}
-          />
-
-          <RichTextEditor
+          <SimplifiedRichTextEditor
             value={formData.content}
             onChange={(content) => setFormData({ ...formData, content })}
-            placeholder="Edit your report content here..."
+            placeholder="Edit your report content here. Use the section templates above to add new sections..."
           />
         </div>
 
         <AdminSidebar
-          onPreview={() => setShowPreview(true)}
+          onPreview={handlePreview}
           onPublish={handleSubmit}
           onCancel={onCancel}
-          canPreview={!!(formData.title && formData.excerpt)}
+          canPreview={canPreview}
           isEditing={true}
         />
       </div>

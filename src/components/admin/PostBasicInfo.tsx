@@ -1,7 +1,14 @@
 
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { categories } from "@/data/blogPosts";
+
+const categories = [
+  "Healthcare",
+  "PMI Insights", 
+  "Industry News",
+  "Insure My Health Updates"
+];
 
 interface PostBasicInfoProps {
   formData: {
@@ -9,6 +16,8 @@ interface PostBasicInfoProps {
     excerpt: string;
     author: string;
     authorRole: string;
+    authorBio: string;
+    authorLinkedin: string;
     category: string;
     tags: string;
     readTime: string;
@@ -38,10 +47,11 @@ export const PostBasicInfo = ({ formData, onChange }: PostBasicInfoProps) => {
 
         <div>
           <label className="block text-sm font-medium mb-2">Excerpt *</label>
-          <Input
+          <Textarea
             value={formData.excerpt}
             onChange={(e) => updateField('excerpt', e.target.value)}
             placeholder="Brief description of the report"
+            rows={3}
           />
         </div>
 
@@ -70,7 +80,7 @@ export const PostBasicInfo = ({ formData, onChange }: PostBasicInfoProps) => {
 
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Author</label>
+            <label className="block text-sm font-medium mb-2">Author Name</label>
             <Input
               value={formData.author}
               onChange={(e) => updateField('author', e.target.value)}
@@ -88,11 +98,31 @@ export const PostBasicInfo = ({ formData, onChange }: PostBasicInfoProps) => {
         </div>
 
         <div>
+          <label className="block text-sm font-medium mb-2">Author Bio</label>
+          <Textarea
+            value={formData.authorBio}
+            onChange={(e) => updateField('authorBio', e.target.value)}
+            placeholder="Brief author biography"
+            rows={2}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2">Author LinkedIn URL</label>
+          <Input
+            value={formData.authorLinkedin}
+            onChange={(e) => updateField('authorLinkedin', e.target.value)}
+            placeholder="https://linkedin.com/in/username"
+            type="url"
+          />
+        </div>
+
+        <div>
           <label className="block text-sm font-medium mb-2">Tags (comma-separated)</label>
           <Input
             value={formData.tags}
             onChange={(e) => updateField('tags', e.target.value)}
-            placeholder="e.g., ACA, Healthcare Policy, Insurance Reform"
+            placeholder="e.g., Healthcare Policy, Insurance Reform, PMI"
           />
         </div>
       </CardContent>

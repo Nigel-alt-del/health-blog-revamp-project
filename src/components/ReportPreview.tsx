@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, Clock, User, Eye } from 'lucide-react';
+import { Calendar, Clock, User, Eye, ExternalLink } from 'lucide-react';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 interface ReportPreviewProps {
@@ -14,6 +13,8 @@ interface ReportPreviewProps {
     content: string;
     author: string;
     authorRole: string;
+    authorBio?: string;
+    authorLinkedin?: string;
     category: string;
     tags: string[];
     readTime: string;
@@ -134,17 +135,35 @@ export const ReportPreview = ({ post, onClose, onPublish }: ReportPreviewProps) 
             )}
           </div>
 
-          {/* Meta Information */}
+          {/* Author & Meta Information */}
           <Card>
             <CardContent className="pt-6">
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-                {post.author && (
-                  <div className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    <span>{post.author}</span>
-                    {post.authorRole && <span className="text-gray-400">• {post.authorRole}</span>}
+              {/* Author Info */}
+              {post.author && (
+                <div className="flex items-start gap-4 mb-4 p-4 bg-gray-50 rounded-lg">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <User className="h-4 w-4" />
+                      <span className="font-medium">{post.author}</span>
+                      {post.authorLinkedin && (
+                        <a 
+                          href={post.authorLinkedin} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </a>
+                      )}
+                    </div>
+                    {post.authorRole && <p className="text-sm text-gray-600 mb-2">{post.authorRole}</p>}
+                    {post.authorBio && <p className="text-sm text-gray-700">{post.authorBio}</p>}
                   </div>
-                )}
+                </div>
+              )}
+              
+              {/* Meta Info */}
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
                   <span>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
