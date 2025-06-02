@@ -21,10 +21,10 @@ interface Post {
 interface PostListViewProps {
   posts: Post[];
   onDeletePost: (postId: string) => void;
+  onEditPost: (postId: string) => void;
 }
 
-export const PostListView = ({ posts, onDeletePost }: PostListViewProps) => {
-  const [editingPost, setEditingPost] = useState<string | null>(null);
+export const PostListView = ({ posts, onDeletePost, onEditPost }: PostListViewProps) => {
   const { toast } = useToast();
 
   const handleDeletePost = (postId: string) => {
@@ -33,6 +33,10 @@ export const PostListView = ({ posts, onDeletePost }: PostListViewProps) => {
       title: "Success",
       description: "Report deleted successfully!"
     });
+  };
+
+  const handleEditPost = (postId: string) => {
+    onEditPost(postId);
   };
 
   return (
@@ -58,7 +62,7 @@ export const PostListView = ({ posts, onDeletePost }: PostListViewProps) => {
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => setEditingPost(post.id)}
+                  onClick={() => handleEditPost(post.id)}
                 >
                   <Edit className="h-4 w-4" />
                 </Button>

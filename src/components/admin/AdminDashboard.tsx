@@ -5,6 +5,7 @@ import { Plus, ArrowLeft } from "lucide-react";
 import BlogLayout from "@/components/BlogLayout";
 import { PostListView } from "./PostListView";
 import { CreatePostForm } from "./CreatePostForm";
+import { EditPostForm } from "./EditPostForm";
 import { blogPosts } from "@/data/blogPosts";
 
 const AdminDashboard = () => {
@@ -13,9 +14,11 @@ const AdminDashboard = () => {
   
   const [posts, setPosts] = useState(blogPosts);
   const [isCreating, setIsCreating] = useState(false);
+  const [editingPostId, setEditingPostId] = useState<string | null>(null);
 
   console.log("Current posts state:", posts);
   console.log("Is creating:", isCreating);
+  console.log("Editing post ID:", editingPostId);
 
   const handleCreatePost = (newPost: any) => {
     const post = {
@@ -31,9 +34,27 @@ const AdminDashboard = () => {
     setIsCreating(false);
   };
 
+  const handleEditPost = (updatedPost: any) => {
+    setPosts(posts.map(post => 
+      post.id === updatedPost.id ? updatedPost : post
+    ));
+    setEditingPostId(null);
+  };
+
   const handleDeletePost = (postId: string) => {
     setPosts(posts.filter(post => post.id !== postId));
   };
+
+  const handleStartEdit = (postId: string) => {
+    setEditingPostId(postId);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingPostId(null);
+  };
+
+  // Find the post being edited
+  const editingPost = editingPostId ? posts.find(post => post.id === editingPostId) : null;
 
   if (isCreating) {
     return (
@@ -60,6 +81,32 @@ const AdminDashboard = () => {
     );
   }
 
+  if (editingPostId && editingPost) {
+    return (
+      <BlogLayout>
+        <div className="max-w-6xl mx-auto px-4 py-12">
+          <div className="mb-8">
+            <Button 
+              variant="outline" 
+              onClick={handleCancelEdit}
+              className="mb-4"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Admin
+            </Button>
+            <h1 className="text-3xl font-bold text-gray-900">Edit Report: {editingPost.title}</h1>
+          </div>
+
+          <EditPostForm 
+            post={editingPost}
+            onSubmit={handleEditPost}
+            onCancel={handleCancelEdit}
+          />
+        </div>
+      </BlogLayout>
+    );
+  }
+
   return (
     <BlogLayout>
       <div className="max-w-6xl mx-auto px-4 py-12">
@@ -78,6 +125,7 @@ const AdminDashboard = () => {
           <PostListView 
             posts={posts}
             onDeletePost={handleDeletePost}
+            onEditPost={handleStartEdit}
           />
         </div>
       </div>
