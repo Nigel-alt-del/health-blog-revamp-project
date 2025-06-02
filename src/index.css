@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -97,5 +98,35 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
   }
 }
+
+/* Custom font support for rich text editor and preview */
+.ql-font-Inter { font-family: 'Inter', sans-serif !important; }
+.ql-font-Roboto { font-family: 'Roboto', sans-serif !important; }
+.ql-font-Open\ Sans { font-family: 'Open Sans', sans-serif !important; }
+.ql-font-Playfair\ Display { font-family: 'Playfair Display', serif !important; }
+.ql-font-Lora { font-family: 'Lora', serif !important; }
+
+/* Custom font size support */
+.ql-size-12px { font-size: 12px !important; }
+.ql-size-14px { font-size: 14px !important; }
+.ql-size-16px { font-size: 16px !important; }
+.ql-size-18px { font-size: 18px !important; }
+.ql-size-24px { font-size: 24px !important; }
+.ql-size-32px { font-size: 32px !important; }
+
+/* Ensure fonts work in preview */
+.prose .ql-font-Inter { font-family: 'Inter', sans-serif !important; }
+.prose .ql-font-Roboto { font-family: 'Roboto', sans-serif !important; }
+.prose .ql-font-Open\ Sans { font-family: 'Open Sans', sans-serif !important; }
+.prose .ql-font-Playfair\ Display { font-family: 'Playfair Display', serif !important; }
+.prose .ql-font-Lora { font-family: 'Lora', serif !important; }
+
+.prose .ql-size-12px { font-size: 12px !important; }
+.prose .ql-size-14px { font-size: 14px !important; }
+.prose .ql-size-16px { font-size: 16px !important; }
+.prose .ql-size-18px { font-size: 18px !important; }
+.prose .ql-size-24px { font-size: 24px !important; }
+.prose .ql-size-32px { font-size: 32px !important; }

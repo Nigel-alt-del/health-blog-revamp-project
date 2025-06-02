@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { PostBasicInfo } from "./PostBasicInfo";
 import { FeaturedImageUpload } from "./FeaturedImageUpload";
@@ -14,6 +15,10 @@ interface EditPostFormProps {
 
 export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) => {
   const [showPreview, setShowPreview] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -50,19 +55,74 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
     }
   }, [post]);
 
+  // Track changes for auto-save
+  useEffect(() => {
+    setHasUnsavedChanges(true);
+    
+    // Clear existing timer
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+    
+    // Set new auto-save timer
+    autoSaveTimerRef.current = setTimeout(() => {
+      handleSaveDraft();
+    }, 30000); // Auto-save every 30 seconds
+
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [formData]);
+
   const formatPostData = (data: typeof formData) => ({
     ...post, // Keep original post properties like id, publishedAt, etc.
     ...data,
     tags: data.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
   });
 
+  const handleSaveDraft = async () => {
+    setIsSaving(true);
+    
+    try {
+      // Simulate saving draft (in real app, this would call an API)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setLastSaved(new Date());
+      setHasUnsavedChanges(false);
+      
+      toast({
+        title: "Draft Saved",
+        description: "Your changes have been saved automatically."
+      });
+    } catch (error) {
+      toast({
+        title: "Save Failed",
+        description: "Failed to save draft. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleSubmit = () => {
     console.log("Update clicked with data:", formData);
     
-    if (!formData.title || !formData.excerpt) {
+    if (!formData.title?.trim()) {
       toast({
         title: "Error",
-        description: "Please fill in title and excerpt",
+        description: "Please add a title",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!formData.excerpt?.trim()) {
+      toast({
+        title: "Error", 
+        description: "Please add an excerpt",
         variant: "destructive"
       });
       return;
@@ -72,6 +132,7 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
 
     console.log("Submitting updated post:", updatedPost);
     onSubmit(updatedPost);
+    setHasUnsavedChanges(false);
     toast({
       title: "Success",
       description: "Report updated successfully!"
@@ -80,11 +141,28 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
 
   const handlePreview = () => {
     console.log("Preview clicked");
+    
+    if (!formData.title?.trim()) {
+      toast({
+        title: "Preview Error",
+        description: "Please add a title to preview the report",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     setShowPreview(true);
   };
 
-  const canPreview = !!(formData.title && formData.excerpt);
-  console.log("Can preview:", canPreview);
+  const handleFormDataChange = (newFormData: any) => {
+    setFormData(newFormData);
+  };
+
+  // Only require title for preview, title + excerpt for publishing
+  const canPreview = !!(formData.title?.trim());
+  const canPublish = !!(formData.title?.trim() && formData.excerpt?.trim());
+  
+  console.log("Can preview:", canPreview, "Can publish:", canPublish);
 
   return (
     <>
@@ -92,17 +170,17 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
         <div className="lg:col-span-2 space-y-6">
           <PostBasicInfo 
             formData={formData}
-            onChange={setFormData}
+            onChange={handleFormDataChange}
           />
 
           <FeaturedImageUpload
             image={formData.image}
-            onImageChange={(image) => setFormData({ ...formData, image })}
+            onImageChange={(image) => handleFormDataChange({ ...formData, image })}
           />
 
           <SimplifiedRichTextEditor
             value={formData.content}
-            onChange={(content) => setFormData({ ...formData, content })}
+            onChange={(content) => handleFormDataChange({ ...formData, content })}
             placeholder="Edit your report content here. Use the section templates above to add new sections..."
           />
         </div>
@@ -111,8 +189,12 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
           onPreview={handlePreview}
           onPublish={handleSubmit}
           onCancel={onCancel}
-          canPreview={canPreview}
+          onSaveDraft={handleSaveDraft}
+          canPreview={canPublish}
           isEditing={true}
+          isSaving={isSaving}
+          lastSaved={lastSaved}
+          hasUnsavedChanges={hasUnsavedChanges}
         />
       </div>
 

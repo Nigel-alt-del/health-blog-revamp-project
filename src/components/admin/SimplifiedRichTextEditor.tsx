@@ -23,6 +23,25 @@ const sectionTemplates = {
   methodology: `<h2>Methodology</h2><p>Explain how the research was conducted...</p>`
 };
 
+const fontFamilies = [
+  { value: 'Inter', label: 'Inter (Modern)' },
+  { value: 'Roboto', label: 'Roboto (Professional)' },
+  { value: 'Open Sans', label: 'Open Sans (Friendly)' },
+  { value: 'Playfair Display', label: 'Playfair Display (Elegant)' },
+  { value: 'Lora', label: 'Lora (Readable)' },
+  { value: 'Arial', label: 'Arial (Classic)' },
+  { value: 'Times New Roman', label: 'Times New Roman (Traditional)' }
+];
+
+const fontSizes = [
+  { value: '12px', label: 'Small (12px)' },
+  { value: '14px', label: 'Normal (14px)' },
+  { value: '16px', label: 'Medium (16px)' },
+  { value: '18px', label: 'Large (18px)' },
+  { value: '24px', label: 'Extra Large (24px)' },
+  { value: '32px', label: 'Huge (32px)' }
+];
+
 const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRichTextEditorProps) => {
   const [showChartBuilder, setShowChartBuilder] = useState(false);
   const [showMediaGallery, setShowMediaGallery] = useState(false);
@@ -31,6 +50,8 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
     toolbar: {
       container: [
         [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+        [{ 'size': fontSizes.map(size => size.value) }],
+        [{ 'font': fontFamilies.map(font => font.value) }],
         ['bold', 'italic', 'underline', 'strike'],
         [{ 'color': [] }, { 'background': [] }],
         [{ 'list': 'ordered'}, { 'list': 'bullet' }],
@@ -39,6 +60,22 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
         ['link', 'image'],
         ['clean']
       ],
+      handlers: {
+        font: function(value: string) {
+          if (value) {
+            this.quill.format('font', value);
+          } else {
+            this.quill.format('font', false);
+          }
+        },
+        size: function(value: string) {
+          if (value) {
+            this.quill.format('size', value);
+          } else {
+            this.quill.format('size', false);
+          }
+        }
+      }
     },
     clipboard: {
       matchVisual: false,
@@ -46,7 +83,7 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
   };
 
   const formats = [
-    'header', 'bold', 'italic', 'underline', 'strike',
+    'header', 'font', 'size', 'bold', 'italic', 'underline', 'strike',
     'color', 'background', 'list', 'bullet', 'align',
     'blockquote', 'code-block', 'link', 'image'
   ];
@@ -185,6 +222,48 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
         </div>
       </CardHeader>
       <CardContent>
+        <style jsx>{`
+          .ql-font .ql-picker-options .ql-picker-item[data-value="Inter"]::before { 
+            content: 'Inter (Modern)'; 
+            font-family: 'Inter', sans-serif; 
+          }
+          .ql-font .ql-picker-options .ql-picker-item[data-value="Roboto"]::before { 
+            content: 'Roboto (Professional)'; 
+            font-family: 'Roboto', sans-serif; 
+          }
+          .ql-font .ql-picker-options .ql-picker-item[data-value="Open Sans"]::before { 
+            content: 'Open Sans (Friendly)'; 
+            font-family: 'Open Sans', sans-serif; 
+          }
+          .ql-font .ql-picker-options .ql-picker-item[data-value="Playfair Display"]::before { 
+            content: 'Playfair Display (Elegant)'; 
+            font-family: 'Playfair Display', serif; 
+          }
+          .ql-font .ql-picker-options .ql-picker-item[data-value="Lora"]::before { 
+            content: 'Lora (Readable)'; 
+            font-family: 'Lora', serif; 
+          }
+          .ql-size .ql-picker-options .ql-picker-item[data-value="12px"]::before { content: 'Small (12px)'; }
+          .ql-size .ql-picker-options .ql-picker-item[data-value="14px"]::before { content: 'Normal (14px)'; }
+          .ql-size .ql-picker-options .ql-picker-item[data-value="16px"]::before { content: 'Medium (16px)'; }
+          .ql-size .ql-picker-options .ql-picker-item[data-value="18px"]::before { content: 'Large (18px)'; }
+          .ql-size .ql-picker-options .ql-picker-item[data-value="24px"]::before { content: 'Extra Large (24px)'; }
+          .ql-size .ql-picker-options .ql-picker-item[data-value="32px"]::before { content: 'Huge (32px)'; }
+          
+          .ql-font-Inter { font-family: 'Inter', sans-serif; }
+          .ql-font-Roboto { font-family: 'Roboto', sans-serif; }
+          .ql-font-Open Sans { font-family: 'Open Sans', sans-serif; }
+          .ql-font-Playfair Display { font-family: 'Playfair Display', serif; }
+          .ql-font-Lora { font-family: 'Lora', serif; }
+          
+          .ql-size-12px { font-size: 12px; }
+          .ql-size-14px { font-size: 14px; }
+          .ql-size-16px { font-size: 16px; }
+          .ql-size-18px { font-size: 18px; }
+          .ql-size-24px { font-size: 24px; }
+          .ql-size-32px { font-size: 32px; }
+        `}</style>
+        
         <ReactQuill
           theme="snow"
           value={value}
