@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, Clock, ArrowRight, Calculator, TrendingUp, FileText } from "lucide-react";
@@ -33,9 +32,19 @@ const BlogHome = () => {
         }}
       >
         <div className="max-w-4xl mx-auto text-center text-white">
+          {/* Logo */}
+          <div className="mb-8">
+            <img 
+              src="/lovable-uploads/7e735a1d-1775-4265-95b3-6d72ae392f04.png" 
+              alt="Insurance Market Hub Logo" 
+              className="h-32 w-auto mx-auto"
+            />
+          </div>
+          
           <h1 className="text-5xl font-bold mb-6 leading-tight">
             The Health <span className="text-[#22aee1]">Compass</span>
           </h1>
+          
           <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
             Analysis, market intelligence, and compliance guidance for UK small 
             and medium enterprises on employee benefits and private medical insurance
