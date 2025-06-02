@@ -15,8 +15,9 @@ const BlogPost = () => {
   const { toast } = useToast();
   const post = blogPosts.find(p => p.id === slug);
   
-  // Check if user came from admin (you could enhance this with proper state management)
-  const cameFromAdmin = document.referrer.includes('/admin');
+  // Check if user came from admin
+  const cameFromAdmin = document.referrer.includes('/admin') || 
+                        sessionStorage.getItem('cameFromAdmin') === 'true';
   
   if (!post) {
     return (
@@ -34,6 +35,9 @@ const BlogPost = () => {
       </BlogLayout>
     );
   }
+
+  // Get author LinkedIn URL safely
+  const authorLinkedIn = (post as any).authorLinkedin || (post as any).authorLink || null;
 
   const handleShare = async () => {
     const shareData = {
@@ -110,7 +114,11 @@ const BlogPost = () => {
       <article className="max-w-4xl mx-auto px-4 py-12">
         <div className="mb-8">
           {cameFromAdmin ? (
-            <Link to="/admin" className="inline-flex items-center text-[#22aee1] hover:text-[#20466d] mb-6">
+            <Link 
+              to="/admin" 
+              className="inline-flex items-center text-[#22aee1] hover:text-[#20466d] mb-6"
+              onClick={() => sessionStorage.removeItem('cameFromAdmin')}
+            >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Admin
             </Link>
@@ -137,9 +145,9 @@ const BlogPost = () => {
               <div>
                 <p className="font-medium text-[#20466d]">{post.author}</p>
                 <p className="text-sm text-[#79858D]">{post.authorRole}</p>
-                {post.authorLinkedin && (
+                {authorLinkedIn && (
                   <a 
-                    href={post.authorLinkedin} 
+                    href={authorLinkedIn} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-sm text-[#22aee1] hover:underline"
@@ -222,9 +230,9 @@ const BlogPost = () => {
               <div>
                 <CardTitle className="text-xl text-[#20466d]">{post.author}</CardTitle>
                 <p className="text-[#79858D]">{post.authorRole}</p>
-                {post.authorLinkedin && (
+                {authorLinkedIn && (
                   <a 
-                    href={post.authorLinkedin} 
+                    href={authorLinkedIn} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-[#22aee1] hover:underline"
