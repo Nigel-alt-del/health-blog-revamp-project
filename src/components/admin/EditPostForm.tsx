@@ -27,7 +27,6 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
     content: "",
     author: "",
     authorRole: "",
-    authorBio: "",
     authorLinkedin: "",
     category: "Healthcare",
     tags: "",
@@ -45,7 +44,6 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
         content: post.content || "",
         author: post.author || "",
         authorRole: post.authorRole || "",
-        authorBio: post.authorBio || "",
         authorLinkedin: post.authorLinkedin || "",
         category: post.category || "Healthcare",
         tags: Array.isArray(post.tags) ? post.tags.join(', ') : (post.tags || ""),
@@ -163,6 +161,7 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
   const canPublish = !!(formData.title?.trim() && formData.excerpt?.trim());
   
   console.log("Can preview:", canPreview, "Can publish:", canPublish);
+  console.log("Form data content:", formData.content);
 
   return (
     <>

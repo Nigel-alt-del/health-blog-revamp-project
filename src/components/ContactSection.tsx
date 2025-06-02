@@ -2,6 +2,7 @@
 import { Mail, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link } from "react-router-dom";
 
 const ContactSection = () => {
   return (
@@ -20,9 +21,11 @@ const ContactSection = () => {
               <p className="text-[#79858D] mb-6">
                 Get insights on employee benefits analysis, information, or need guidance?
               </p>
-              <Button className="w-full bg-[#22aee1] hover:bg-[#20466d]">
-                Contact Information Team
-              </Button>
+              <Link to="/contact">
+                <Button className="w-full bg-[#22aee1] hover:bg-[#20466d]">
+                  Contact Information Team
+                </Button>
+              </Link>
             </CardContent>
           </Card>
 

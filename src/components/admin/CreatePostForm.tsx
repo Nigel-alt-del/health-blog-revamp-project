@@ -26,7 +26,6 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
     content: "",
     author: "",
     authorRole: "",
-    authorBio: "",
     authorLinkedin: "",
     category: "Healthcare",
     tags: "",

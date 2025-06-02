@@ -16,7 +16,6 @@ interface PostBasicInfoProps {
     excerpt: string;
     author: string;
     authorRole: string;
-    authorBio: string;
     authorLinkedin: string;
     category: string;
     tags: string;
@@ -95,16 +94,6 @@ export const PostBasicInfo = ({ formData, onChange }: PostBasicInfoProps) => {
               placeholder="e.g., Healthcare Policy Analyst"
             />
           </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-2">Author Bio</label>
-          <Textarea
-            value={formData.authorBio}
-            onChange={(e) => updateField('authorBio', e.target.value)}
-            placeholder="Brief author biography"
-            rows={2}
-          />
         </div>
 
         <div>

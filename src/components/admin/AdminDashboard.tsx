@@ -9,16 +9,9 @@ import { EditPostForm } from "./EditPostForm";
 import { blogPosts } from "@/data/blogPosts";
 
 const AdminDashboard = () => {
-  console.log("AdminDashboard rendering");
-  console.log("Blog posts:", blogPosts);
-  
   const [posts, setPosts] = useState(blogPosts);
   const [isCreating, setIsCreating] = useState(false);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
-
-  console.log("Current posts state:", posts);
-  console.log("Is creating:", isCreating);
-  console.log("Editing post ID:", editingPostId);
 
   const handleCreatePost = (newPost: any) => {
     const post = {
@@ -118,16 +111,11 @@ const AdminDashboard = () => {
           </Button>
         </div>
 
-        <div className="bg-white p-4 rounded-lg shadow">
-          <p className="text-sm text-gray-600 mb-4">
-            Debug Info: {posts.length} posts loaded
-          </p>
-          <PostListView 
-            posts={posts}
-            onDeletePost={handleDeletePost}
-            onEditPost={handleStartEdit}
-          />
-        </div>
+        <PostListView 
+          posts={posts}
+          onDeletePost={handleDeletePost}
+          onEditPost={handleStartEdit}
+        />
       </div>
     </BlogLayout>
   );
