@@ -35,8 +35,8 @@ const BlogHome = () => {
           {/* Logo */}
           <div className="mb-8">
             <img 
-              src="/lovable-uploads/7e735a1d-1775-4265-95b3-6d72ae392f04.png" 
-              alt="Insurance Market Hub Logo" 
+              src="/lovable-uploads/06828512-2dab-4a11-8779-5f96f5b9ceb5.png" 
+              alt="The Health Compass Logo" 
               className="h-32 w-auto mx-auto"
             />
           </div>
