@@ -30,6 +30,11 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
     image: ""
   });
 
+  const formatPostData = (data: typeof formData) => ({
+    ...data,
+    tags: data.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
+  });
+
   const handleSubmit = () => {
     console.log("Submit clicked with data:", formData);
     
@@ -42,10 +47,7 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
       return;
     }
 
-    const postData = {
-      ...formData,
-      tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
-    };
+    const postData = formatPostData(formData);
 
     console.log("Submitting post data:", postData);
     onSubmit(postData);
@@ -94,7 +96,7 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
 
       {showPreview && (
         <ReportPreview
-          post={formData}
+          post={formatPostData(formData)}
           onClose={() => setShowPreview(false)}
           onPublish={handleSubmit}
         />

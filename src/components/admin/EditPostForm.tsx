@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { PostBasicInfo } from "./PostBasicInfo";
@@ -51,6 +50,12 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
     }
   }, [post]);
 
+  const formatPostData = (data: typeof formData) => ({
+    ...post, // Keep original post properties like id, publishedAt, etc.
+    ...data,
+    tags: data.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
+  });
+
   const handleSubmit = () => {
     console.log("Update clicked with data:", formData);
     
@@ -63,11 +68,7 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
       return;
     }
 
-    const updatedPost = {
-      ...post, // Keep original post properties like id, publishedAt, etc.
-      ...formData,
-      tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
-    };
+    const updatedPost = formatPostData(formData);
 
     console.log("Submitting updated post:", updatedPost);
     onSubmit(updatedPost);
@@ -84,12 +85,6 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
 
   const canPreview = !!(formData.title && formData.excerpt);
   console.log("Can preview:", canPreview);
-
-  const currentPostForPreview = {
-    ...post,
-    ...formData,
-    tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
-  };
 
   return (
     <>
@@ -123,7 +118,7 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
 
       {showPreview && (
         <ReportPreview
-          post={currentPostForPreview}
+          post={formatPostData(formData)}
           onClose={() => setShowPreview(false)}
           onPublish={handleSubmit}
         />
