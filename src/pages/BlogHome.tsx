@@ -35,7 +35,7 @@ const BlogHome = () => {
           {/* Logo */}
           <div className="mb-8">
             <img 
-              src="/lovable-uploads/e09fb273-6510-480f-b652-61b01e3ca293.png" 
+              src="/lovable-uploads/7e735a1d-1775-4265-95b3-6d72ae392f04.png" 
               alt="The Health Compass Logo" 
               className="h-32 w-auto mx-auto"
               onError={(e) => {
