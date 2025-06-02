@@ -222,48 +222,6 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
         </div>
       </CardHeader>
       <CardContent>
-        <style jsx>{`
-          .ql-font .ql-picker-options .ql-picker-item[data-value="Inter"]::before { 
-            content: 'Inter (Modern)'; 
-            font-family: 'Inter', sans-serif; 
-          }
-          .ql-font .ql-picker-options .ql-picker-item[data-value="Roboto"]::before { 
-            content: 'Roboto (Professional)'; 
-            font-family: 'Roboto', sans-serif; 
-          }
-          .ql-font .ql-picker-options .ql-picker-item[data-value="Open Sans"]::before { 
-            content: 'Open Sans (Friendly)'; 
-            font-family: 'Open Sans', sans-serif; 
-          }
-          .ql-font .ql-picker-options .ql-picker-item[data-value="Playfair Display"]::before { 
-            content: 'Playfair Display (Elegant)'; 
-            font-family: 'Playfair Display', serif; 
-          }
-          .ql-font .ql-picker-options .ql-picker-item[data-value="Lora"]::before { 
-            content: 'Lora (Readable)'; 
-            font-family: 'Lora', serif; 
-          }
-          .ql-size .ql-picker-options .ql-picker-item[data-value="12px"]::before { content: 'Small (12px)'; }
-          .ql-size .ql-picker-options .ql-picker-item[data-value="14px"]::before { content: 'Normal (14px)'; }
-          .ql-size .ql-picker-options .ql-picker-item[data-value="16px"]::before { content: 'Medium (16px)'; }
-          .ql-size .ql-picker-options .ql-picker-item[data-value="18px"]::before { content: 'Large (18px)'; }
-          .ql-size .ql-picker-options .ql-picker-item[data-value="24px"]::before { content: 'Extra Large (24px)'; }
-          .ql-size .ql-picker-options .ql-picker-item[data-value="32px"]::before { content: 'Huge (32px)'; }
-          
-          .ql-font-Inter { font-family: 'Inter', sans-serif; }
-          .ql-font-Roboto { font-family: 'Roboto', sans-serif; }
-          .ql-font-Open Sans { font-family: 'Open Sans', sans-serif; }
-          .ql-font-Playfair Display { font-family: 'Playfair Display', serif; }
-          .ql-font-Lora { font-family: 'Lora', serif; }
-          
-          .ql-size-12px { font-size: 12px; }
-          .ql-size-14px { font-size: 14px; }
-          .ql-size-16px { font-size: 16px; }
-          .ql-size-18px { font-size: 18px; }
-          .ql-size-24px { font-size: 24px; }
-          .ql-size-32px { font-size: 32px; }
-        `}</style>
-        
         <ReactQuill
           theme="snow"
           value={value}
