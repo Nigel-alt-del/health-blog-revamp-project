@@ -171,7 +171,7 @@ const AdminDashboard = () => {
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Admin
             </Button>
-            <h1 ="text-3xl font-bold text-gray-900">Edit Report: {editingPost.title}</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Edit Report: {editingPost.title}</h1>
           </div>
 
           <EditPostForm 
