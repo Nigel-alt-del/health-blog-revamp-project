@@ -1,4 +1,3 @@
-
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Clock, ArrowLeft, Share2, BookmarkPlus } from "lucide-react";
@@ -8,13 +7,13 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import BlogLayout from "@/components/BlogLayout";
 import BlogCard from "@/components/BlogCard";
-import { getStoredPosts } from "@/utils/localStorage";
+import { getStoredPosts, type BlogPost } from "@/utils/localStorage";
 import { blogPosts } from "@/data/blogPosts";
 
 const BlogPost = () => {
   const { slug } = useParams();
   const { toast } = useToast();
-  const [allPosts, setAllPosts] = useState(blogPosts);
+  const [allPosts, setAllPosts] = useState<BlogPost[]>(blogPosts);
   
   // Load posts from localStorage on component mount
   useEffect(() => {

@@ -6,12 +6,16 @@ interface BlogPost {
   content: string;
   author: string;
   authorRole: string;
+  authorImage?: string;
+  authorLink?: string;
   publishedAt: string;
   readTime: string;
   category: string;
   tags: string[];
   featured: boolean;
   image: string;
+  seoKeywords?: string;
+  metaDescription?: string;
 }
 
 const STORAGE_KEY = 'blog_posts';
@@ -53,3 +57,5 @@ export const deletePostFromStorage = (postId: string): void => {
   const updatedPosts = posts.filter(post => post.id !== postId);
   savePostsToStorage(updatedPosts);
 };
+
+export type { BlogPost };

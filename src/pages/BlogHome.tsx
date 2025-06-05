@@ -6,12 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Search } from "lucide-react";
-import { getStoredPosts } from "@/utils/localStorage";
+import { getStoredPosts, type BlogPost } from "@/utils/localStorage";
 import { blogPosts } from "@/data/blogPosts";
 
 const BlogHome = () => {
-  const [allPosts, setAllPosts] = useState(blogPosts);
-  const [filteredPosts, setFilteredPosts] = useState(blogPosts);
+  const [allPosts, setAllPosts] = useState<BlogPost[]>(blogPosts);
+  const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>(blogPosts);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 

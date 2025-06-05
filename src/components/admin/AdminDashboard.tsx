@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ArrowLeft } from "lucide-react";
@@ -6,11 +5,11 @@ import BlogLayout from "@/components/BlogLayout";
 import { PostListView } from "./PostListView";
 import { CreatePostForm } from "./CreatePostForm";
 import { EditPostForm } from "./EditPostForm";
-import { getStoredPosts, addPostToStorage, updatePostInStorage, deletePostFromStorage } from "@/utils/localStorage";
+import { getStoredPosts, addPostToStorage, updatePostInStorage, deletePostFromStorage, type BlogPost } from "@/utils/localStorage";
 import { blogPosts } from "@/data/blogPosts";
 
 const AdminDashboard = () => {
-  const [posts, setPosts] = useState(blogPosts);
+  const [posts, setPosts] = useState<BlogPost[]>(blogPosts);
   const [isCreating, setIsCreating] = useState(false);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
 
@@ -19,7 +18,6 @@ const AdminDashboard = () => {
     const storedPosts = getStoredPosts();
     if (storedPosts.length > 0) {
       // Combine stored posts with default posts, prioritizing stored ones
-      const defaultPostIds = new Set(blogPosts.map(p => p.id));
       const combinedPosts = [
         ...storedPosts,
         ...blogPosts.filter(p => !storedPosts.some(sp => sp.id === p.id))
