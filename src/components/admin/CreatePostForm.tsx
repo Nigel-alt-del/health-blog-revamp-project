@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { PostBasicInfo } from "./PostBasicInfo";
@@ -60,7 +59,9 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
     category: data.category,
     tags: data.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
     image: data.image,
-    readTime: "5 min read"
+    readTime: "5 min read",
+    author: "InsureMyHealth Team",
+    authorRole: "Healthcare Policy Analyst"
   });
 
   const handleSaveDraft = async () => {
