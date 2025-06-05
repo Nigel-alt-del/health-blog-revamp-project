@@ -6,6 +6,7 @@ import { FeaturedImageUpload } from "./FeaturedImageUpload";
 import { AdminSidebar } from "./AdminSidebar";
 import SimplifiedRichTextEditor from "./SimplifiedRichTextEditor";
 import { ReportPreview } from "../ReportPreview";
+import { updatePostInStorage, type BlogPost } from "@/utils/localStorage";
 
 interface EditPostFormProps {
   post: any;
@@ -68,30 +69,50 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
 
   const formatPostData = (data: typeof formData) => ({
     ...post, // Keep original post properties like id, publishedAt, etc.
-    ...data,
+    title: data.title,
+    excerpt: data.excerpt,
+    content: data.content,
+    category: data.category,
+    tags: data.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+    image: data.image,
     // Preserve existing author data or use defaults
     author: post.author || "InsureMyHealth Team",
     authorRole: post.authorRole || "Healthcare Policy Analyst",
     authorLinkedin: post.authorLinkedin || "",
-    readTime: post.readTime || "5 min read",
-    tags: data.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
+    readTime: post.readTime || "5 min read"
   });
 
   const handleSaveDraft = async () => {
+    if (!formData.title?.trim()) {
+      toast({
+        title: "Cannot Save Draft",
+        description: "Please add a title before saving draft",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     setIsSaving(true);
     
     try {
-      // Simulate saving draft (in real app, this would call an API)
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log("Saving draft with data:", formData);
+      
+      const updatedPost = formatPostData(formData);
+      
+      // Save to localStorage
+      updatePostInStorage(updatedPost);
       
       setLastSaved(new Date());
       setHasUnsavedChanges(false);
       
+      console.log("Draft updated successfully:", updatedPost);
+      
       toast({
         title: "Draft Saved",
-        description: "Your changes have been saved automatically."
+        description: "Your changes have been saved successfully."
       });
     } catch (error) {
+      console.error("Error saving draft:", error);
       toast({
         title: "Save Failed",
         description: "Failed to save draft. Please try again.",
@@ -123,15 +144,25 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
       return;
     }
 
-    const updatedPost = formatPostData(formData);
+    try {
+      const updatedPost = formatPostData(formData);
 
-    console.log("Submitting updated post:", updatedPost);
-    onSubmit(updatedPost);
-    setHasUnsavedChanges(false);
-    toast({
-      title: "Success",
-      description: "Report updated successfully!"
-    });
+      console.log("Submitting updated post:", updatedPost);
+      onSubmit(updatedPost);
+      setHasUnsavedChanges(false);
+      
+      toast({
+        title: "Success",
+        description: "Report updated successfully!"
+      });
+    } catch (error) {
+      console.error("Error updating post:", error);
+      toast({
+        title: "Update Failed",
+        description: "Failed to update report. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handlePreview = () => {

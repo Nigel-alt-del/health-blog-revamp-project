@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { PostBasicInfo } from "./PostBasicInfo";
@@ -6,6 +5,7 @@ import { FeaturedImageUpload } from "./FeaturedImageUpload";
 import { AdminSidebar } from "./AdminSidebar";
 import SimplifiedRichTextEditor from "./SimplifiedRichTextEditor";
 import { ReportPreview } from "../ReportPreview";
+import { addPostToStorage, type BlogPost } from "@/utils/localStorage";
 
 interface CreatePostFormProps {
   onSubmit: (post: any) => void;
@@ -17,6 +17,7 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [draftId, setDraftId] = useState<string | null>(null);
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
@@ -53,6 +54,16 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
     };
   }, [formData]);
 
+  const generateId = (title: string): string => {
+    const baseId = title.toLowerCase()
+      .replace(/[^a-z0-9\s]/g, '')
+      .replace(/\s+/g, '-')
+      .substring(0, 50);
+    
+    const timestamp = Date.now();
+    return `${baseId}-${timestamp}`;
+  };
+
   const formatPostData = (data: typeof formData) => ({
     title: data.title,
     excerpt: data.excerpt,
@@ -78,22 +89,54 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
   });
 
   const handleSaveDraft = async () => {
-    if (!formData.title?.trim()) return; // Don't save empty drafts
+    if (!formData.title?.trim()) {
+      toast({
+        title: "Cannot Save Draft",
+        description: "Please add a title before saving draft",
+        variant: "destructive"
+      });
+      return;
+    }
     
     setIsSaving(true);
     
     try {
-      // Simulate saving draft (in real app, this would call an API)
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log("Saving draft with data:", formData);
+      
+      // Create or update draft
+      const draftPost: BlogPost = {
+        id: draftId || generateId(formData.title),
+        title: formData.title,
+        excerpt: formData.excerpt,
+        content: formData.content,
+        publishedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        readTime: "5 min read",
+        category: formData.category,
+        tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+        featured: false,
+        image: formData.image || "/placeholder.svg",
+        seoKeywords: '',
+        metaDescription: formData.excerpt
+      };
+
+      // Save to localStorage
+      addPostToStorage(draftPost);
+      
+      if (!draftId) {
+        setDraftId(draftPost.id);
+      }
       
       setLastSaved(new Date());
       setHasUnsavedChanges(false);
       
+      console.log("Draft saved successfully:", draftPost);
+      
       toast({
         title: "Draft Saved",
-        description: "Your changes have been saved automatically."
+        description: "Your changes have been saved successfully."
       });
     } catch (error) {
+      console.error("Error saving draft:", error);
       toast({
         title: "Save Failed",
         description: "Failed to save draft. Please try again.",
@@ -125,16 +168,25 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
       return;
     }
 
-    const postData = formatPostData(formData);
-    console.log("Submitting post data:", postData);
-    
-    onSubmit(postData);
-    setHasUnsavedChanges(false);
-    
-    toast({
-      title: "Success",
-      description: "Report created successfully!"
-    });
+    try {
+      const postData = formatPostData(formData);
+      console.log("Submitting post data:", postData);
+      
+      onSubmit(postData);
+      setHasUnsavedChanges(false);
+      
+      toast({
+        title: "Success",
+        description: "Report created successfully!"
+      });
+    } catch (error) {
+      console.error("Error submitting post:", error);
+      toast({
+        title: "Submission Failed",
+        description: "Failed to create report. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handlePreview = () => {
