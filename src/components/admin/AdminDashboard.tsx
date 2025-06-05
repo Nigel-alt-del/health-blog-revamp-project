@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ArrowLeft } from "lucide-react";
@@ -20,7 +19,7 @@ const AdminDashboard = () => {
     const storedPosts = getStoredPosts();
     console.log("Stored posts:", storedPosts);
     
-    // Convert blogPosts to match our simplified BlogPost interface
+    // Convert blogPosts to match our simplified BlogPost interface - safely handle optional properties
     const simplifiedBlogPosts = blogPosts.map(post => ({
       id: post.id,
       title: post.title,
@@ -32,8 +31,8 @@ const AdminDashboard = () => {
       tags: post.tags,
       featured: post.featured,
       image: post.image,
-      seoKeywords: post.seoKeywords,
-      metaDescription: post.metaDescription
+      seoKeywords: (post as any).seoKeywords || '',
+      metaDescription: (post as any).metaDescription || post.excerpt
     }));
 
     if (storedPosts.length > 0) {
