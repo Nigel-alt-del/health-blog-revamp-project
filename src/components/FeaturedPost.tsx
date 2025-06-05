@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { Clock, ArrowRight, User } from "lucide-react";
+import { Clock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,9 +10,6 @@ interface BlogPost {
   title: string;
   excerpt: string;
   content: string;
-  author: string;
-  authorRole: string;
-  authorImage: string;
   publishedAt: string;
   readTime: string;
   category: string;
@@ -55,24 +52,13 @@ const FeaturedPost = ({ post }: FeaturedPostProps) => {
             </p>
           </div>
           
-          {/* Author and Meta */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-[#79858D] rounded-full flex items-center justify-center">
-                <User className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <p className="font-medium text-[#20466d]">{post.author}</p>
-                <p className="text-sm text-[#79858D]">{post.authorRole}</p>
-              </div>
-            </div>
-            <div className="flex items-center text-sm text-[#79858D] space-x-4">
-              <span className="flex items-center">
-                <Clock className="h-4 w-4 mr-1" />
-                {post.readTime}
-              </span>
-              <span>{post.publishedAt}</span>
-            </div>
+          {/* Meta Info */}
+          <div className="flex items-center text-sm text-[#79858D] space-x-4 mb-6">
+            <span className="flex items-center">
+              <Clock className="h-4 w-4 mr-1" />
+              {post.readTime}
+            </span>
+            <span>{post.publishedAt}</span>
           </div>
           
           <Link to={`/post/${post.id}`}>

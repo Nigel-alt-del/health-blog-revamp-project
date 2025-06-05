@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { Clock, User } from "lucide-react";
+import { Clock } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -8,8 +8,6 @@ interface BlogPost {
   id: string;
   title: string;
   excerpt: string;
-  author: string;
-  authorRole: string;
   publishedAt: string;
   readTime: string;
   category: string;
@@ -48,12 +46,6 @@ const BlogCard = ({ post }: BlogCardProps) => {
         </Link>
         
         <div className="flex items-center justify-between text-sm text-[#79858D]">
-          <div className="flex items-center space-x-2">
-            <div className="w-6 h-6 bg-[#79858D] rounded-full flex items-center justify-center">
-              <User className="h-3 w-3 text-white" />
-            </div>
-            <span className="font-medium">{post.author}</span>
-          </div>
           <div className="flex items-center space-x-3">
             <span className="flex items-center">
               <Clock className="h-4 w-4 mr-1" />

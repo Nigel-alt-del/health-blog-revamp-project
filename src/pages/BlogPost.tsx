@@ -1,19 +1,34 @@
 
 import { useParams, Link } from "react-router-dom";
-import { Clock, User, ArrowLeft, Share2, BookmarkPlus } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Clock, ArrowLeft, Share2, BookmarkPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import BlogLayout from "@/components/BlogLayout";
 import BlogCard from "@/components/BlogCard";
+import { getStoredPosts } from "@/utils/localStorage";
 import { blogPosts } from "@/data/blogPosts";
 
 const BlogPost = () => {
   const { slug } = useParams();
   const { toast } = useToast();
-  const post = blogPosts.find(p => p.id === slug);
+  const [allPosts, setAllPosts] = useState(blogPosts);
+  
+  // Load posts from localStorage on component mount
+  useEffect(() => {
+    const storedPosts = getStoredPosts();
+    if (storedPosts.length > 0) {
+      const combinedPosts = [
+        ...storedPosts,
+        ...blogPosts.filter(p => !storedPosts.some(sp => sp.id === p.id))
+      ];
+      setAllPosts(combinedPosts);
+    }
+  }, []);
+
+  const post = allPosts.find(p => p.id === slug);
   
   // Check if user came from admin
   const cameFromAdmin = document.referrer.includes('/admin') || 
@@ -35,9 +50,6 @@ const BlogPost = () => {
       </BlogLayout>
     );
   }
-
-  // Get author LinkedIn URL safely
-  const authorLinkedIn = (post as any).authorLinkedin || (post as any).authorLink || null;
 
   const handleShare = async () => {
     const shareData = {
@@ -104,7 +116,7 @@ const BlogPost = () => {
     }
   };
 
-  const relatedPosts = blogPosts
+  const relatedPosts = allPosts
     .filter(p => p.id !== post.id && p.category === post.category)
     .slice(0, 3);
 
@@ -137,34 +149,12 @@ const BlogPost = () => {
             {post.title}
           </h1>
           
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-[#79858D] rounded-full flex items-center justify-center">
-                <User className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <p className="font-medium text-[#20466d]">{post.author}</p>
-                <p className="text-sm text-[#79858D]">{post.authorRole}</p>
-                {authorLinkedIn && (
-                  <a 
-                    href={authorLinkedIn} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-sm text-[#22aee1] hover:underline"
-                  >
-                    LinkedIn Profile
-                  </a>
-                )}
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-6 text-sm text-[#79858D]">
-              <span className="flex items-center">
-                <Clock className="h-4 w-4 mr-1" />
-                {post.readTime}
-              </span>
-              <span>{post.publishedAt}</span>
-            </div>
+          <div className="flex items-center space-x-6 text-sm text-[#79858D] mb-8">
+            <span className="flex items-center">
+              <Clock className="h-4 w-4 mr-1" />
+              {post.readTime}
+            </span>
+            <span>{post.publishedAt}</span>
           </div>
           
           <div className="flex items-center space-x-4 mb-8">
@@ -209,7 +199,7 @@ const BlogPost = () => {
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
 
-        {/* Tags */}
+        {/* Tags at the end */}
         <div className="flex flex-wrap gap-2 mb-8">
           {post.tags.map((tag) => (
             <Badge key={tag} variant="outline" className="border-[#22aee1] text-[#22aee1]">
@@ -219,38 +209,6 @@ const BlogPost = () => {
         </div>
 
         <Separator className="my-12" />
-
-        {/* Author Info */}
-        <Card className="mb-12 border-[#79858D]/20">
-          <CardHeader>
-            <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 bg-[#79858D] rounded-full flex items-center justify-center">
-                <User className="h-8 w-8 text-white" />
-              </div>
-              <div>
-                <CardTitle className="text-xl text-[#20466d]">{post.author}</CardTitle>
-                <p className="text-[#79858D]">{post.authorRole}</p>
-                {authorLinkedIn && (
-                  <a 
-                    href={authorLinkedIn} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-[#22aee1] hover:underline"
-                  >
-                    View LinkedIn Profile
-                  </a>
-                )}
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <p className="text-[#79858D]">
-              {post.author} is a leading analyst in health insurance policy and consumer advocacy. 
-              With over a decade of experience in the healthcare industry, they provide insights 
-              that help consumers navigate the complex world of health insurance.
-            </p>
-          </CardContent>
-        </Card>
 
         {/* Related Articles */}
         {relatedPosts.length > 0 && (

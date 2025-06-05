@@ -1,11 +1,12 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ArrowLeft } from "lucide-react";
 import BlogLayout from "@/components/BlogLayout";
 import { PostListView } from "./PostListView";
 import { CreatePostForm } from "./CreatePostForm";
 import { EditPostForm } from "./EditPostForm";
+import { getStoredPosts, addPostToStorage, updatePostInStorage, deletePostFromStorage } from "@/utils/localStorage";
 import { blogPosts } from "@/data/blogPosts";
 
 const AdminDashboard = () => {
@@ -13,21 +14,44 @@ const AdminDashboard = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
 
+  // Load posts from localStorage on component mount
+  useEffect(() => {
+    const storedPosts = getStoredPosts();
+    if (storedPosts.length > 0) {
+      // Combine stored posts with default posts, prioritizing stored ones
+      const defaultPostIds = new Set(blogPosts.map(p => p.id));
+      const combinedPosts = [
+        ...storedPosts,
+        ...blogPosts.filter(p => !storedPosts.some(sp => sp.id === p.id))
+      ];
+      setPosts(combinedPosts);
+    }
+  }, []);
+
   const handleCreatePost = (newPost: any) => {
     const post = {
       ...newPost,
       id: newPost.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
-      authorImage: "/placeholder.svg",
+      author: "InsureMyHealth Team",
+      authorRole: "Healthcare Policy Analyst",
       publishedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
       featured: false,
       image: newPost.image || "/placeholder.svg"
     };
 
+    // Save to localStorage
+    addPostToStorage(post);
+    
+    // Update state
     setPosts([post, ...posts]);
     setIsCreating(false);
   };
 
   const handleEditPost = (updatedPost: any) => {
+    // Save to localStorage
+    updatePostInStorage(updatedPost);
+    
+    // Update state
     setPosts(posts.map(post => 
       post.id === updatedPost.id ? updatedPost : post
     ));
@@ -35,6 +59,10 @@ const AdminDashboard = () => {
   };
 
   const handleDeletePost = (postId: string) => {
+    // Remove from localStorage
+    deletePostFromStorage(postId);
+    
+    // Update state
     setPosts(posts.filter(post => post.id !== postId));
   };
 
