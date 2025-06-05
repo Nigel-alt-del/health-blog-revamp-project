@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ArrowLeft } from "lucide-react";
@@ -9,62 +10,119 @@ import { getStoredPosts, addPostToStorage, updatePostInStorage, deletePostFromSt
 import { blogPosts } from "@/data/blogPosts";
 
 const AdminDashboard = () => {
-  const [posts, setPosts] = useState<BlogPost[]>(blogPosts);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
 
   // Load posts from localStorage on component mount
   useEffect(() => {
+    console.log("Loading posts in AdminDashboard");
     const storedPosts = getStoredPosts();
+    console.log("Stored posts:", storedPosts);
+    
+    // Convert blogPosts to match our simplified BlogPost interface
+    const simplifiedBlogPosts = blogPosts.map(post => ({
+      id: post.id,
+      title: post.title,
+      excerpt: post.excerpt,
+      content: post.content,
+      publishedAt: post.publishedAt,
+      readTime: post.readTime,
+      category: post.category,
+      tags: post.tags,
+      featured: post.featured,
+      image: post.image,
+      seoKeywords: post.seoKeywords,
+      metaDescription: post.metaDescription
+    }));
+
     if (storedPosts.length > 0) {
       // Combine stored posts with default posts, prioritizing stored ones
       const combinedPosts = [
         ...storedPosts,
-        ...blogPosts.filter(p => !storedPosts.some(sp => sp.id === p.id))
+        ...simplifiedBlogPosts.filter(p => !storedPosts.some(sp => sp.id === p.id))
       ];
       setPosts(combinedPosts);
+    } else {
+      setPosts(simplifiedBlogPosts);
     }
   }, []);
 
+  const generateId = (title: string): string => {
+    const baseId = title.toLowerCase()
+      .replace(/[^a-z0-9\s]/g, '')
+      .replace(/\s+/g, '-')
+      .substring(0, 50);
+    
+    // Add timestamp to ensure uniqueness
+    const timestamp = Date.now();
+    return `${baseId}-${timestamp}`;
+  };
+
   const handleCreatePost = (newPost: any) => {
-    const post = {
-      ...newPost,
-      id: newPost.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
-      author: "InsureMyHealth Team",
-      authorRole: "Healthcare Policy Analyst",
+    console.log("Creating new post:", newPost);
+    
+    const post: BlogPost = {
+      id: generateId(newPost.title),
+      title: newPost.title,
+      excerpt: newPost.excerpt,
+      content: newPost.content || '',
       publishedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      readTime: "5 min read",
+      category: newPost.category,
+      tags: Array.isArray(newPost.tags) ? newPost.tags : (newPost.tags || '').split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag),
       featured: false,
-      image: newPost.image || "/placeholder.svg"
+      image: newPost.image || "/placeholder.svg",
+      seoKeywords: newPost.seoKeywords || '',
+      metaDescription: newPost.metaDescription || newPost.excerpt
     };
+
+    console.log("Formatted post:", post);
 
     // Save to localStorage
     addPostToStorage(post);
     
     // Update state
-    setPosts([post, ...posts]);
+    setPosts(prevPosts => [post, ...prevPosts]);
     setIsCreating(false);
+    
+    console.log("Post created successfully");
   };
 
   const handleEditPost = (updatedPost: any) => {
+    console.log("Updating post:", updatedPost);
+    
+    const formattedPost: BlogPost = {
+      ...updatedPost,
+      tags: Array.isArray(updatedPost.tags) ? updatedPost.tags : (updatedPost.tags || '').split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag)
+    };
+
     // Save to localStorage
-    updatePostInStorage(updatedPost);
+    updatePostInStorage(formattedPost);
     
     // Update state
-    setPosts(posts.map(post => 
-      post.id === updatedPost.id ? updatedPost : post
+    setPosts(prevPosts => prevPosts.map(post => 
+      post.id === formattedPost.id ? formattedPost : post
     ));
     setEditingPostId(null);
+    
+    console.log("Post updated successfully");
   };
 
   const handleDeletePost = (postId: string) => {
+    console.log("Deleting post:", postId);
+    
     // Remove from localStorage
     deletePostFromStorage(postId);
     
     // Update state
-    setPosts(posts.filter(post => post.id !== postId));
+    setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
+    
+    console.log("Post deleted successfully");
   };
 
   const handleStartEdit = (postId: string) => {
+    console.log("Starting edit for post:", postId);
     setEditingPostId(postId);
   };
 
@@ -113,7 +171,7 @@ const AdminDashboard = () => {
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Admin
             </Button>
-            <h1 className="text-3xl font-bold text-gray-900">Edit Report: {editingPost.title}</h1>
+            <h1 ="text-3xl font-bold text-gray-900">Edit Report: {editingPost.title}</h1>
           </div>
 
           <EditPostForm 

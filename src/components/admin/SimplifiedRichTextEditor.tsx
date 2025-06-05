@@ -16,6 +16,8 @@ interface SimplifiedRichTextEditorProps {
 const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRichTextEditorProps) => {
   const [showMediaGallery, setShowMediaGallery] = useState(false);
 
+  console.log("SimplifiedRichTextEditor - current value:", value);
+
   // Simple ReactQuill configuration with basic formatting
   const modules = {
     toolbar: [
@@ -39,14 +41,23 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
   ];
 
   const insertImage = (imageUrl: string, caption?: string) => {
+    console.log("Inserting image:", imageUrl, caption);
     const imageHtml = `<div class="image-container" style="margin: 20px 0; text-align: center;"><img src="${imageUrl}" alt="${caption || 'Report image'}" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />${caption ? `<p style="margin-top: 8px; font-style: italic; color: #666; font-size: 14px;">${caption}</p>` : ''}</div>`;
     const currentValue = value || '';
-    onChange(currentValue + imageHtml);
+    const newValue = currentValue + imageHtml;
+    console.log("New content with image:", newValue);
+    onChange(newValue);
     setShowMediaGallery(false);
   };
 
   const handleChange = (content: string) => {
+    console.log("Content changed in editor:", content);
     onChange(content || '');
+  };
+
+  const handleAddImageClick = () => {
+    console.log("Add Image button clicked");
+    setShowMediaGallery(true);
   };
 
   return (
@@ -57,7 +68,7 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setShowMediaGallery(true)}
+            onClick={handleAddImageClick}
           >
             <Image className="mr-2 h-4 w-4" />
             Add Image
@@ -78,7 +89,10 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
         {showMediaGallery && (
           <MediaGallery
             onInsert={insertImage}
-            onClose={() => setShowMediaGallery(false)}
+            onClose={() => {
+              console.log("MediaGallery closed");
+              setShowMediaGallery(false);
+            }}
           />
         )}
       </CardContent>

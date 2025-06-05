@@ -11,7 +11,6 @@ interface Post {
   id: string;
   title: string;
   excerpt: string;
-  author: string;
   publishedAt: string;
   readTime: string;
   category: string;
@@ -78,8 +77,6 @@ export const PostListView = ({ posts, onDeletePost, onEditPost }: PostListViewPr
           </CardHeader>
           <CardContent>
             <div className="flex items-center text-sm text-gray-500 space-x-4">
-              <span>By {post.author}</span>
-              <span>•</span>
               <span>{post.publishedAt}</span>
               <span>•</span>
               <span>{post.readTime}</span>

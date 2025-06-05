@@ -4,10 +4,6 @@ interface BlogPost {
   title: string;
   excerpt: string;
   content: string;
-  author: string;
-  authorRole: string;
-  authorImage?: string;
-  authorLink?: string;
   publishedAt: string;
   readTime: string;
   category: string;
@@ -33,6 +29,7 @@ export const getStoredPosts = (): BlogPost[] => {
 export const savePostsToStorage = (posts: BlogPost[]): void => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+    console.log('Posts saved to localStorage:', posts);
   } catch (error) {
     console.error('Error saving to localStorage:', error);
   }
@@ -42,6 +39,7 @@ export const addPostToStorage = (post: BlogPost): void => {
   const posts = getStoredPosts();
   const updatedPosts = [post, ...posts];
   savePostsToStorage(updatedPosts);
+  console.log('Post added to storage:', post);
 };
 
 export const updatePostInStorage = (updatedPost: BlogPost): void => {
@@ -50,12 +48,14 @@ export const updatePostInStorage = (updatedPost: BlogPost): void => {
     post.id === updatedPost.id ? updatedPost : post
   );
   savePostsToStorage(updatedPosts);
+  console.log('Post updated in storage:', updatedPost);
 };
 
 export const deletePostFromStorage = (postId: string): void => {
   const posts = getStoredPosts();
   const updatedPosts = posts.filter(post => post.id !== postId);
   savePostsToStorage(updatedPosts);
+  console.log('Post deleted from storage:', postId);
 };
 
 export type { BlogPost };

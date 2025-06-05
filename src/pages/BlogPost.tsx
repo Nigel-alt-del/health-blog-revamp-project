@@ -13,17 +13,38 @@ import { blogPosts } from "@/data/blogPosts";
 const BlogPost = () => {
   const { slug } = useParams();
   const { toast } = useToast();
-  const [allPosts, setAllPosts] = useState<BlogPost[]>(blogPosts);
+  const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
   
   // Load posts from localStorage on component mount
   useEffect(() => {
+    console.log("Loading posts in BlogPost");
     const storedPosts = getStoredPosts();
+    console.log("Stored posts:", storedPosts);
+    
+    // Convert blogPosts to match our simplified BlogPost interface
+    const simplifiedBlogPosts = blogPosts.map(post => ({
+      id: post.id,
+      title: post.title,
+      excerpt: post.excerpt,
+      content: post.content,
+      publishedAt: post.publishedAt,
+      readTime: post.readTime,
+      category: post.category,
+      tags: post.tags,
+      featured: post.featured,
+      image: post.image,
+      seoKeywords: post.seoKeywords,
+      metaDescription: post.metaDescription
+    }));
+
     if (storedPosts.length > 0) {
       const combinedPosts = [
         ...storedPosts,
-        ...blogPosts.filter(p => !storedPosts.some(sp => sp.id === p.id))
+        ...simplifiedBlogPosts.filter(p => !storedPosts.some(sp => sp.id === p.id))
       ];
       setAllPosts(combinedPosts);
+    } else {
+      setAllPosts(simplifiedBlogPosts);
     }
   }, []);
 

@@ -54,13 +54,13 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
   }, [formData]);
 
   const formatPostData = (data: typeof formData) => ({
-    ...data,
-    // Add default values for removed fields
-    author: "InsureMyHealth Team",
-    authorRole: "Healthcare Policy Analyst",
-    authorLinkedin: "",
-    readTime: "5 min read",
-    tags: data.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
+    title: data.title,
+    excerpt: data.excerpt,
+    content: data.content,
+    category: data.category,
+    tags: data.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+    image: data.image,
+    readTime: "5 min read"
   });
 
   const handleSaveDraft = async () => {
@@ -112,10 +112,11 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
     }
 
     const postData = formatPostData(formData);
-
     console.log("Submitting post data:", postData);
+    
     onSubmit(postData);
     setHasUnsavedChanges(false);
+    
     toast({
       title: "Success",
       description: "Report created successfully!"
@@ -138,6 +139,7 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
   };
 
   const handleFormDataChange = (newFormData: any) => {
+    console.log("Form data changed:", newFormData);
     setFormData(newFormData);
   };
 
@@ -163,7 +165,10 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
 
           <SimplifiedRichTextEditor
             value={formData.content}
-            onChange={(content) => handleFormDataChange({ ...formData, content })}
+            onChange={(content) => {
+              console.log("Content changed:", content);
+              handleFormDataChange({ ...formData, content });
+            }}
             placeholder="Write your report content here. Use the formatting tools above to style your text and add images..."
           />
         </div>

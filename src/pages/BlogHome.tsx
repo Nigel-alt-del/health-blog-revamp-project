@@ -10,21 +10,43 @@ import { getStoredPosts, type BlogPost } from "@/utils/localStorage";
 import { blogPosts } from "@/data/blogPosts";
 
 const BlogHome = () => {
-  const [allPosts, setAllPosts] = useState<BlogPost[]>(blogPosts);
-  const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>(blogPosts);
+  const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
+  const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
   // Load posts from localStorage on component mount
   useEffect(() => {
+    console.log("Loading posts in BlogHome");
     const storedPosts = getStoredPosts();
+    console.log("Stored posts:", storedPosts);
+    
+    // Convert blogPosts to match our simplified BlogPost interface
+    const simplifiedBlogPosts = blogPosts.map(post => ({
+      id: post.id,
+      title: post.title,
+      excerpt: post.excerpt,
+      content: post.content,
+      publishedAt: post.publishedAt,
+      readTime: post.readTime,
+      category: post.category,
+      tags: post.tags,
+      featured: post.featured,
+      image: post.image,
+      seoKeywords: post.seoKeywords,
+      metaDescription: post.metaDescription
+    }));
+
     if (storedPosts.length > 0) {
       const combinedPosts = [
         ...storedPosts,
-        ...blogPosts.filter(p => !storedPosts.some(sp => sp.id === p.id))
+        ...simplifiedBlogPosts.filter(p => !storedPosts.some(sp => sp.id === p.id))
       ];
       setAllPosts(combinedPosts);
       setFilteredPosts(combinedPosts);
+    } else {
+      setAllPosts(simplifiedBlogPosts);
+      setFilteredPosts(simplifiedBlogPosts);
     }
   }, []);
 
