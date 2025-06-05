@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { PostBasicInfo } from "./PostBasicInfo";
@@ -53,6 +54,18 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
   }, [formData]);
 
   const formatPostData = (data: typeof formData) => ({
+    title: data.title,
+    excerpt: data.excerpt,
+    content: data.content,
+    category: data.category,
+    tags: data.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+    image: data.image,
+    readTime: "5 min read",
+    author: "InsureMyHealth Team",
+    authorRole: "Healthcare Policy Analyst"
+  });
+
+  const formatPostDataForPreview = (data: typeof formData) => ({
     title: data.title,
     excerpt: data.excerpt,
     content: data.content,
@@ -188,7 +201,7 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
 
       {showPreview && (
         <ReportPreview
-          post={formatPostData(formData)}
+          post={formatPostDataForPreview(formData)}
           onClose={() => setShowPreview(false)}
           onPublish={handleSubmit}
         />
