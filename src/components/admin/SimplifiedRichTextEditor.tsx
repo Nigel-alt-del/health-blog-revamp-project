@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -41,21 +40,23 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
     'color', 'background', 'list', 'bullet', 'align', 'link', 'image'
   ];
 
-  const insertImage = (imageUrl: string, caption?: string) => {
-    console.log("Inserting image:", imageUrl, caption);
+  const insertImage = (imageUrl: string, caption?: string, width?: string, height?: string) => {
+    console.log("Inserting image:", imageUrl, caption, width, height);
     
     if (quillRef.current) {
       const quill = quillRef.current.getEditor();
       const range = quill.getSelection();
       const index = range ? range.index : quill.getLength();
       
-      // Create the image HTML with proper styling
-      const imageHtml = `<div class="image-container" style="margin: 20px 0; text-align: center;"><img src="${imageUrl}" alt="${caption || 'Report image'}" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />${caption ? `<p style="margin-top: 8px; font-style: italic; color: #666; font-size: 14px;">${caption}</p>` : ''}</div>`;
+      // Create the image HTML with proper styling and sizing
+      const imageStyle = `max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); ${width ? `width: ${width};` : ''} ${height && height !== 'auto' ? `height: ${height};` : ''}`;
+      
+      const imageHtml = `<div class="image-container" style="margin: 20px 0; text-align: center;"><img src="${imageUrl}" alt="${caption || 'Report image'}" style="${imageStyle}" />${caption ? `<p style="margin-top: 8px; font-style: italic; color: #666; font-size: 14px;">${caption}</p>` : ''}</div>`;
       
       // Insert the image HTML at the cursor position
       quill.clipboard.dangerouslyPasteHTML(index, imageHtml);
       
-      // Move cursor after the inserted content - fix the TypeScript error
+      // Move cursor after the inserted content
       const newCursorPosition = index + imageHtml.length;
       quill.setSelection(newCursorPosition, 0);
       

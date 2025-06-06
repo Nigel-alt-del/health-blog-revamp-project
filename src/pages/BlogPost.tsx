@@ -18,10 +18,18 @@ const BlogPost = () => {
   // Load posts from localStorage on component mount
   useEffect(() => {
     console.log("Loading posts in BlogPost");
+    
+    // Check if we need to force refresh (coming from admin)
+    const forceRefresh = sessionStorage.getItem('forceRefresh');
+    if (forceRefresh) {
+      sessionStorage.removeItem('forceRefresh');
+      console.log("Force refreshing post data from admin");
+    }
+    
     const storedPosts = getStoredPosts();
     console.log("Stored posts:", storedPosts);
     
-    // Convert blogPosts to match our simplified BlogPost interface - safely handle optional properties
+    // Convert blogPosts to match our simplified BlogPost interface
     const simplifiedBlogPosts = blogPosts.map(post => ({
       id: post.id,
       title: post.title,
@@ -53,7 +61,7 @@ const BlogPost = () => {
   // Check if user came from admin
   const cameFromAdmin = document.referrer.includes('/admin') || 
                         sessionStorage.getItem('cameFromAdmin') === 'true';
-  
+
   if (!post) {
     return (
       <BlogLayout>

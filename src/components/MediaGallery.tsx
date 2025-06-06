@@ -1,14 +1,14 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
 
 interface MediaGalleryProps {
-  onInsert: (imageUrl: string, caption?: string) => void;
+  onInsert: (imageUrl: string, caption?: string, width?: string, height?: string) => void;
   onClose: () => void;
 }
 
@@ -16,6 +16,17 @@ export const MediaGallery = ({ onInsert, onClose }: MediaGalleryProps) => {
   const [uploadedImages, setUploadedImages] = useState<Array<{ url: string; name: string }>>([]);
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [caption, setCaption] = useState('');
+  const [sizePreset, setSizePreset] = useState('medium');
+  const [customWidth, setCustomWidth] = useState('');
+  const [customHeight, setCustomHeight] = useState('');
+
+  const sizePresets = {
+    small: { width: '300px', height: 'auto' },
+    medium: { width: '500px', height: 'auto' },
+    large: { width: '700px', height: 'auto' },
+    full: { width: '100%', height: 'auto' },
+    custom: { width: customWidth || '400px', height: customHeight || 'auto' }
+  };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -40,7 +51,8 @@ export const MediaGallery = ({ onInsert, onClose }: MediaGalleryProps) => {
 
   const handleInsert = () => {
     if (selectedImage) {
-      onInsert(selectedImage, caption);
+      const selectedSize = sizePresets[sizePreset as keyof typeof sizePresets];
+      onInsert(selectedImage, caption, selectedSize.width, selectedSize.height);
     }
   };
 
@@ -108,7 +120,7 @@ export const MediaGallery = ({ onInsert, onClose }: MediaGalleryProps) => {
             </div>
           )}
 
-          {/* Selected Image Preview */}
+          {/* Selected Image Preview and Settings */}
           {selectedImage && (
             <div className="grid md:grid-cols-2 gap-4">
               <div>
@@ -131,6 +143,45 @@ export const MediaGallery = ({ onInsert, onClose }: MediaGalleryProps) => {
                       placeholder="Enter image caption"
                     />
                   </div>
+                  
+                  <div>
+                    <Label htmlFor="size-preset">Image Size</Label>
+                    <Select value={sizePreset} onValueChange={setSizePreset}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select size" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="small">Small (300px)</SelectItem>
+                        <SelectItem value="medium">Medium (500px)</SelectItem>
+                        <SelectItem value="large">Large (700px)</SelectItem>
+                        <SelectItem value="full">Full Width (100%)</SelectItem>
+                        <SelectItem value="custom">Custom</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {sizePreset === 'custom' && (
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <Label htmlFor="custom-width">Width</Label>
+                        <Input
+                          id="custom-width"
+                          value={customWidth}
+                          onChange={(e) => setCustomWidth(e.target.value)}
+                          placeholder="400px"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="custom-height">Height</Label>
+                        <Input
+                          id="custom-height"
+                          value={customHeight}
+                          onChange={(e) => setCustomHeight(e.target.value)}
+                          placeholder="auto"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

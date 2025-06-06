@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Edit, Trash2, Star, StarOff } from "lucide-react";
@@ -40,8 +39,10 @@ export const PostListView = ({ posts, onDeletePost, onEditPost, onToggleFeatured
   };
 
   const handleViewPost = (postId: string) => {
+    // Set flag to indicate coming from admin and force fresh data load
     sessionStorage.setItem('cameFromAdmin', 'true');
-    window.open(`/post/${postId}`, '_blank');
+    sessionStorage.setItem('forceRefresh', 'true');
+    window.open(`/post/${postId}?from=admin&t=${Date.now()}`, '_blank');
   };
 
   const handleToggleFeatured = (postId: string, currentFeatured: boolean) => {
