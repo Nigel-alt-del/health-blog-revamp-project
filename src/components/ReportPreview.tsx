@@ -199,9 +199,6 @@ export const ReportPreview = ({ post, onClose, onPublish }: ReportPreviewProps) 
           <Button variant="outline" onClick={onClose}>
             Close Preview
           </Button>
-          <Button onClick={onPublish} className="bg-[#22aee1] hover:bg-[#20466d]">
-            Publish Report
-          </Button>
         </div>
       </DialogContent>
     </Dialog>

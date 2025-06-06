@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -18,7 +19,7 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
 
   console.log("SimplifiedRichTextEditor - current value:", value);
 
-  // Simple ReactQuill configuration with basic formatting including image support
+  // ReactQuill configuration WITHOUT image support (removed from toolbar)
   const modules = {
     toolbar: [
       [{ 'font': [] }],
@@ -27,7 +28,7 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
       [{ 'color': [] }, { 'background': [] }],
       [{ 'list': 'ordered'}, { 'list': 'bullet' }],
       [{ 'align': [] }],
-      ['link', 'image'],
+      ['link'], // Removed 'image' from here
       ['clean']
     ],
     clipboard: {
@@ -37,21 +38,38 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
 
   const formats = [
     'font', 'size', 'bold', 'italic', 'underline',
-    'color', 'background', 'list', 'bullet', 'align', 'link', 'image'
+    'color', 'background', 'list', 'bullet', 'align', 'link' // Removed 'image' from here
   ];
 
   const insertImage = (imageUrl: string, caption?: string, width?: string, height?: string) => {
-    console.log("Inserting image:", imageUrl, caption, width, height);
+    console.log("Inserting image with sizing:", imageUrl, caption, width, height);
     
     if (quillRef.current) {
       const quill = quillRef.current.getEditor();
       const range = quill.getSelection();
       const index = range ? range.index : quill.getLength();
       
-      // Create the image HTML with proper styling and sizing
-      const imageStyle = `max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); ${width ? `width: ${width};` : ''} ${height && height !== 'auto' ? `height: ${height};` : ''}`;
+      // Create proper CSS styles for sizing
+      let imageStyles = 'max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: block; margin: 0 auto;';
       
-      const imageHtml = `<div class="image-container" style="margin: 20px 0; text-align: center;"><img src="${imageUrl}" alt="${caption || 'Report image'}" style="${imageStyle}" />${caption ? `<p style="margin-top: 8px; font-style: italic; color: #666; font-size: 14px;">${caption}</p>` : ''}</div>`;
+      // Apply specific width and height if provided
+      if (width && width !== '100%') {
+        imageStyles += ` width: ${width} !important;`;
+      } else if (width === '100%') {
+        imageStyles += ' width: 100% !important;';
+      }
+      
+      if (height && height !== 'auto') {
+        imageStyles += ` height: ${height} !important;`;
+      }
+      
+      // Create the image HTML with proper styling
+      const imageHtml = `
+        <div class="image-container" style="margin: 20px 0; text-align: center;">
+          <img src="${imageUrl}" alt="${caption || 'Report image'}" style="${imageStyles}" />
+          ${caption ? `<p style="margin-top: 8px; font-style: italic; color: #666; font-size: 14px;">${caption}</p>` : ''}
+        </div>
+      `;
       
       // Insert the image HTML at the cursor position
       quill.clipboard.dangerouslyPasteHTML(index, imageHtml);
@@ -60,7 +78,7 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
       const newCursorPosition = index + imageHtml.length;
       quill.setSelection(newCursorPosition, 0);
       
-      console.log("Image inserted at position:", index);
+      console.log("Image inserted with styles:", imageStyles);
     }
     
     setShowMediaGallery(false);

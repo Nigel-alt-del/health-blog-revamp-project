@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,7 @@ export const MediaGallery = ({ onInsert, onClose }: MediaGalleryProps) => {
   const [customWidth, setCustomWidth] = useState('');
   const [customHeight, setCustomHeight] = useState('');
 
+  // Updated size presets with proper values
   const sizePresets = {
     small: { width: '300px', height: 'auto' },
     medium: { width: '500px', height: 'auto' },
@@ -52,6 +54,7 @@ export const MediaGallery = ({ onInsert, onClose }: MediaGalleryProps) => {
   const handleInsert = () => {
     if (selectedImage) {
       const selectedSize = sizePresets[sizePreset as keyof typeof sizePresets];
+      console.log("Inserting image with size preset:", sizePreset, selectedSize);
       onInsert(selectedImage, caption, selectedSize.width, selectedSize.height);
     }
   };
@@ -182,6 +185,10 @@ export const MediaGallery = ({ onInsert, onClose }: MediaGalleryProps) => {
                       </div>
                     </div>
                   )}
+
+                  <div className="text-sm text-gray-600 p-3 bg-gray-50 rounded">
+                    <strong>Current selection:</strong> {sizePreset === 'custom' ? `${customWidth || '400px'} × ${customHeight || 'auto'}` : `${sizePresets[sizePreset as keyof typeof sizePresets].width} × ${sizePresets[sizePreset as keyof typeof sizePresets].height}`}
+                  </div>
                 </div>
               </div>
             </div>
