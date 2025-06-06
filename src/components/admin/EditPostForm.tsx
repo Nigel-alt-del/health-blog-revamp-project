@@ -68,18 +68,24 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
   }, [formData]);
 
   const formatPostData = (data: typeof formData) => ({
-    ...post, // Keep original post properties like id, publishedAt, etc.
+    id: post.id, // Preserve original ID
     title: data.title,
     excerpt: data.excerpt,
     content: data.content,
     category: data.category,
     tags: data.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
     image: data.image,
-    // Preserve existing author data or use defaults
+    // Preserve existing metadata
+    publishedAt: post.publishedAt,
+    readTime: post.readTime || "5 min read",
+    featured: post.featured || false,
+    // Preserve or use default author data
     author: post.author || "InsureMyHealth Team",
     authorRole: post.authorRole || "Healthcare Policy Analyst",
     authorLinkedin: post.authorLinkedin || "",
-    readTime: post.readTime || "5 min read"
+    authorBio: post.authorBio || "",
+    seoKeywords: post.seoKeywords || '',
+    metaDescription: data.excerpt
   });
 
   const handleSaveDraft = async () => {
@@ -96,8 +102,10 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
     
     try {
       console.log("Saving draft with data:", formData);
+      console.log("Original post ID:", post.id);
       
       const updatedPost = formatPostData(formData);
+      console.log("Formatted post for save:", updatedPost);
       
       // Save to localStorage
       updatePostInStorage(updatedPost);
@@ -125,6 +133,7 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
 
   const handleSubmit = () => {
     console.log("Update clicked with data:", formData);
+    console.log("Original post:", post);
     
     if (!formData.title?.trim()) {
       toast({
@@ -146,8 +155,11 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
 
     try {
       const updatedPost = formatPostData(formData);
-
       console.log("Submitting updated post:", updatedPost);
+
+      // Save to localStorage first
+      updatePostInStorage(updatedPost);
+      
       onSubmit(updatedPost);
       setHasUnsavedChanges(false);
       

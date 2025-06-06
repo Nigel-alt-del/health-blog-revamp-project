@@ -12,6 +12,10 @@ interface BlogPost {
   image: string;
   seoKeywords?: string;
   metaDescription?: string;
+  author?: string;
+  authorRole?: string;
+  authorLinkedin?: string;
+  authorBio?: string;
 }
 
 const STORAGE_KEY = 'blog_posts';
@@ -19,7 +23,9 @@ const STORAGE_KEY = 'blog_posts';
 export const getStoredPosts = (): BlogPost[] => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
+    const posts = stored ? JSON.parse(stored) : [];
+    console.log('Retrieved posts from localStorage:', posts);
+    return posts;
   } catch (error) {
     console.error('Error reading from localStorage:', error);
     return [];
@@ -44,11 +50,19 @@ export const addPostToStorage = (post: BlogPost): void => {
 
 export const updatePostInStorage = (updatedPost: BlogPost): void => {
   const posts = getStoredPosts();
-  const updatedPosts = posts.map(post => 
-    post.id === updatedPost.id ? updatedPost : post
-  );
-  savePostsToStorage(updatedPosts);
-  console.log('Post updated in storage:', updatedPost);
+  const existingIndex = posts.findIndex(post => post.id === updatedPost.id);
+  
+  if (existingIndex !== -1) {
+    // Update existing post
+    posts[existingIndex] = updatedPost;
+    console.log('Updating existing post in storage:', updatedPost);
+  } else {
+    // Add as new post if not found
+    posts.unshift(updatedPost);
+    console.log('Adding new post to storage (not found for update):', updatedPost);
+  }
+  
+  savePostsToStorage(posts);
 };
 
 export const deletePostFromStorage = (postId: string): void => {

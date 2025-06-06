@@ -106,6 +106,9 @@ const AdminDashboard = () => {
     setEditingPostId(null);
     
     console.log("Post updated successfully");
+    
+    // Set a flag so user knows they came from admin
+    sessionStorage.setItem('cameFromAdmin', 'true');
   };
 
   const handleDeletePost = (postId: string) => {

@@ -38,6 +38,11 @@ export const PostListView = ({ posts, onDeletePost, onEditPost }: PostListViewPr
     onEditPost(postId);
   };
 
+  const handleViewPost = (postId: string) => {
+    sessionStorage.setItem('cameFromAdmin', 'true');
+    window.open(`/post/${postId}`, '_blank');
+  };
+
   return (
     <div className="grid gap-6">
       {posts.map((post) => (
@@ -53,11 +58,13 @@ export const PostListView = ({ posts, onDeletePost, onEditPost }: PostListViewPr
                 <p className="text-gray-600">{post.excerpt}</p>
               </div>
               <div className="flex space-x-2 ml-4">
-                <Link to={`/post/${post.id}`}>
-                  <Button variant="outline" size="sm">
-                    View
-                  </Button>
-                </Link>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleViewPost(post.id)}
+                >
+                  View
+                </Button>
                 <Button 
                   variant="outline" 
                   size="sm"
