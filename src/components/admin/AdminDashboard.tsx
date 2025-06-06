@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ArrowLeft } from "lucide-react";
@@ -14,7 +15,7 @@ const AdminDashboard = () => {
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
 
   // Load posts from localStorage on component mount
-  useEffect(() => {
+  const loadPosts = () => {
     console.log("Loading posts in AdminDashboard");
     const storedPosts = getStoredPosts();
     console.log("Stored posts:", storedPosts);
@@ -45,6 +46,10 @@ const AdminDashboard = () => {
     } else {
       setPosts(simplifiedBlogPosts);
     }
+  };
+
+  useEffect(() => {
+    loadPosts();
   }, []);
 
   const generateId = (title: string): string => {
@@ -81,8 +86,8 @@ const AdminDashboard = () => {
     // Save to localStorage
     addPostToStorage(post);
     
-    // Update state
-    setPosts(prevPosts => [post, ...prevPosts]);
+    // Reload posts to get fresh data
+    loadPosts();
     setIsCreating(false);
     
     console.log("Post created successfully");
@@ -99,10 +104,8 @@ const AdminDashboard = () => {
     // Save to localStorage
     updatePostInStorage(formattedPost);
     
-    // Update state
-    setPosts(prevPosts => prevPosts.map(post => 
-      post.id === formattedPost.id ? formattedPost : post
-    ));
+    // Reload posts to get fresh data
+    loadPosts();
     setEditingPostId(null);
     
     console.log("Post updated successfully");
@@ -117,10 +120,32 @@ const AdminDashboard = () => {
     // Remove from localStorage
     deletePostFromStorage(postId);
     
-    // Update state
-    setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
+    // Reload posts to get fresh data
+    loadPosts();
     
     console.log("Post deleted successfully");
+  };
+
+  const handleToggleFeatured = (postId: string) => {
+    console.log("Toggling featured status for post:", postId);
+    
+    const updatedPosts = posts.map(post => {
+      if (post.id === postId) {
+        // Toggle this post's featured status
+        const updatedPost = { ...post, featured: !post.featured };
+        updatePostInStorage(updatedPost);
+        return updatedPost;
+      } else if (post.featured) {
+        // Remove featured status from other posts (only one can be featured)
+        const updatedPost = { ...post, featured: false };
+        updatePostInStorage(updatedPost);
+        return updatedPost;
+      }
+      return post;
+    });
+    
+    setPosts(updatedPosts);
+    console.log("Featured status updated");
   };
 
   const handleStartEdit = (postId: string) => {
@@ -201,6 +226,7 @@ const AdminDashboard = () => {
           posts={posts}
           onDeletePost={handleDeletePost}
           onEditPost={handleStartEdit}
+          onToggleFeatured={handleToggleFeatured}
         />
       </div>
     </BlogLayout>

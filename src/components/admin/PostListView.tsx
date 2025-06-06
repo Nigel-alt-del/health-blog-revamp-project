@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, Star, StarOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,9 +21,10 @@ interface PostListViewProps {
   posts: Post[];
   onDeletePost: (postId: string) => void;
   onEditPost: (postId: string) => void;
+  onToggleFeatured: (postId: string) => void;
 }
 
-export const PostListView = ({ posts, onDeletePost, onEditPost }: PostListViewProps) => {
+export const PostListView = ({ posts, onDeletePost, onEditPost, onToggleFeatured }: PostListViewProps) => {
   const { toast } = useToast();
 
   const handleDeletePost = (postId: string) => {
@@ -41,6 +42,14 @@ export const PostListView = ({ posts, onDeletePost, onEditPost }: PostListViewPr
   const handleViewPost = (postId: string) => {
     sessionStorage.setItem('cameFromAdmin', 'true');
     window.open(`/post/${postId}`, '_blank');
+  };
+
+  const handleToggleFeatured = (postId: string, currentFeatured: boolean) => {
+    onToggleFeatured(postId);
+    toast({
+      title: "Success",
+      description: currentFeatured ? "Report removed from featured" : "Report set as featured"
+    });
   };
 
   return (
@@ -64,6 +73,14 @@ export const PostListView = ({ posts, onDeletePost, onEditPost }: PostListViewPr
                   onClick={() => handleViewPost(post.id)}
                 >
                   View
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => handleToggleFeatured(post.id, post.featured)}
+                  title={post.featured ? "Remove from featured" : "Set as featured"}
+                >
+                  {post.featured ? <StarOff className="h-4 w-4" /> : <Star className="h-4 w-4" />}
                 </Button>
                 <Button 
                   variant="outline" 

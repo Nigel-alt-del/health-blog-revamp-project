@@ -23,19 +23,29 @@ interface FeaturedPostProps {
 }
 
 const FeaturedPost = ({ post }: FeaturedPostProps) => {
+  const hasCustomImage = post.image && post.image !== "/placeholder.svg";
+
   return (
     <Card className="overflow-hidden border-0 shadow-2xl">
       <div className="grid md:grid-cols-2 gap-0">
         {/* Image */}
-        <div className="relative h-64 md:h-full bg-gradient-to-br from-[#22aee1] to-[#20466d]">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center p-8">
-              <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-[#20466d] text-2xl font-bold">IMH</span>
+        <div className="relative h-64 md:h-full">
+          {hasCustomImage ? (
+            <img 
+              src={post.image} 
+              alt={post.title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-[#22aee1] to-[#20466d] flex items-center justify-center">
+              <div className="text-center p-8">
+                <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-[#20466d] text-2xl font-bold">IMH</span>
+                </div>
+                <p className="text-white font-medium">Featured Article</p>
               </div>
-              <p className="text-white font-medium">Featured Article</p>
             </div>
-          </div>
+          )}
         </div>
         
         {/* Content */}

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,10 +15,11 @@ interface SimplifiedRichTextEditorProps {
 
 const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRichTextEditorProps) => {
   const [showMediaGallery, setShowMediaGallery] = useState(false);
+  const quillRef = useRef<ReactQuill>(null);
 
   console.log("SimplifiedRichTextEditor - current value:", value);
 
-  // Simple ReactQuill configuration with basic formatting
+  // Simple ReactQuill configuration with basic formatting including image support
   const modules = {
     toolbar: [
       [{ 'font': [] }],
@@ -27,7 +28,7 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
       [{ 'color': [] }, { 'background': [] }],
       [{ 'list': 'ordered'}, { 'list': 'bullet' }],
       [{ 'align': [] }],
-      ['link'],
+      ['link', 'image'],
       ['clean']
     ],
     clipboard: {
@@ -37,16 +38,29 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
 
   const formats = [
     'font', 'size', 'bold', 'italic', 'underline',
-    'color', 'background', 'list', 'bullet', 'align', 'link'
+    'color', 'background', 'list', 'bullet', 'align', 'link', 'image'
   ];
 
   const insertImage = (imageUrl: string, caption?: string) => {
     console.log("Inserting image:", imageUrl, caption);
-    const imageHtml = `<div class="image-container" style="margin: 20px 0; text-align: center;"><img src="${imageUrl}" alt="${caption || 'Report image'}" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />${caption ? `<p style="margin-top: 8px; font-style: italic; color: #666; font-size: 14px;">${caption}</p>` : ''}</div>`;
-    const currentValue = value || '';
-    const newValue = currentValue + imageHtml;
-    console.log("New content with image:", newValue);
-    onChange(newValue);
+    
+    if (quillRef.current) {
+      const quill = quillRef.current.getEditor();
+      const range = quill.getSelection();
+      const index = range ? range.index : quill.getLength();
+      
+      // Create the image HTML with proper styling
+      const imageHtml = `<div class="image-container" style="margin: 20px 0; text-align: center;"><img src="${imageUrl}" alt="${caption || 'Report image'}" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />${caption ? `<p style="margin-top: 8px; font-style: italic; color: #666; font-size: 14px;">${caption}</p>` : ''}</div>`;
+      
+      // Insert the image HTML at the cursor position
+      quill.clipboard.dangerouslyPasteHTML(index, imageHtml);
+      
+      // Move cursor after the inserted content
+      quill.setSelection(index + imageHtml.length);
+      
+      console.log("Image inserted at position:", index);
+    }
+    
     setShowMediaGallery(false);
   };
 
@@ -77,6 +91,7 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
       </CardHeader>
       <CardContent>
         <ReactQuill
+          ref={quillRef}
           theme="snow"
           value={value || ''}
           onChange={handleChange}

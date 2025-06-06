@@ -12,6 +12,7 @@ interface BlogPost {
   readTime: string;
   category: string;
   tags: string[];
+  image?: string;
 }
 
 interface BlogCardProps {
@@ -19,16 +20,28 @@ interface BlogCardProps {
 }
 
 const BlogCard = ({ post }: BlogCardProps) => {
+  const hasCustomImage = post.image && post.image !== "/placeholder.svg";
+
   return (
     <Card className="h-full hover:shadow-lg transition-shadow duration-300 group border-[#79858D]/20">
       <CardHeader className="pb-4">
-        <div className="w-full h-48 bg-gradient-to-br from-[#22aee1] to-[#20466d] rounded-lg mb-4 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center mx-auto mb-2">
-              <span className="text-[#20466d] font-bold">IMH</span>
+        <div className="w-full h-48 rounded-lg mb-4 overflow-hidden">
+          {hasCustomImage ? (
+            <img 
+              src={post.image} 
+              alt={post.title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-[#22aee1] to-[#20466d] flex items-center justify-center">
+              <div className="text-center">
+                <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center mx-auto mb-2">
+                  <span className="text-[#20466d] font-bold">IMH</span>
+                </div>
+                <p className="text-white text-sm font-medium">{post.category}</p>
+              </div>
             </div>
-            <p className="text-white text-sm font-medium">{post.category}</p>
-          </div>
+          )}
         </div>
         <Badge variant="secondary" className="w-fit bg-[#22aee1] text-white">
           {post.category}
