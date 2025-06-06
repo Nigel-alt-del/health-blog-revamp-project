@@ -55,8 +55,9 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
       // Insert the image HTML at the cursor position
       quill.clipboard.dangerouslyPasteHTML(index, imageHtml);
       
-      // Move cursor after the inserted content
-      quill.setSelection(index + imageHtml.length);
+      // Move cursor after the inserted content - fix the TypeScript error
+      const newCursorPosition = index + imageHtml.length;
+      quill.setSelection(newCursorPosition, 0);
       
       console.log("Image inserted at position:", index);
     }
