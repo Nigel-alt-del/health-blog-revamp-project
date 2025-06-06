@@ -20,7 +20,7 @@ const SimplifiedRichTextEditor = ({
 }: SimplifiedRichTextEditorProps) => {
   const [showMediaGallery, setShowMediaGallery] = useState(false);
   const quillRef = useRef<ReactQuill>(null);
-  const [isReady, setIsReady] = useState(false);
+  const [isEditorReady, setIsEditorReady] = useState(false);
 
   console.log("SimplifiedRichTextEditor - current value:", value);
   console.log("SimplifiedRichTextEditor - hideImageButton:", hideImageButton);
@@ -31,13 +31,8 @@ const SimplifiedRichTextEditor = ({
     setShowMediaGallery(true);
   };
 
-  // Wait for component to be ready before setting up modules
-  useEffect(() => {
-    setIsReady(true);
-  }, []);
-
-  // ReactQuill configuration - only when ready
-  const modules = isReady ? {
+  // Stable modules configuration - no conditional changes
+  const modules = {
     toolbar: {
       container: [
         [{ 'font': [] }],
@@ -56,17 +51,6 @@ const SimplifiedRichTextEditor = ({
     clipboard: {
       matchVisual: false,
     }
-  } : {
-    toolbar: [
-      [{ 'font': [] }],
-      [{ 'size': ['small', false, 'large', 'huge'] }],
-      ['bold', 'italic', 'underline'],
-      [{ 'color': [] }, { 'background': [] }],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'align': [] }],
-      ['link'],
-      ['clean']
-    ]
   };
 
   const formats = [
@@ -74,10 +58,19 @@ const SimplifiedRichTextEditor = ({
     'color', 'background', 'list', 'bullet', 'align', 'link', 'image'
   ];
 
+  // Handle editor ready state
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsEditorReady(true);
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   const insertImage = (imageUrl: string, caption?: string, width?: string, height?: string, alignment?: string) => {
     console.log("Inserting image with options:", { imageUrl, caption, width, height, alignment });
     
-    if (quillRef.current) {
+    if (quillRef.current && isEditorReady) {
       const quill = quillRef.current.getEditor();
       if (quill) {
         const range = quill.getSelection();
@@ -127,8 +120,8 @@ const SimplifiedRichTextEditor = ({
     onChange(content || '');
   };
 
-  // Don't render ReactQuill until ready
-  if (!isReady) {
+  // Show loading only briefly while editor initializes
+  if (!isEditorReady) {
     return (
       <Card>
         <CardHeader>
