@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,6 +20,7 @@ const SimplifiedRichTextEditor = ({
 }: SimplifiedRichTextEditorProps) => {
   const [showMediaGallery, setShowMediaGallery] = useState(false);
   const quillRef = useRef<ReactQuill>(null);
+  const [isReady, setIsReady] = useState(false);
 
   console.log("SimplifiedRichTextEditor - current value:", value);
   console.log("SimplifiedRichTextEditor - hideImageButton:", hideImageButton);
@@ -30,8 +31,13 @@ const SimplifiedRichTextEditor = ({
     setShowMediaGallery(true);
   };
 
-  // ReactQuill configuration WITH image support and custom toolbar
-  const modules = {
+  // Wait for component to be ready before setting up modules
+  useEffect(() => {
+    setIsReady(true);
+  }, []);
+
+  // ReactQuill configuration - only when ready
+  const modules = isReady ? {
     toolbar: {
       container: [
         [{ 'font': [] }],
@@ -50,6 +56,17 @@ const SimplifiedRichTextEditor = ({
     clipboard: {
       matchVisual: false,
     }
+  } : {
+    toolbar: [
+      [{ 'font': [] }],
+      [{ 'size': ['small', false, 'large', 'huge'] }],
+      ['bold', 'italic', 'underline'],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'align': [] }],
+      ['link'],
+      ['clean']
+    ]
   };
 
   const formats = [
@@ -62,23 +79,44 @@ const SimplifiedRichTextEditor = ({
     
     if (quillRef.current) {
       const quill = quillRef.current.getEditor();
-      const range = quill.getSelection();
-      const index = range ? range.index : quill.getLength();
-      
-      // Use ReactQuill's native insertEmbed for better persistence
-      quill.insertEmbed(index, 'image', imageUrl);
-      
-      // Move cursor after the image
-      quill.setSelection(index + 1, 0);
-      
-      // If we have additional styling (caption, alignment), we'll enhance this later
-      if (caption) {
-        quill.insertText(index + 1, '\n');
-        quill.insertText(index + 2, caption, { italic: true, color: '#666' });
-        quill.insertText(index + 2 + caption.length, '\n');
+      if (quill) {
+        const range = quill.getSelection();
+        const index = range ? range.index : quill.getLength();
+        
+        // Create image HTML with proper styling and attributes
+        let imageHtml = `<img src="${imageUrl}" alt="${caption || 'Inserted image'}" style="`;
+        
+        // Add size styling
+        if (width) imageHtml += `width: ${width}; `;
+        if (height) imageHtml += `height: ${height}; `;
+        
+        // Add default styling
+        imageHtml += `max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin: 16px 0;`;
+        
+        // Add alignment styling
+        if (alignment === 'center') {
+          imageHtml += ` display: block; margin-left: auto; margin-right: auto;`;
+        } else if (alignment === 'left') {
+          imageHtml += ` float: left; margin-right: 16px;`;
+        } else if (alignment === 'right') {
+          imageHtml += ` float: right; margin-left: 16px;`;
+        }
+        
+        imageHtml += `" />`;
+        
+        // Add caption if provided
+        if (caption) {
+          imageHtml += `<div style="text-align: ${alignment === 'center' ? 'center' : alignment || 'center'}; font-style: italic; color: #666; font-size: 14px; margin-top: 8px;">${caption}</div>`;
+        }
+        
+        // Insert the HTML
+        quill.clipboard.dangerouslyPasteHTML(index, imageHtml);
+        
+        // Move cursor after the inserted content
+        quill.setSelection(index + 1, 0);
+        
+        console.log("Image inserted successfully");
       }
-      
-      console.log("Image inserted using insertEmbed method");
     }
     
     setShowMediaGallery(false);
@@ -88,6 +126,22 @@ const SimplifiedRichTextEditor = ({
     console.log("Content changed in editor:", content);
     onChange(content || '');
   };
+
+  // Don't render ReactQuill until ready
+  if (!isReady) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Content Editor</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-96 bg-muted rounded flex items-center justify-center">
+            <p className="text-muted-foreground">Loading editor...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
