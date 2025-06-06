@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ArrowLeft } from "lucide-react";
@@ -18,32 +17,51 @@ const AdminDashboard = () => {
   const loadPosts = () => {
     console.log("Loading posts in AdminDashboard");
     const storedPosts = getStoredPosts();
-    console.log("Stored posts:", storedPosts);
+    console.log("Stored posts from localStorage:", storedPosts);
     
-    // Convert blogPosts to match our simplified BlogPost interface - safely handle optional properties
-    const simplifiedBlogPosts = blogPosts.map(post => ({
-      id: post.id,
-      title: post.title,
-      excerpt: post.excerpt,
-      content: post.content,
-      publishedAt: post.publishedAt,
-      readTime: post.readTime,
-      category: post.category,
-      tags: post.tags,
-      featured: post.featured,
-      image: post.image,
-      seoKeywords: (post as any).seoKeywords || '',
-      metaDescription: (post as any).metaDescription || post.excerpt
-    }));
-
     if (storedPosts.length > 0) {
-      // Combine stored posts with default posts, prioritizing stored ones
-      const combinedPosts = [
-        ...storedPosts,
-        ...simplifiedBlogPosts.filter(p => !storedPosts.some(sp => sp.id === p.id))
-      ];
+      // If we have stored posts, use them as the primary source
+      const storedPostIds = storedPosts.map(p => p.id);
+      
+      // Convert blogPosts to match our simplified BlogPost interface
+      const simplifiedBlogPosts = blogPosts
+        .filter(post => !storedPostIds.includes(post.id)) // Only include default posts that haven't been modified
+        .map(post => ({
+          id: post.id,
+          title: post.title,
+          excerpt: post.excerpt,
+          content: post.content,
+          publishedAt: post.publishedAt,
+          readTime: post.readTime,
+          category: post.category,
+          tags: post.tags,
+          featured: post.featured,
+          image: post.image,
+          seoKeywords: (post as any).seoKeywords || '',
+          metaDescription: (post as any).metaDescription || post.excerpt
+        }));
+
+      // Combine stored posts with unmodified default posts
+      const combinedPosts = [...storedPosts, ...simplifiedBlogPosts];
+      console.log("Combined posts (prioritizing stored):", combinedPosts);
       setPosts(combinedPosts);
     } else {
+      // No stored posts, use default blog posts
+      const simplifiedBlogPosts = blogPosts.map(post => ({
+        id: post.id,
+        title: post.title,
+        excerpt: post.excerpt,
+        content: post.content,
+        publishedAt: post.publishedAt,
+        readTime: post.readTime,
+        category: post.category,
+        tags: post.tags,
+        featured: post.featured,
+        image: post.image,
+        seoKeywords: (post as any).seoKeywords || '',
+        metaDescription: (post as any).metaDescription || post.excerpt
+      }));
+      console.log("Using default blog posts:", simplifiedBlogPosts);
       setPosts(simplifiedBlogPosts);
     }
   };
@@ -86,8 +104,8 @@ const AdminDashboard = () => {
     // Save to localStorage
     addPostToStorage(post);
     
-    // Reload posts to get fresh data
-    loadPosts();
+    // Update state directly instead of reloading
+    setPosts(prevPosts => [post, ...prevPosts]);
     setIsCreating(false);
     
     console.log("Post created successfully");
@@ -104,11 +122,14 @@ const AdminDashboard = () => {
     // Save to localStorage
     updatePostInStorage(formattedPost);
     
-    // Reload posts to get fresh data
-    loadPosts();
+    // Update state directly with the new post data
+    setPosts(prevPosts => prevPosts.map(post => 
+      post.id === formattedPost.id ? formattedPost : post
+    ));
+    
     setEditingPostId(null);
     
-    console.log("Post updated successfully");
+    console.log("Post updated successfully:", formattedPost);
     
     // Set a flag so user knows they came from admin
     sessionStorage.setItem('cameFromAdmin', 'true');
@@ -120,8 +141,8 @@ const AdminDashboard = () => {
     // Remove from localStorage
     deletePostFromStorage(postId);
     
-    // Reload posts to get fresh data
-    loadPosts();
+    // Update state directly
+    setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
     
     console.log("Post deleted successfully");
   };
@@ -129,23 +150,25 @@ const AdminDashboard = () => {
   const handleToggleFeatured = (postId: string) => {
     console.log("Toggling featured status for post:", postId);
     
-    const updatedPosts = posts.map(post => {
-      if (post.id === postId) {
-        // Toggle this post's featured status
-        const updatedPost = { ...post, featured: !post.featured };
-        updatePostInStorage(updatedPost);
-        return updatedPost;
-      } else if (post.featured) {
-        // Remove featured status from other posts (only one can be featured)
-        const updatedPost = { ...post, featured: false };
-        updatePostInStorage(updatedPost);
-        return updatedPost;
-      }
-      return post;
+    setPosts(prevPosts => {
+      const updatedPosts = prevPosts.map(post => {
+        if (post.id === postId) {
+          // Toggle this post's featured status
+          const updatedPost = { ...post, featured: !post.featured };
+          updatePostInStorage(updatedPost);
+          return updatedPost;
+        } else if (post.featured) {
+          // Remove featured status from other posts (only one can be featured)
+          const updatedPost = { ...post, featured: false };
+          updatePostInStorage(updatedPost);
+          return updatedPost;
+        }
+        return post;
+      });
+      
+      console.log("Featured status updated");
+      return updatedPosts;
     });
-    
-    setPosts(updatedPosts);
-    console.log("Featured status updated");
   };
 
   const handleStartEdit = (postId: string) => {

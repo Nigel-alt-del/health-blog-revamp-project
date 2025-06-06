@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { PostBasicInfo } from "./PostBasicInfo";
 import { FeaturedImageUpload } from "./FeaturedImageUpload";
@@ -17,9 +17,6 @@ interface EditPostFormProps {
 export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) => {
   const [showPreview, setShowPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [lastSaved, setLastSaved] = useState<Date | null>(null);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -45,27 +42,6 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
       });
     }
   }, [post]);
-
-  // Track changes for auto-save
-  useEffect(() => {
-    setHasUnsavedChanges(true);
-    
-    // Clear existing timer
-    if (autoSaveTimerRef.current) {
-      clearTimeout(autoSaveTimerRef.current);
-    }
-    
-    // Set new auto-save timer
-    autoSaveTimerRef.current = setTimeout(() => {
-      handleSaveDraft();
-    }, 30000); // Auto-save every 30 seconds
-
-    return () => {
-      if (autoSaveTimerRef.current) {
-        clearTimeout(autoSaveTimerRef.current);
-      }
-    };
-  }, [formData]);
 
   const formatPostData = (data: typeof formData) => ({
     id: post.id, // Preserve original ID
@@ -110,9 +86,6 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
       // Save to localStorage
       updatePostInStorage(updatedPost);
       
-      setLastSaved(new Date());
-      setHasUnsavedChanges(false);
-      
       console.log("Draft updated successfully:", updatedPost);
       
       toast({
@@ -153,15 +126,17 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
       return;
     }
 
+    setIsSaving(true);
+
     try {
       const updatedPost = formatPostData(formData);
       console.log("Submitting updated post:", updatedPost);
 
-      // Save to localStorage first
+      // Save to localStorage
       updatePostInStorage(updatedPost);
       
+      // Call the parent's onSubmit to update the admin list
       onSubmit(updatedPost);
-      setHasUnsavedChanges(false);
       
       toast({
         title: "Success",
@@ -174,6 +149,8 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
         description: "Failed to update report. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -232,8 +209,8 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
           canPreview={canPublish}
           isEditing={true}
           isSaving={isSaving}
-          lastSaved={lastSaved}
-          hasUnsavedChanges={hasUnsavedChanges}
+          lastSaved={null}
+          hasUnsavedChanges={false}
         />
       </div>
 
