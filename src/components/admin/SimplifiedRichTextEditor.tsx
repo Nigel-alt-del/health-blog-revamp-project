@@ -3,8 +3,6 @@ import React, { useState, useRef } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Image } from 'lucide-react';
 import { MediaGallery } from '../MediaGallery';
 
 interface SimplifiedRichTextEditorProps {
@@ -26,18 +24,29 @@ const SimplifiedRichTextEditor = ({
   console.log("SimplifiedRichTextEditor - current value:", value);
   console.log("SimplifiedRichTextEditor - hideImageButton:", hideImageButton);
 
-  // ReactQuill configuration WITHOUT image support
+  // Custom image handler for toolbar
+  const imageHandler = () => {
+    console.log("Custom toolbar image handler called");
+    setShowMediaGallery(true);
+  };
+
+  // ReactQuill configuration WITH image support and custom toolbar
   const modules = {
-    toolbar: [
-      [{ 'font': [] }],
-      [{ 'size': ['small', false, 'large', 'huge'] }],
-      ['bold', 'italic', 'underline'],
-      [{ 'color': [] }, { 'background': [] }],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'align': [] }],
-      ['link'],
-      ['clean']
-    ],
+    toolbar: {
+      container: [
+        [{ 'font': [] }],
+        [{ 'size': ['small', false, 'large', 'huge'] }],
+        ['bold', 'italic', 'underline'],
+        [{ 'color': [] }, { 'background': [] }],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        [{ 'align': [] }],
+        ['link', 'image'],
+        ['clean']
+      ],
+      handlers: {
+        image: imageHandler
+      }
+    },
     clipboard: {
       matchVisual: false,
     }
@@ -45,42 +54,31 @@ const SimplifiedRichTextEditor = ({
 
   const formats = [
     'font', 'size', 'bold', 'italic', 'underline',
-    'color', 'background', 'list', 'bullet', 'align', 'link'
+    'color', 'background', 'list', 'bullet', 'align', 'link', 'image'
   ];
 
-  const insertImage = (imageUrl: string, caption?: string, width?: string, height?: string) => {
-    console.log("Inserting image with sizing:", imageUrl, caption, width, height);
+  const insertImage = (imageUrl: string, caption?: string, width?: string, height?: string, alignment?: string) => {
+    console.log("Inserting image with options:", { imageUrl, caption, width, height, alignment });
     
     if (quillRef.current) {
       const quill = quillRef.current.getEditor();
       const range = quill.getSelection();
       const index = range ? range.index : quill.getLength();
       
-      // Create proper CSS styles for sizing
-      let imageStyles = 'max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: block; margin: 0 auto;';
+      // Use ReactQuill's native insertEmbed for better persistence
+      quill.insertEmbed(index, 'image', imageUrl);
       
-      if (width && width !== '100%') {
-        imageStyles += ` width: ${width} !important;`;
-      } else if (width === '100%') {
-        imageStyles += ' width: 100% !important;';
+      // Move cursor after the image
+      quill.setSelection(index + 1, 0);
+      
+      // If we have additional styling (caption, alignment), we'll enhance this later
+      if (caption) {
+        quill.insertText(index + 1, '\n');
+        quill.insertText(index + 2, caption, { italic: true, color: '#666' });
+        quill.insertText(index + 2 + caption.length, '\n');
       }
       
-      if (height && height !== 'auto') {
-        imageStyles += ` height: ${height} !important;`;
-      }
-      
-      const imageHtml = `
-        <div class="image-container" style="margin: 20px 0; text-align: center;">
-          <img src="${imageUrl}" alt="${caption || 'Report image'}" style="${imageStyles}" />
-          ${caption ? `<p style="margin-top: 8px; font-style: italic; color: #666; font-size: 14px;">${caption}</p>` : ''}
-        </div>
-      `;
-      
-      quill.clipboard.dangerouslyPasteHTML(index, imageHtml);
-      const newCursorPosition = index + imageHtml.length;
-      quill.setSelection(newCursorPosition, 0);
-      
-      console.log("Image inserted with styles:", imageStyles);
+      console.log("Image inserted using insertEmbed method");
     }
     
     setShowMediaGallery(false);
@@ -91,27 +89,10 @@ const SimplifiedRichTextEditor = ({
     onChange(content || '');
   };
 
-  const handleAddImageClick = () => {
-    console.log("Add Image button clicked");
-    setShowMediaGallery(true);
-  };
-
   return (
     <Card>
       <CardHeader>
         <CardTitle>Content Editor</CardTitle>
-        {!hideImageButton && (
-          <div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleAddImageClick}
-            >
-              <Image className="mr-2 h-4 w-4" />
-              Add Image
-            </Button>
-          </div>
-        )}
       </CardHeader>
       <CardContent>
         <ReactQuill
@@ -125,7 +106,7 @@ const SimplifiedRichTextEditor = ({
           style={{ minHeight: '400px' }}
         />
         
-        {!hideImageButton && showMediaGallery && (
+        {showMediaGallery && (
           <MediaGallery
             onInsert={insertImage}
             onClose={() => {

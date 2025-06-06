@@ -220,8 +220,8 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
           <SimplifiedRichTextEditor
             value={formData.content}
             onChange={(content) => handleFormDataChange({ ...formData, content })}
-            placeholder="Edit your report content here. Use the formatting tools above to style your text. Use the 'Insert Featured Image' button above to add your image to the content..."
-            hideImageButton={true}
+            placeholder="Edit your report content here. Use the formatting tools above to style your text. Click the image button in the toolbar to insert images directly at your cursor position..."
+            hideImageButton={false}
           />
         </div>
 

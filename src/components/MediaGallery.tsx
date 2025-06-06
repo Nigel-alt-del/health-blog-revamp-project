@@ -6,10 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Upload, X, Image as ImageIcon } from 'lucide-react';
+import { Upload, X, Image as ImageIcon, AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
 
 interface MediaGalleryProps {
-  onInsert: (imageUrl: string, caption?: string, width?: string, height?: string) => void;
+  onInsert: (imageUrl: string, caption?: string, width?: string, height?: string, alignment?: string) => void;
   onClose: () => void;
 }
 
@@ -17,18 +17,26 @@ export const MediaGallery = ({ onInsert, onClose }: MediaGalleryProps) => {
   const [uploadedImages, setUploadedImages] = useState<Array<{ url: string; name: string }>>([]);
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [caption, setCaption] = useState('');
+  const [altText, setAltText] = useState('');
   const [sizePreset, setSizePreset] = useState('medium');
+  const [alignment, setAlignment] = useState('center');
   const [customWidth, setCustomWidth] = useState('');
   const [customHeight, setCustomHeight] = useState('');
 
-  // Updated size presets with proper values
+  // Enhanced size presets with proper values
   const sizePresets = {
-    small: { width: '300px', height: 'auto' },
-    medium: { width: '500px', height: 'auto' },
-    large: { width: '700px', height: 'auto' },
-    full: { width: '100%', height: 'auto' },
-    custom: { width: customWidth || '400px', height: customHeight || 'auto' }
+    small: { width: '300px', height: 'auto', label: 'Small (300px)' },
+    medium: { width: '500px', height: 'auto', label: 'Medium (500px)' },
+    large: { width: '700px', height: 'auto', label: 'Large (700px)' },
+    full: { width: '100%', height: 'auto', label: 'Full Width' },
+    custom: { width: customWidth || '400px', height: customHeight || 'auto', label: 'Custom Size' }
   };
+
+  const alignmentOptions = [
+    { value: 'left', label: 'Left', icon: AlignLeft },
+    { value: 'center', label: 'Center', icon: AlignCenter },
+    { value: 'right', label: 'Right', icon: AlignRight }
+  ];
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -38,6 +46,10 @@ export const MediaGallery = ({ onInsert, onClose }: MediaGalleryProps) => {
         reader.onload = (e) => {
           const imageUrl = e.target?.result as string;
           setUploadedImages(prev => [...prev, { url: imageUrl, name: file.name }]);
+          // Auto-select the first uploaded image
+          if (uploadedImages.length === 0) {
+            setSelectedImage(imageUrl);
+          }
         };
         reader.readAsDataURL(file);
       });
@@ -54,16 +66,22 @@ export const MediaGallery = ({ onInsert, onClose }: MediaGalleryProps) => {
   const handleInsert = () => {
     if (selectedImage) {
       const selectedSize = sizePresets[sizePreset as keyof typeof sizePresets];
-      console.log("Inserting image with size preset:", sizePreset, selectedSize);
-      onInsert(selectedImage, caption, selectedSize.width, selectedSize.height);
+      console.log("Inserting image with enhanced options:", {
+        url: selectedImage,
+        caption,
+        width: selectedSize.width,
+        height: selectedSize.height,
+        alignment
+      });
+      onInsert(selectedImage, caption, selectedSize.width, selectedSize.height, alignment);
     }
   };
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Media Gallery</DialogTitle>
+          <DialogTitle>Insert Image</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-6">
@@ -72,7 +90,7 @@ export const MediaGallery = ({ onInsert, onClose }: MediaGalleryProps) => {
             <CardContent className="pt-6">
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
                 <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                <p className="text-gray-600 mb-4">Upload images for your report</p>
+                <p className="text-gray-600 mb-4">Upload images for your content</p>
                 <Input
                   type="file"
                   accept="image/*"
@@ -88,12 +106,12 @@ export const MediaGallery = ({ onInsert, onClose }: MediaGalleryProps) => {
           {uploadedImages.length > 0 && (
             <div>
               <h3 className="text-lg font-semibold mb-4">Available Images</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-h-64 overflow-y-auto">
                 {uploadedImages.map((image, index) => (
                   <div key={index} className="relative group">
                     <div
-                      className={`relative cursor-pointer border-2 rounded-lg overflow-hidden ${
-                        selectedImage === image.url ? 'border-[#22aee1]' : 'border-gray-200'
+                      className={`relative cursor-pointer border-2 rounded-lg overflow-hidden transition-all ${
+                        selectedImage === image.url ? 'border-primary ring-2 ring-primary/20' : 'border-gray-200 hover:border-gray-300'
                       }`}
                       onClick={() => setSelectedImage(image.url)}
                     >
@@ -103,8 +121,8 @@ export const MediaGallery = ({ onInsert, onClose }: MediaGalleryProps) => {
                         className="w-full h-32 object-cover"
                       />
                       {selectedImage === image.url && (
-                        <div className="absolute inset-0 bg-[#22aee1] bg-opacity-20 flex items-center justify-center">
-                          <ImageIcon className="h-8 w-8 text-[#22aee1]" />
+                        <div className="absolute inset-0 bg-primary/10 flex items-center justify-center">
+                          <ImageIcon className="h-8 w-8 text-primary" />
                         </div>
                       )}
                     </div>
@@ -116,26 +134,39 @@ export const MediaGallery = ({ onInsert, onClose }: MediaGalleryProps) => {
                     >
                       <X className="h-3 w-3" />
                     </Button>
-                    <p className="text-xs text-gray-500 mt-1 truncate">{image.name}</p>
+                    <p className="text-xs text-muted-foreground mt-1 truncate">{image.name}</p>
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Selected Image Preview and Settings */}
+          {/* Enhanced Image Settings */}
           {selectedImage && (
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid lg:grid-cols-2 gap-6">
               <div>
-                <h3 className="text-lg font-semibold mb-2">Preview</h3>
-                <img
-                  src={selectedImage}
-                  alt="Selected preview"
-                  className="w-full max-h-64 object-contain border rounded-lg"
-                />
+                <h3 className="text-lg font-semibold mb-4">Preview</h3>
+                <div className="border rounded-lg p-4 bg-gray-50">
+                  <img
+                    src={selectedImage}
+                    alt="Selected preview"
+                    className={`max-h-64 object-contain mx-auto ${
+                      alignment === 'left' ? 'mr-auto ml-0' : 
+                      alignment === 'right' ? 'ml-auto mr-0' : 'mx-auto'
+                    }`}
+                    style={{ 
+                      width: sizePresets[sizePreset as keyof typeof sizePresets].width,
+                      maxWidth: '100%'
+                    }}
+                  />
+                  {caption && (
+                    <p className="text-sm text-muted-foreground mt-2 italic text-center">{caption}</p>
+                  )}
+                </div>
               </div>
+              
               <div>
-                <h3 className="text-lg font-semibold mb-2">Image Settings</h3>
+                <h3 className="text-lg font-semibold mb-4">Image Settings</h3>
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="image-caption">Caption (optional)</Label>
@@ -146,9 +177,19 @@ export const MediaGallery = ({ onInsert, onClose }: MediaGalleryProps) => {
                       placeholder="Enter image caption"
                     />
                   </div>
+
+                  <div>
+                    <Label htmlFor="alt-text">Alt Text (for accessibility)</Label>
+                    <Input
+                      id="alt-text"
+                      value={altText}
+                      onChange={(e) => setAltText(e.target.value)}
+                      placeholder="Describe the image"
+                    />
+                  </div>
                   
                   <div>
-                    <Label htmlFor="size-preset">Image Size</Label>
+                    <Label>Image Size</Label>
                     <Select value={sizePreset} onValueChange={setSizePreset}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select size" />
@@ -163,6 +204,24 @@ export const MediaGallery = ({ onInsert, onClose }: MediaGalleryProps) => {
                     </Select>
                   </div>
 
+                  <div>
+                    <Label>Alignment</Label>
+                    <div className="flex gap-2 mt-2">
+                      {alignmentOptions.map(({ value, label, icon: Icon }) => (
+                        <Button
+                          key={value}
+                          variant={alignment === value ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setAlignment(value)}
+                          className="flex items-center gap-2"
+                        >
+                          <Icon className="h-4 w-4" />
+                          {label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
                   {sizePreset === 'custom' && (
                     <div className="grid grid-cols-2 gap-2">
                       <div>
@@ -171,7 +230,7 @@ export const MediaGallery = ({ onInsert, onClose }: MediaGalleryProps) => {
                           id="custom-width"
                           value={customWidth}
                           onChange={(e) => setCustomWidth(e.target.value)}
-                          placeholder="400px"
+                          placeholder="400px or 50%"
                         />
                       </div>
                       <div>
@@ -180,14 +239,17 @@ export const MediaGallery = ({ onInsert, onClose }: MediaGalleryProps) => {
                           id="custom-height"
                           value={customHeight}
                           onChange={(e) => setCustomHeight(e.target.value)}
-                          placeholder="auto"
+                          placeholder="auto or 300px"
                         />
                       </div>
                     </div>
                   )}
 
-                  <div className="text-sm text-gray-600 p-3 bg-gray-50 rounded">
-                    <strong>Current selection:</strong> {sizePreset === 'custom' ? `${customWidth || '400px'} × ${customHeight || 'auto'}` : `${sizePresets[sizePreset as keyof typeof sizePresets].width} × ${sizePresets[sizePreset as keyof typeof sizePresets].height}`}
+                  <div className="text-sm text-muted-foreground p-3 bg-muted rounded">
+                    <strong>Current settings:</strong><br/>
+                    Size: {sizePresets[sizePreset as keyof typeof sizePresets].label}<br/>
+                    Alignment: {alignment}<br/>
+                    {caption && `Caption: "${caption}"`}
                   </div>
                 </div>
               </div>
@@ -195,7 +257,7 @@ export const MediaGallery = ({ onInsert, onClose }: MediaGalleryProps) => {
           )}
         </div>
 
-        <div className="flex justify-end gap-2 mt-6">
+        <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
