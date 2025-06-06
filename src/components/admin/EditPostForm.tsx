@@ -25,37 +25,50 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
     content: "",
     category: "Healthcare",
     tags: "",
-    image: ""
+    image: "",
+    imageSize: "medium" as "small" | "medium" | "large" | "full"
   });
 
   // Load existing post data when component mounts or post changes
   useEffect(() => {
-    console.log("Loading post data:", post);
-    if (post) {
+    console.log("EditPostForm - Loading post data:", post);
+    if (post && post.id) {
+      const tagsString = Array.isArray(post.tags) ? post.tags.join(', ') : (post.tags || "");
+      
       setFormData({
         title: post.title || "",
         excerpt: post.excerpt || "",
         content: post.content || "",
         category: post.category || "Healthcare",
-        tags: Array.isArray(post.tags) ? post.tags.join(', ') : (post.tags || ""),
-        image: post.image || ""
+        tags: tagsString,
+        image: post.image || "",
+        imageSize: post.imageSize || "medium"
       });
+      
+      console.log("EditPostForm - Form data set:", {
+        title: post.title,
+        excerpt: post.excerpt,
+        category: post.category,
+        tagsString,
+        imageSize: post.imageSize || "medium"
+      });
+    } else {
+      console.error("EditPostForm - No valid post received:", post);
     }
   }, [post]);
 
   const formatPostData = (data: typeof formData) => ({
-    id: post.id, // Preserve original ID
+    id: post.id,
     title: data.title,
     excerpt: data.excerpt,
     content: data.content,
     category: data.category,
     tags: data.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
     image: data.image,
-    // Preserve existing metadata
+    imageSize: data.imageSize,
     publishedAt: post.publishedAt,
     readTime: post.readTime || "5 min read",
     featured: post.featured || false,
-    // Preserve or use default author data
     author: post.author || "InsureMyHealth Team",
     authorRole: post.authorRole || "Healthcare Policy Analyst",
     authorLinkedin: post.authorLinkedin || "",
@@ -77,16 +90,8 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
     setIsSaving(true);
     
     try {
-      console.log("Saving draft with data:", formData);
-      console.log("Original post ID:", post.id);
-      
       const updatedPost = formatPostData(formData);
-      console.log("Formatted post for save:", updatedPost);
-      
-      // Save to localStorage
       updatePostInStorage(updatedPost);
-      
-      console.log("Draft updated successfully:", updatedPost);
       
       toast({
         title: "Draft Saved",
@@ -105,9 +110,6 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
   };
 
   const handleSubmit = () => {
-    console.log("Update clicked with data:", formData);
-    console.log("Original post:", post);
-    
     if (!formData.title?.trim()) {
       toast({
         title: "Error",
@@ -130,12 +132,7 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
 
     try {
       const updatedPost = formatPostData(formData);
-      console.log("Submitting updated post:", updatedPost);
-
-      // Save to localStorage
       updatePostInStorage(updatedPost);
-      
-      // Call the parent's onSubmit to update the admin list
       onSubmit(updatedPost);
       
       toast({
@@ -155,8 +152,6 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
   };
 
   const handlePreview = () => {
-    console.log("Preview clicked");
-    
     if (!formData.title?.trim()) {
       toast({
         title: "Preview Error",
@@ -173,12 +168,37 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
     setFormData(newFormData);
   };
 
-  // Only require title for preview, title + excerpt for publishing
+  const insertFeaturedImage = () => {
+    if (!formData.image) {
+      toast({
+        title: "No Image",
+        description: "Please upload a featured image first",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const sizeStyles = {
+      small: { width: "200px", height: "auto" },
+      medium: { width: "400px", height: "auto" },
+      large: { width: "600px", height: "auto" },
+      full: { width: "100%", height: "auto" }
+    };
+
+    const size = sizeStyles[formData.imageSize];
+    const imageHtml = `<div style="text-align: center; margin: 20px 0;"><img src="${formData.image}" alt="Featured image" style="width: ${size.width}; height: ${size.height}; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" /></div>`;
+    
+    const newContent = formData.content + imageHtml;
+    setFormData({ ...formData, content: newContent });
+
+    toast({
+      title: "Image Inserted",
+      description: "Featured image has been added to your content"
+    });
+  };
+
   const canPreview = !!(formData.title?.trim());
   const canPublish = !!(formData.title?.trim() && formData.excerpt?.trim());
-  
-  console.log("Can preview:", canPreview, "Can publish:", canPublish);
-  console.log("Form data content:", formData.content);
 
   return (
     <>
@@ -191,13 +211,17 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
 
           <FeaturedImageUpload
             image={formData.image}
+            imageSize={formData.imageSize}
             onImageChange={(image) => handleFormDataChange({ ...formData, image })}
+            onImageSizeChange={(size) => handleFormDataChange({ ...formData, imageSize: size })}
+            onInsertToContent={insertFeaturedImage}
           />
 
           <SimplifiedRichTextEditor
             value={formData.content}
             onChange={(content) => handleFormDataChange({ ...formData, content })}
-            placeholder="Edit your report content here. Use the formatting tools above to style your text and add images..."
+            placeholder="Edit your report content here. Use the formatting tools above to style your text. Use the 'Insert Featured Image' button above to add your image to the content..."
+            hideImageButton={true}
           />
         </div>
 

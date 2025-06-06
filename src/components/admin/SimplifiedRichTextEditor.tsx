@@ -11,15 +11,22 @@ interface SimplifiedRichTextEditorProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  hideImageButton?: boolean;
 }
 
-const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRichTextEditorProps) => {
+const SimplifiedRichTextEditor = ({ 
+  value, 
+  onChange, 
+  placeholder,
+  hideImageButton = false 
+}: SimplifiedRichTextEditorProps) => {
   const [showMediaGallery, setShowMediaGallery] = useState(false);
   const quillRef = useRef<ReactQuill>(null);
 
   console.log("SimplifiedRichTextEditor - current value:", value);
+  console.log("SimplifiedRichTextEditor - hideImageButton:", hideImageButton);
 
-  // ReactQuill configuration WITHOUT image support (removed from toolbar)
+  // ReactQuill configuration WITHOUT image support
   const modules = {
     toolbar: [
       [{ 'font': [] }],
@@ -28,7 +35,7 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
       [{ 'color': [] }, { 'background': [] }],
       [{ 'list': 'ordered'}, { 'list': 'bullet' }],
       [{ 'align': [] }],
-      ['link'], // Removed 'image' from here
+      ['link'],
       ['clean']
     ],
     clipboard: {
@@ -38,7 +45,7 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
 
   const formats = [
     'font', 'size', 'bold', 'italic', 'underline',
-    'color', 'background', 'list', 'bullet', 'align', 'link' // Removed 'image' from here
+    'color', 'background', 'list', 'bullet', 'align', 'link'
   ];
 
   const insertImage = (imageUrl: string, caption?: string, width?: string, height?: string) => {
@@ -52,7 +59,6 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
       // Create proper CSS styles for sizing
       let imageStyles = 'max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: block; margin: 0 auto;';
       
-      // Apply specific width and height if provided
       if (width && width !== '100%') {
         imageStyles += ` width: ${width} !important;`;
       } else if (width === '100%') {
@@ -63,7 +69,6 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
         imageStyles += ` height: ${height} !important;`;
       }
       
-      // Create the image HTML with proper styling
       const imageHtml = `
         <div class="image-container" style="margin: 20px 0; text-align: center;">
           <img src="${imageUrl}" alt="${caption || 'Report image'}" style="${imageStyles}" />
@@ -71,10 +76,7 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
         </div>
       `;
       
-      // Insert the image HTML at the cursor position
       quill.clipboard.dangerouslyPasteHTML(index, imageHtml);
-      
-      // Move cursor after the inserted content
       const newCursorPosition = index + imageHtml.length;
       quill.setSelection(newCursorPosition, 0);
       
@@ -98,16 +100,18 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
     <Card>
       <CardHeader>
         <CardTitle>Content Editor</CardTitle>
-        <div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleAddImageClick}
-          >
-            <Image className="mr-2 h-4 w-4" />
-            Add Image
-          </Button>
-        </div>
+        {!hideImageButton && (
+          <div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleAddImageClick}
+            >
+              <Image className="mr-2 h-4 w-4" />
+              Add Image
+            </Button>
+          </div>
+        )}
       </CardHeader>
       <CardContent>
         <ReactQuill
@@ -121,7 +125,7 @@ const SimplifiedRichTextEditor = ({ value, onChange, placeholder }: SimplifiedRi
           style={{ minHeight: '400px' }}
         />
         
-        {showMediaGallery && (
+        {!hideImageButton && showMediaGallery && (
           <MediaGallery
             onInsert={insertImage}
             onClose={() => {

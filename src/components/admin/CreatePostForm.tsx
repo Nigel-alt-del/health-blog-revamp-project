@@ -1,11 +1,11 @@
-import { useState, useEffect, useRef } from "react";
+
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { PostBasicInfo } from "./PostBasicInfo";
 import { FeaturedImageUpload } from "./FeaturedImageUpload";
 import { AdminSidebar } from "./AdminSidebar";
 import SimplifiedRichTextEditor from "./SimplifiedRichTextEditor";
 import { ReportPreview } from "../ReportPreview";
-import { addPostToStorage, type BlogPost } from "@/utils/localStorage";
 
 interface CreatePostFormProps {
   onSubmit: (post: any) => void;
@@ -15,10 +15,6 @@ interface CreatePostFormProps {
 export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
   const [showPreview, setShowPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [lastSaved, setLastSaved] = useState<Date | null>(null);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [draftId, setDraftId] = useState<string | null>(null);
-  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -27,42 +23,9 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
     content: "",
     category: "Healthcare",
     tags: "",
-    image: ""
+    image: "",
+    imageSize: "medium" as "small" | "medium" | "large" | "full"
   });
-
-  // Track changes for auto-save
-  useEffect(() => {
-    // Only set unsaved changes if there's actual content
-    if (formData.title || formData.excerpt || formData.content) {
-      setHasUnsavedChanges(true);
-      
-      // Clear existing timer
-      if (autoSaveTimerRef.current) {
-        clearTimeout(autoSaveTimerRef.current);
-      }
-      
-      // Set new auto-save timer
-      autoSaveTimerRef.current = setTimeout(() => {
-        handleSaveDraft();
-      }, 30000); // Auto-save every 30 seconds
-    }
-
-    return () => {
-      if (autoSaveTimerRef.current) {
-        clearTimeout(autoSaveTimerRef.current);
-      }
-    };
-  }, [formData]);
-
-  const generateId = (title: string): string => {
-    const baseId = title.toLowerCase()
-      .replace(/[^a-z0-9\s]/g, '')
-      .replace(/\s+/g, '-')
-      .substring(0, 50);
-    
-    const timestamp = Date.now();
-    return `${baseId}-${timestamp}`;
-  };
 
   const formatPostData = (data: typeof formData) => ({
     title: data.title,
@@ -71,21 +34,15 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
     category: data.category,
     tags: data.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
     image: data.image,
+    imageSize: data.imageSize,
     readTime: "5 min read",
+    featured: false,
     author: "InsureMyHealth Team",
-    authorRole: "Healthcare Policy Analyst"
-  });
-
-  const formatPostDataForPreview = (data: typeof formData) => ({
-    title: data.title,
-    excerpt: data.excerpt,
-    content: data.content,
-    category: data.category,
-    tags: data.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
-    image: data.image,
-    readTime: "5 min read",
-    author: "InsureMyHealth Team",
-    authorRole: "Healthcare Policy Analyst"
+    authorRole: "Healthcare Policy Analyst",
+    authorLinkedin: "",
+    authorBio: "",
+    seoKeywords: '',
+    metaDescription: data.excerpt
   });
 
   const handleSaveDraft = async () => {
@@ -101,39 +58,12 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
     setIsSaving(true);
     
     try {
-      console.log("Saving draft with data:", formData);
-      
-      // Create or update draft
-      const draftPost: BlogPost = {
-        id: draftId || generateId(formData.title),
-        title: formData.title,
-        excerpt: formData.excerpt,
-        content: formData.content,
-        publishedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-        readTime: "5 min read",
-        category: formData.category,
-        tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
-        featured: false,
-        image: formData.image || "/placeholder.svg",
-        seoKeywords: '',
-        metaDescription: formData.excerpt
-      };
-
-      // Save to localStorage
-      addPostToStorage(draftPost);
-      
-      if (!draftId) {
-        setDraftId(draftPost.id);
-      }
-      
-      setLastSaved(new Date());
-      setHasUnsavedChanges(false);
-      
-      console.log("Draft saved successfully:", draftPost);
+      // In a real app, you'd save to localStorage or call an API
+      console.log("Saving draft:", formData);
       
       toast({
         title: "Draft Saved",
-        description: "Your changes have been saved successfully."
+        description: "Your draft has been saved successfully."
       });
     } catch (error) {
       console.error("Error saving draft:", error);
@@ -148,7 +78,7 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
   };
 
   const handleSubmit = () => {
-    console.log("Submit clicked with data:", formData);
+    console.log("Create clicked with data:", formData);
     
     if (!formData.title?.trim()) {
       toast({
@@ -161,32 +91,17 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
 
     if (!formData.excerpt?.trim()) {
       toast({
-        title: "Error",
-        description: "Please add an excerpt", 
+        title: "Error", 
+        description: "Please add an excerpt",
         variant: "destructive"
       });
       return;
     }
 
-    try {
-      const postData = formatPostData(formData);
-      console.log("Submitting post data:", postData);
-      
-      onSubmit(postData);
-      setHasUnsavedChanges(false);
-      
-      toast({
-        title: "Success",
-        description: "Report created successfully!"
-      });
-    } catch (error) {
-      console.error("Error submitting post:", error);
-      toast({
-        title: "Submission Failed",
-        description: "Failed to create report. Please try again.",
-        variant: "destructive"
-      });
-    }
+    const post = formatPostData(formData);
+    console.log("Submitting new post:", post);
+    
+    onSubmit(post);
   };
 
   const handlePreview = () => {
@@ -205,15 +120,40 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
   };
 
   const handleFormDataChange = (newFormData: any) => {
-    console.log("Form data changed:", newFormData);
     setFormData(newFormData);
   };
 
-  // Only require title for preview, title + excerpt for publishing
+  const insertFeaturedImage = () => {
+    if (!formData.image) {
+      toast({
+        title: "No Image",
+        description: "Please upload a featured image first",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const sizeStyles = {
+      small: { width: "200px", height: "auto" },
+      medium: { width: "400px", height: "auto" },
+      large: { width: "600px", height: "auto" },
+      full: { width: "100%", height: "auto" }
+    };
+
+    const size = sizeStyles[formData.imageSize];
+    const imageHtml = `<div style="text-align: center; margin: 20px 0;"><img src="${formData.image}" alt="Featured image" style="width: ${size.width}; height: ${size.height}; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" /></div>`;
+    
+    const newContent = formData.content + imageHtml;
+    setFormData({ ...formData, content: newContent });
+
+    toast({
+      title: "Image Inserted",
+      description: "Featured image has been added to your content"
+    });
+  };
+
   const canPreview = !!(formData.title?.trim());
   const canPublish = !!(formData.title?.trim() && formData.excerpt?.trim());
-  
-  console.log("Can preview:", canPreview, "Can publish:", canPublish);
 
   return (
     <>
@@ -226,16 +166,17 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
 
           <FeaturedImageUpload
             image={formData.image}
+            imageSize={formData.imageSize}
             onImageChange={(image) => handleFormDataChange({ ...formData, image })}
+            onImageSizeChange={(size) => handleFormDataChange({ ...formData, imageSize: size })}
+            onInsertToContent={insertFeaturedImage}
           />
 
           <SimplifiedRichTextEditor
             value={formData.content}
-            onChange={(content) => {
-              console.log("Content changed:", content);
-              handleFormDataChange({ ...formData, content });
-            }}
-            placeholder="Write your report content here. Use the formatting tools above to style your text and add images..."
+            onChange={(content) => handleFormDataChange({ ...formData, content })}
+            placeholder="Write your report content here. Use the formatting tools above to style your text. Use the 'Insert Featured Image' button above to add your image to the content..."
+            hideImageButton={true}
           />
         </div>
 
@@ -244,16 +185,17 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
           onPublish={handleSubmit}
           onCancel={onCancel}
           onSaveDraft={handleSaveDraft}
-          canPreview={canPublish}
+          canPreview={canPreview}
+          isEditing={false}
           isSaving={isSaving}
-          lastSaved={lastSaved}
-          hasUnsavedChanges={hasUnsavedChanges}
+          lastSaved={null}
+          hasUnsavedChanges={false}
         />
       </div>
 
       {showPreview && (
         <ReportPreview
-          post={formatPostDataForPreview(formData)}
+          post={formatPostData(formData)}
           onClose={() => setShowPreview(false)}
           onPublish={handleSubmit}
         />
