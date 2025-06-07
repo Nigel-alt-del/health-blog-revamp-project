@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -20,20 +21,56 @@ export const FeaturedImageUpload = ({
   onImageSizeChange,
   onInsertToContent 
 }: FeaturedImageUploadProps) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageUrl = e.target?.result as string;
-        onImageChange(imageUrl);
-      };
-      reader.readAsDataURL(file);
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const imageUrl = e.target?.result as string;
+          if (imageUrl) {
+            onImageChange(imageUrl);
+          } else {
+            setError("Failed to load image");
+          }
+          setIsLoading(false);
+        };
+        reader.onerror = () => {
+          setError("Error reading file");
+          setIsLoading(false);
+        };
+        reader.readAsDataURL(file);
+      } catch (err) {
+        setError("Error processing file");
+        setIsLoading(false);
+      }
     }
   };
 
   const removeImage = () => {
-    onImageChange("");
+    try {
+      onImageChange("");
+      setError(null);
+    } catch (err) {
+      setError("Error removing image");
+    }
+  };
+
+  const handleSizeChange = (size: "small" | "medium" | "large" | "full") => {
+    try {
+      if (onImageSizeChange) {
+        onImageSizeChange(size);
+      }
+      setError(null);
+    } catch (err) {
+      setError("Error changing image size");
+    }
   };
 
   const getSizePreview = () => {
@@ -43,7 +80,7 @@ export const FeaturedImageUpload = ({
       large: { width: "600px", label: "Large (600px)" },
       full: { width: "100%", label: "Full Width" }
     };
-    return sizes[imageSize];
+    return sizes[imageSize] || sizes.medium;
   };
 
   return (
@@ -51,7 +88,7 @@ export const FeaturedImageUpload = ({
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           Featured Image
-          {image && onInsertToContent && (
+          {image && onInsertToContent && !isLoading && (
             <Button
               variant="outline"
               size="sm"
@@ -65,7 +102,19 @@ export const FeaturedImageUpload = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {image ? (
+        {error && (
+          <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
+        
+        {isLoading && (
+          <div className="p-4 text-center">
+            <p className="text-sm text-gray-600">Loading image...</p>
+          </div>
+        )}
+
+        {image && !isLoading ? (
           <div className="space-y-4">
             {/* Image Preview */}
             <div className="relative inline-block w-full">
@@ -74,6 +123,7 @@ export const FeaturedImageUpload = ({
                 alt="Preview" 
                 className="w-full max-h-64 object-cover rounded-lg"
                 style={{ maxWidth: getSizePreview().width }}
+                onError={() => setError("Failed to display image")}
               />
               <Button
                 variant="destructive"
@@ -90,7 +140,7 @@ export const FeaturedImageUpload = ({
               <div className="space-y-2">
                 <label className="block text-sm font-medium">Image Size</label>
                 <div className="flex items-center gap-4">
-                  <Select value={imageSize} onValueChange={onImageSizeChange}>
+                  <Select value={imageSize} onValueChange={handleSizeChange}>
                     <SelectTrigger className="w-48">
                       <SelectValue />
                     </SelectTrigger>
@@ -114,10 +164,11 @@ export const FeaturedImageUpload = ({
                 accept="image/*"
                 onChange={handleImageUpload}
                 className="max-w-xs"
+                disabled={isLoading}
               />
             </div>
           </div>
-        ) : (
+        ) : !isLoading && (
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
             <Image className="mx-auto h-12 w-12 text-gray-400 mb-4" />
             <p className="text-sm text-gray-600 mb-4">Upload a featured image for your report</p>
@@ -126,6 +177,7 @@ export const FeaturedImageUpload = ({
               accept="image/*"
               onChange={handleImageUpload}
               className="max-w-xs mx-auto"
+              disabled={isLoading}
             />
           </div>
         )}

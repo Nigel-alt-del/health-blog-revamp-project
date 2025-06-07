@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import BlogLayout from "@/components/BlogLayout";
 import FeaturedPost from "@/components/FeaturedPost";
@@ -74,19 +75,26 @@ const BlogHome = () => {
 
   return (
     <BlogLayout>
-      <div className="max-w-6xl mx-auto px-4 py-12">
-        {/* Hero Section */}
-        <div className="text-center mb-16">
-          <h1 className="text-5xl font-bold text-[#20466d] mb-6">
-            InsureMyHealth Reports
+      {/* Hero Section with Background */}
+      <section 
+        className="relative py-20 px-4 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `linear-gradient(rgba(32, 70, 109, 0.8), rgba(32, 70, 109, 0.8)), url('/lovable-uploads/b61ae919-b75e-409d-a884-8437e2befc15.png')`
+        }}
+      >
+        <div className="max-w-4xl mx-auto text-center text-white">
+          <h1 className="text-5xl font-bold mb-6 leading-tight">
+            InsureMyHealth <span className="text-[#22aee1]">Reports</span>
           </h1>
-          <p className="text-xl text-[#79858D] max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl mb-8 max-w-3xl mx-auto leading-relaxed opacity-90">
             Stay informed with the latest insights on healthcare policy, insurance trends, 
             and industry analysis. Our expert team delivers comprehensive reports to help 
             you navigate the complex world of health insurance.
           </p>
         </div>
+      </section>
 
+      <div className="max-w-6xl mx-auto px-4 py-12">
         {/* Search and Filter */}
         <div className="mb-12">
           <div className="flex flex-col md:flex-row gap-4 mb-6">

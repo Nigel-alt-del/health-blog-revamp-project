@@ -17,6 +17,7 @@ interface EditPostFormProps {
 export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) => {
   const [showPreview, setShowPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -33,29 +34,41 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
   useEffect(() => {
     console.log("EditPostForm - Loading post data:", post);
     if (post && post.id) {
-      const tagsString = Array.isArray(post.tags) ? post.tags.join(', ') : (post.tags || "");
-      
-      setFormData({
-        title: post.title || "",
-        excerpt: post.excerpt || "",
-        content: post.content || "",
-        category: post.category || "Healthcare",
-        tags: tagsString,
-        image: post.image || "",
-        imageSize: post.imageSize || "medium"
-      });
-      
-      console.log("EditPostForm - Form data set:", {
-        title: post.title,
-        excerpt: post.excerpt,
-        category: post.category,
-        tagsString,
-        imageSize: post.imageSize || "medium"
-      });
+      try {
+        const tagsString = Array.isArray(post.tags) ? post.tags.join(', ') : (post.tags || "");
+        
+        const newFormData = {
+          title: post.title || "",
+          excerpt: post.excerpt || "",
+          content: post.content || "",
+          category: post.category || "Healthcare",
+          tags: tagsString,
+          image: post.image || "",
+          imageSize: post.imageSize || "medium"
+        };
+        
+        console.log("EditPostForm - Setting form data:", newFormData);
+        setFormData(newFormData);
+        
+        // Allow time for the editor to initialize before marking as loaded
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 300);
+        
+      } catch (error) {
+        console.error("EditPostForm - Error loading post data:", error);
+        toast({
+          title: "Loading Error",
+          description: "Error loading post data. Please try again.",
+          variant: "destructive"
+        });
+        setIsLoading(false);
+      }
     } else {
       console.error("EditPostForm - No valid post received:", post);
+      setIsLoading(false);
     }
-  }, [post]);
+  }, [post, toast]);
 
   const formatPostData = (data: typeof formData) => ({
     id: post.id,
@@ -165,6 +178,7 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
   };
 
   const handleFormDataChange = (newFormData: any) => {
+    console.log("EditPostForm - Form data changing:", newFormData);
     setFormData(newFormData);
   };
 
@@ -178,27 +192,47 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
       return;
     }
 
-    const sizeStyles = {
-      small: { width: "200px", height: "auto" },
-      medium: { width: "400px", height: "auto" },
-      large: { width: "600px", height: "auto" },
-      full: { width: "100%", height: "auto" }
-    };
+    try {
+      const sizeStyles = {
+        small: { width: "200px", height: "auto" },
+        medium: { width: "400px", height: "auto" },
+        large: { width: "600px", height: "auto" },
+        full: { width: "100%", height: "auto" }
+      };
 
-    const size = sizeStyles[formData.imageSize];
-    const imageHtml = `<div style="text-align: center; margin: 20px 0;"><img src="${formData.image}" alt="Featured image" style="width: ${size.width}; height: ${size.height}; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" /></div>`;
-    
-    const newContent = formData.content + imageHtml;
-    setFormData({ ...formData, content: newContent });
+      const size = sizeStyles[formData.imageSize];
+      const imageHtml = `<div style="text-align: center; margin: 20px 0;"><img src="${formData.image}" alt="Featured image" style="width: ${size.width}; height: ${size.height}; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" /></div>`;
+      
+      const newContent = formData.content + imageHtml;
+      setFormData({ ...formData, content: newContent });
 
-    toast({
-      title: "Image Inserted",
-      description: "Featured image has been added to your content"
-    });
+      toast({
+        title: "Image Inserted",
+        description: "Featured image has been added to your content"
+      });
+    } catch (error) {
+      console.error("Error inserting featured image:", error);
+      toast({
+        title: "Insert Failed",
+        description: "Failed to insert image. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const canPreview = !!(formData.title?.trim());
   const canPublish = !!(formData.title?.trim() && formData.excerpt?.trim());
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center">
+          <p className="text-lg font-medium">Loading post data...</p>
+          <p className="text-sm text-muted-foreground mt-2">Please wait while we load your content</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -230,7 +264,7 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
           onPublish={handleSubmit}
           onCancel={onCancel}
           onSaveDraft={handleSaveDraft}
-          canPreview={canPublish}
+          canPreview={canPreview}
           isEditing={true}
           isSaving={isSaving}
           lastSaved={null}

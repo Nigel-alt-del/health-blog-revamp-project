@@ -21,8 +21,10 @@ const SimplifiedRichTextEditor = ({
   const [showMediaGallery, setShowMediaGallery] = useState(false);
   const quillRef = useRef<ReactQuill>(null);
   const [isEditorReady, setIsEditorReady] = useState(false);
+  const [editorContent, setEditorContent] = useState(value || '');
 
   console.log("SimplifiedRichTextEditor - current value:", value);
+  console.log("SimplifiedRichTextEditor - editorContent:", editorContent);
   console.log("SimplifiedRichTextEditor - hideImageButton:", hideImageButton);
 
   // Custom image handler for toolbar
@@ -58,14 +60,33 @@ const SimplifiedRichTextEditor = ({
     'color', 'background', 'list', 'bullet', 'align', 'link', 'image'
   ];
 
-  // Handle editor ready state
+  // Handle editor ready state and content synchronization
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsEditorReady(true);
-    }, 100);
+    }, 200);
     
     return () => clearTimeout(timer);
   }, []);
+
+  // Sync external value changes with editor content
+  useEffect(() => {
+    if (value !== editorContent) {
+      console.log("Syncing external value to editor:", value);
+      setEditorContent(value || '');
+    }
+  }, [value]);
+
+  // Ensure editor content is updated when it becomes ready
+  useEffect(() => {
+    if (isEditorReady && quillRef.current) {
+      const quill = quillRef.current.getEditor();
+      if (quill && value && quill.root.innerHTML !== value) {
+        console.log("Setting editor content on ready:", value);
+        quill.root.innerHTML = value;
+      }
+    }
+  }, [isEditorReady, value]);
 
   const insertImage = (imageUrl: string, caption?: string, width?: string, height?: string, alignment?: string) => {
     console.log("Inserting image with options:", { imageUrl, caption, width, height, alignment });
@@ -73,42 +94,46 @@ const SimplifiedRichTextEditor = ({
     if (quillRef.current && isEditorReady) {
       const quill = quillRef.current.getEditor();
       if (quill) {
-        const range = quill.getSelection();
-        const index = range ? range.index : quill.getLength();
-        
-        // Create image HTML with proper styling and attributes
-        let imageHtml = `<img src="${imageUrl}" alt="${caption || 'Inserted image'}" style="`;
-        
-        // Add size styling
-        if (width) imageHtml += `width: ${width}; `;
-        if (height) imageHtml += `height: ${height}; `;
-        
-        // Add default styling
-        imageHtml += `max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin: 16px 0;`;
-        
-        // Add alignment styling
-        if (alignment === 'center') {
-          imageHtml += ` display: block; margin-left: auto; margin-right: auto;`;
-        } else if (alignment === 'left') {
-          imageHtml += ` float: left; margin-right: 16px;`;
-        } else if (alignment === 'right') {
-          imageHtml += ` float: right; margin-left: 16px;`;
+        try {
+          const range = quill.getSelection();
+          const index = range ? range.index : quill.getLength();
+          
+          // Create image HTML with proper styling and attributes
+          let imageHtml = `<img src="${imageUrl}" alt="${caption || 'Inserted image'}" style="`;
+          
+          // Add size styling
+          if (width) imageHtml += `width: ${width}; `;
+          if (height) imageHtml += `height: ${height}; `;
+          
+          // Add default styling
+          imageHtml += `max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin: 16px 0;`;
+          
+          // Add alignment styling
+          if (alignment === 'center') {
+            imageHtml += ` display: block; margin-left: auto; margin-right: auto;`;
+          } else if (alignment === 'left') {
+            imageHtml += ` float: left; margin-right: 16px;`;
+          } else if (alignment === 'right') {
+            imageHtml += ` float: right; margin-left: 16px;`;
+          }
+          
+          imageHtml += `" />`;
+          
+          // Add caption if provided
+          if (caption) {
+            imageHtml += `<div style="text-align: ${alignment === 'center' ? 'center' : alignment || 'center'}; font-style: italic; color: #666; font-size: 14px; margin-top: 8px;">${caption}</div>`;
+          }
+          
+          // Insert the HTML
+          quill.clipboard.dangerouslyPasteHTML(index, imageHtml);
+          
+          // Move cursor after the inserted content
+          quill.setSelection(index + 1, 0);
+          
+          console.log("Image inserted successfully");
+        } catch (error) {
+          console.error("Error inserting image:", error);
         }
-        
-        imageHtml += `" />`;
-        
-        // Add caption if provided
-        if (caption) {
-          imageHtml += `<div style="text-align: ${alignment === 'center' ? 'center' : alignment || 'center'}; font-style: italic; color: #666; font-size: 14px; margin-top: 8px;">${caption}</div>`;
-        }
-        
-        // Insert the HTML
-        quill.clipboard.dangerouslyPasteHTML(index, imageHtml);
-        
-        // Move cursor after the inserted content
-        quill.setSelection(index + 1, 0);
-        
-        console.log("Image inserted successfully");
       }
     }
     
@@ -117,6 +142,7 @@ const SimplifiedRichTextEditor = ({
 
   const handleChange = (content: string) => {
     console.log("Content changed in editor:", content);
+    setEditorContent(content || '');
     onChange(content || '');
   };
 
@@ -145,7 +171,7 @@ const SimplifiedRichTextEditor = ({
         <ReactQuill
           ref={quillRef}
           theme="snow"
-          value={value || ''}
+          value={editorContent}
           onChange={handleChange}
           modules={modules}
           formats={formats}
