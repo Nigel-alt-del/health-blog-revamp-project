@@ -14,47 +14,62 @@ const BlogPost = () => {
   const { slug } = useParams();
   const { toast } = useToast();
   const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Load posts from localStorage on component mount
   useEffect(() => {
-    console.log("Loading posts in BlogPost");
+    console.log("BlogPost - Loading posts for slug:", slug);
     
-    // Check if we need to force refresh (coming from admin)
-    const forceRefresh = sessionStorage.getItem('forceRefresh');
-    if (forceRefresh) {
-      sessionStorage.removeItem('forceRefresh');
-      console.log("Force refreshing post data from admin");
-    }
-    
-    const storedPosts = getStoredPosts();
-    console.log("Stored posts:", storedPosts);
-    
-    // Convert blogPosts to match our simplified BlogPost interface
-    const simplifiedBlogPosts = blogPosts.map(post => ({
-      id: post.id,
-      title: post.title,
-      excerpt: post.excerpt,
-      content: post.content,
-      publishedAt: post.publishedAt,
-      readTime: post.readTime,
-      category: post.category,
-      tags: post.tags,
-      featured: post.featured,
-      image: post.image,
-      seoKeywords: (post as any).seoKeywords || '',
-      metaDescription: (post as any).metaDescription || post.excerpt
-    }));
+    const loadPostData = () => {
+      // Check if we need to force refresh (coming from admin)
+      const forceRefresh = sessionStorage.getItem('forceRefresh');
+      if (forceRefresh) {
+        sessionStorage.removeItem('forceRefresh');
+        console.log("BlogPost - Force refreshing post data from admin");
+      }
+      
+      const storedPosts = getStoredPosts();
+      console.log("BlogPost - Stored posts:", storedPosts);
+      
+      // Convert blogPosts to match our simplified BlogPost interface
+      const simplifiedBlogPosts = blogPosts.map(post => ({
+        id: post.id,
+        title: post.title,
+        excerpt: post.excerpt,
+        content: post.content,
+        publishedAt: post.publishedAt,
+        readTime: post.readTime,
+        category: post.category,
+        tags: post.tags,
+        featured: post.featured,
+        image: post.image,
+        seoKeywords: (post as any).seoKeywords || '',
+        metaDescription: (post as any).metaDescription || post.excerpt
+      }));
 
-    if (storedPosts.length > 0) {
-      const combinedPosts = [
-        ...storedPosts,
-        ...simplifiedBlogPosts.filter(p => !storedPosts.some(sp => sp.id === p.id))
-      ];
+      let combinedPosts: BlogPost[] = [];
+
+      if (storedPosts.length > 0) {
+        // Prioritize stored posts and add default posts that haven't been modified
+        const storedPostIds = storedPosts.map(p => p.id);
+        const unmodifiedDefaultPosts = simplifiedBlogPosts.filter(p => !storedPostIds.includes(p.id));
+        combinedPosts = [...storedPosts, ...unmodifiedDefaultPosts];
+      } else {
+        combinedPosts = simplifiedBlogPosts;
+      }
+      
+      console.log("BlogPost - Combined posts:", combinedPosts);
+      console.log("BlogPost - Looking for post with slug:", slug);
+      
+      const foundPost = combinedPosts.find(p => p.id === slug);
+      console.log("BlogPost - Found post:", foundPost);
+      
       setAllPosts(combinedPosts);
-    } else {
-      setAllPosts(simplifiedBlogPosts);
-    }
-  }, []);
+      setIsLoading(false);
+    };
+
+    loadPostData();
+  }, [slug]);
 
   const post = allPosts.find(p => p.id === slug);
   
@@ -62,18 +77,42 @@ const BlogPost = () => {
   const cameFromAdmin = document.referrer.includes('/admin') || 
                         sessionStorage.getItem('cameFromAdmin') === 'true';
 
+  if (isLoading) {
+    return (
+      <BlogLayout>
+        <div className="max-w-4xl mx-auto px-4 py-12 text-center">
+          <h1 className="text-3xl font-bold text-[#20466d] mb-4">Loading Report...</h1>
+          <p className="text-[#79858D] mb-8">Please wait while we load the report content.</p>
+        </div>
+      </BlogLayout>
+    );
+  }
+
   if (!post) {
+    console.error("BlogPost - Post not found for slug:", slug);
+    console.error("BlogPost - Available post IDs:", allPosts.map(p => p.id));
+    
     return (
       <BlogLayout>
         <div className="max-w-4xl mx-auto px-4 py-12 text-center">
           <h1 className="text-3xl font-bold text-[#20466d] mb-4">Report Not Found</h1>
-          <p className="text-[#79858D] mb-8">The report you're looking for doesn't exist.</p>
-          <Link to="/">
-            <Button className="bg-[#22aee1] hover:bg-[#20466d]">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Reports
-            </Button>
-          </Link>
+          <p className="text-[#79858D] mb-4">The report you're looking for doesn't exist or may have been moved.</p>
+          <p className="text-sm text-[#79858D] mb-8">Searched for: {slug}</p>
+          {cameFromAdmin ? (
+            <Link to="/admin">
+              <Button className="bg-[#22aee1] hover:bg-[#20466d]">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Admin
+              </Button>
+            </Link>
+          ) : (
+            <Link to="/">
+              <Button className="bg-[#22aee1] hover:bg-[#20466d]">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Reports
+              </Button>
+            </Link>
+          )}
         </div>
       </BlogLayout>
     );

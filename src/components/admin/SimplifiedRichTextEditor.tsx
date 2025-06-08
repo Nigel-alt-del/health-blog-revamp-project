@@ -46,11 +46,11 @@ const SimplifiedRichTextEditor = ({
   hideImageButton = false 
 }: SimplifiedRichTextEditorProps) => {
   const [showMediaGallery, setShowMediaGallery] = useState(false);
-  const [isReady, setIsReady] = useState(false);
+  const [editorReady, setEditorReady] = useState(false);
   const quillRef = useRef<ReactQuill>(null);
+  const hasInitialized = useRef(false);
 
-  console.log("SimplifiedRichTextEditor - Rendering with value:", value);
-  console.log("SimplifiedRichTextEditor - isReady:", isReady);
+  console.log("SimplifiedRichTextEditor - Rendering with value length:", value?.length || 0);
 
   // Stable image handler using useCallback
   const imageHandler = useCallback(() => {
@@ -61,85 +61,93 @@ const SimplifiedRichTextEditor = ({
   // Stable modules configuration
   const modules = useCallback(() => createEditorModules(imageHandler), [imageHandler]);
 
-  // Handle Quill ready state properly
-  const handleQuillReady = useCallback(() => {
-    console.log("Quill editor is ready");
-    setIsReady(true);
-  }, []);
-
-  // Initialize editor when it's mounted and ready
+  // Initialize editor when mounted
   useEffect(() => {
-    if (quillRef.current) {
+    if (quillRef.current && !hasInitialized.current) {
       const quill = quillRef.current.getEditor();
-      if (quill && !isReady) {
-        console.log("Initializing Quill editor");
-        handleQuillReady();
+      if (quill) {
+        console.log("SimplifiedRichTextEditor - Editor initialized");
+        hasInitialized.current = true;
+        setEditorReady(true);
+        
+        // Set initial content if provided
+        if (value && quill.root.innerHTML !== value) {
+          console.log("SimplifiedRichTextEditor - Setting initial content");
+          quill.root.innerHTML = value;
+        }
       }
     }
-  }, [isReady, handleQuillReady]);
+  }, [value]);
 
   const insertImage = useCallback((imageUrl: string, caption?: string, width?: string, height?: string, alignment?: string) => {
     console.log("Inserting image with options:", { imageUrl, caption, width, height, alignment });
     
-    if (!quillRef.current || !isReady) {
+    if (!quillRef.current || !editorReady) {
       console.warn("Quill not ready for image insertion");
       return;
     }
 
     try {
       const quill = quillRef.current.getEditor();
-      if (!quill || !quill.getSelection) {
-        console.warn("Quill editor not properly initialized");
+      if (!quill) {
+        console.warn("Quill editor not available");
         return;
       }
 
       const range = quill.getSelection();
       const index = range ? range.index : quill.getLength();
       
-      // Create image HTML with proper styling and attributes
+      // Create image HTML with proper styling and sizing
       let imageHtml = `<img src="${imageUrl}" alt="${caption || 'Inserted image'}" style="`;
       
-      // Add size styling
-      if (width) imageHtml += `width: ${width}; `;
-      if (height) imageHtml += `height: ${height}; `;
+      // Add size styling with !important to override CSS
+      if (width) {
+        imageHtml += `width: ${width} !important; max-width: ${width} !important; `;
+      } else {
+        imageHtml += `width: 400px !important; max-width: 400px !important; `;
+      }
+      
+      if (height) {
+        imageHtml += `height: ${height} !important; `;
+      } else {
+        imageHtml += `height: auto !important; `;
+      }
       
       // Add default styling
-      imageHtml += `max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin: 16px 0;`;
+      imageHtml += `border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin: 16px 0; display: block;`;
       
       // Add alignment styling
       if (alignment === 'center') {
-        imageHtml += ` display: block; margin-left: auto; margin-right: auto;`;
+        imageHtml += ` margin-left: auto; margin-right: auto;`;
       } else if (alignment === 'left') {
-        imageHtml += ` float: left; margin-right: 16px;`;
+        imageHtml += ` float: left; margin-right: 16px; margin-bottom: 8px;`;
       } else if (alignment === 'right') {
-        imageHtml += ` float: right; margin-left: 16px;`;
+        imageHtml += ` float: right; margin-left: 16px; margin-bottom: 8px;`;
       }
       
       imageHtml += `" />`;
       
       // Add caption if provided
       if (caption) {
-        imageHtml += `<div style="text-align: ${alignment === 'center' ? 'center' : alignment || 'center'}; font-style: italic; color: #666; font-size: 14px; margin-top: 8px;">${caption}</div>`;
+        const captionAlignment = alignment === 'center' ? 'center' : alignment || 'center';
+        imageHtml += `<div style="text-align: ${captionAlignment}; font-style: italic; color: #666; font-size: 14px; margin-top: 8px; margin-bottom: 16px;">${caption}</div>`;
       }
       
-      // Insert the HTML safely
-      if (quill.clipboard && quill.clipboard.dangerouslyPasteHTML) {
-        quill.clipboard.dangerouslyPasteHTML(index, imageHtml);
-        quill.setSelection(index + 1, 0);
-      }
+      // Insert the HTML
+      quill.clipboard.dangerouslyPasteHTML(index, imageHtml);
+      quill.setSelection(index + 1, 0);
       
-      console.log("Image inserted successfully");
+      console.log("Image inserted successfully with sizing");
     } catch (error) {
       console.error("Error inserting image:", error);
     }
     
     setShowMediaGallery(false);
-  }, [isReady]);
+  }, [editorReady]);
 
   const handleChange = useCallback((content: string) => {
-    console.log("Content changed in editor:", content);
-    const cleanContent = content || '';
-    onChange(cleanContent);
+    console.log("Content changed in editor, length:", content?.length || 0);
+    onChange(content || '');
   }, [onChange]);
 
   const handleCloseMediaGallery = useCallback(() => {

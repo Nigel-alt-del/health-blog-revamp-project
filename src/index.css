@@ -131,31 +131,52 @@
 .prose .ql-size-24px { font-size: 24px !important; }
 .prose .ql-size-32px { font-size: 32px !important; }
 
-/* Enhanced ReactQuill image support */
+/* Enhanced ReactQuill image support with proper sizing */
 .ql-editor img {
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  margin: 16px 0;
-  max-width: 100%;
-  height: auto;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+  margin: 16px 0 !important;
+  height: auto !important;
+  display: block !important;
+}
+
+/* Specific image size classes that override defaults */
+.ql-editor img[style*="width: 200px"] {
+  width: 200px !important;
+  max-width: 200px !important;
+}
+
+.ql-editor img[style*="width: 400px"] {
+  width: 400px !important;
+  max-width: 400px !important;
+}
+
+.ql-editor img[style*="width: 600px"] {
+  width: 600px !important;
+  max-width: 600px !important;
+}
+
+.ql-editor img[style*="width: 100%"] {
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 /* Image alignment classes for ReactQuill */
 .ql-align-left img {
-  float: left;
-  margin-right: 16px;
-  margin-bottom: 8px;
+  float: left !important;
+  margin-right: 16px !important;
+  margin-bottom: 8px !important;
 }
 
 .ql-align-right img {
-  float: right;
-  margin-left: 16px;
-  margin-bottom: 8px;
+  float: right !important;
+  margin-left: 16px !important;
+  margin-bottom: 8px !important;
 }
 
 .ql-align-center img {
-  display: block;
-  margin: 16px auto;
+  display: block !important;
+  margin: 16px auto !important;
 }
 
 /* Clear floats after images */
@@ -165,7 +186,7 @@
   clear: both;
 }
 
-/* Custom image container styles */
+/* Custom image container styles with proper sizing */
 .image-container {
   margin: 20px 0;
   text-align: center;
@@ -188,8 +209,28 @@
 .image-container img {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  max-width: 100%;
   height: auto;
+}
+
+/* Specific sizing for image containers */
+.image-container.size-small img {
+  width: 200px !important;
+  max-width: 200px !important;
+}
+
+.image-container.size-medium img {
+  width: 400px !important;
+  max-width: 400px !important;
+}
+
+.image-container.size-large img {
+  width: 600px !important;
+  max-width: 600px !important;
+}
+
+.image-container.size-full img {
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 .image-container .caption {
@@ -197,4 +238,31 @@
   font-style: italic;
   color: #666;
   font-size: 14px;
+}
+
+/* Ensure prose styles don't override our image sizing */
+.prose img {
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+  margin: 16px 0 !important;
+}
+
+.prose img[style*="width: 200px"] {
+  width: 200px !important;
+  max-width: 200px !important;
+}
+
+.prose img[style*="width: 400px"] {
+  width: 400px !important;
+  max-width: 400px !important;
+}
+
+.prose img[style*="width: 600px"] {
+  width: 600px !important;
+  max-width: 600px !important;
+}
+
+.prose img[style*="width: 100%"] {
+  width: 100% !important;
+  max-width: 100% !important;
 }
