@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,6 +12,33 @@ interface SimplifiedRichTextEditorProps {
   hideImageButton?: boolean;
 }
 
+// Stable modules configuration outside component to prevent recreation
+const createEditorModules = (imageHandler: () => void) => ({
+  toolbar: {
+    container: [
+      [{ 'font': [] }],
+      [{ 'size': ['small', false, 'large', 'huge'] }],
+      ['bold', 'italic', 'underline'],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'align': [] }],
+      ['link', 'image'],
+      ['clean']
+    ],
+    handlers: {
+      image: imageHandler
+    }
+  },
+  clipboard: {
+    matchVisual: false,
+  }
+});
+
+const formats = [
+  'font', 'size', 'bold', 'italic', 'underline',
+  'color', 'background', 'list', 'bullet', 'align', 'link', 'image'
+];
+
 const SimplifiedRichTextEditor = ({ 
   value, 
   onChange, 
@@ -19,84 +46,42 @@ const SimplifiedRichTextEditor = ({
   hideImageButton = false 
 }: SimplifiedRichTextEditorProps) => {
   const [showMediaGallery, setShowMediaGallery] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   const quillRef = useRef<ReactQuill>(null);
-  const [isQuillReady, setIsQuillReady] = useState(false);
-  const [editorContent, setEditorContent] = useState('');
 
-  console.log("SimplifiedRichTextEditor - current value:", value);
-  console.log("SimplifiedRichTextEditor - editorContent:", editorContent);
-  console.log("SimplifiedRichTextEditor - isQuillReady:", isQuillReady);
+  console.log("SimplifiedRichTextEditor - Rendering with value:", value);
+  console.log("SimplifiedRichTextEditor - isReady:", isReady);
 
-  // Custom image handler for toolbar
-  const imageHandler = () => {
-    console.log("Custom toolbar image handler called");
+  // Stable image handler using useCallback
+  const imageHandler = useCallback(() => {
+    console.log("Image handler called");
     setShowMediaGallery(true);
-  };
-
-  // Stable modules configuration
-  const modules = {
-    toolbar: {
-      container: [
-        [{ 'font': [] }],
-        [{ 'size': ['small', false, 'large', 'huge'] }],
-        ['bold', 'italic', 'underline'],
-        [{ 'color': [] }, { 'background': [] }],
-        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-        [{ 'align': [] }],
-        ['link', 'image'],
-        ['clean']
-      ],
-      handlers: {
-        image: imageHandler
-      }
-    },
-    clipboard: {
-      matchVisual: false,
-    }
-  };
-
-  const formats = [
-    'font', 'size', 'bold', 'italic', 'underline',
-    'color', 'background', 'list', 'bullet', 'align', 'link', 'image'
-  ];
-
-  // Initialize editor content safely
-  useEffect(() => {
-    console.log("Initializing editor content with value:", value);
-    setEditorContent(value || '');
   }, []);
 
-  // Handle external value changes only when Quill is ready
-  useEffect(() => {
-    if (isQuillReady && value !== editorContent) {
-      console.log("Updating editor content from external value:", value);
-      setEditorContent(value || '');
-    }
-  }, [value, isQuillReady]);
+  // Stable modules configuration
+  const modules = useCallback(() => createEditorModules(imageHandler), [imageHandler]);
 
-  // Handle Quill ready state
-  const handleQuillReady = () => {
+  // Handle Quill ready state properly
+  const handleQuillReady = useCallback(() => {
     console.log("Quill editor is ready");
-    setIsQuillReady(true);
-    
-    // Set initial content when editor is ready
-    if (quillRef.current && value) {
+    setIsReady(true);
+  }, []);
+
+  // Initialize editor when it's mounted and ready
+  useEffect(() => {
+    if (quillRef.current) {
       const quill = quillRef.current.getEditor();
-      if (quill && quill.root) {
-        try {
-          console.log("Setting initial content:", value);
-          quill.root.innerHTML = value;
-        } catch (error) {
-          console.error("Error setting initial content:", error);
-        }
+      if (quill && !isReady) {
+        console.log("Initializing Quill editor");
+        handleQuillReady();
       }
     }
-  };
+  }, [isReady, handleQuillReady]);
 
-  const insertImage = (imageUrl: string, caption?: string, width?: string, height?: string, alignment?: string) => {
+  const insertImage = useCallback((imageUrl: string, caption?: string, width?: string, height?: string, alignment?: string) => {
     console.log("Inserting image with options:", { imageUrl, caption, width, height, alignment });
     
-    if (!quillRef.current || !isQuillReady) {
+    if (!quillRef.current || !isReady) {
       console.warn("Quill not ready for image insertion");
       return;
     }
@@ -149,14 +134,18 @@ const SimplifiedRichTextEditor = ({
     }
     
     setShowMediaGallery(false);
-  };
+  }, [isReady]);
 
-  const handleChange = (content: string) => {
+  const handleChange = useCallback((content: string) => {
     console.log("Content changed in editor:", content);
     const cleanContent = content || '';
-    setEditorContent(cleanContent);
     onChange(cleanContent);
-  };
+  }, [onChange]);
+
+  const handleCloseMediaGallery = useCallback(() => {
+    console.log("MediaGallery closed");
+    setShowMediaGallery(false);
+  }, []);
 
   return (
     <Card>
@@ -167,10 +156,9 @@ const SimplifiedRichTextEditor = ({
         <ReactQuill
           ref={quillRef}
           theme="snow"
-          value={editorContent}
+          value={value || ''}
           onChange={handleChange}
-          onFocus={handleQuillReady}
-          modules={modules}
+          modules={modules()}
           formats={formats}
           placeholder={placeholder}
           style={{ minHeight: '400px' }}
@@ -179,10 +167,7 @@ const SimplifiedRichTextEditor = ({
         {showMediaGallery && (
           <MediaGallery
             onInsert={insertImage}
-            onClose={() => {
-              console.log("MediaGallery closed");
-              setShowMediaGallery(false);
-            }}
+            onClose={handleCloseMediaGallery}
           />
         )}
       </CardContent>

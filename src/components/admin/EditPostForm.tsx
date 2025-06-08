@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { PostBasicInfo } from "./PostBasicInfo";
@@ -49,11 +48,7 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
         
         console.log("EditPostForm - Setting form data:", newFormData);
         setFormData(newFormData);
-        
-        // Allow time for the editor to initialize before marking as loaded
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 300);
+        setIsLoading(false);
         
       } catch (error) {
         console.error("EditPostForm - Error loading post data:", error);
