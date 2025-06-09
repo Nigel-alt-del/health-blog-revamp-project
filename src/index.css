@@ -117,20 +117,6 @@
 .ql-size-24px { font-size: 24px !important; }
 .ql-size-32px { font-size: 32px !important; }
 
-/* Ensure fonts work in preview */
-.prose .ql-font-Inter { font-family: 'Inter', sans-serif !important; }
-.prose .ql-font-Roboto { font-family: 'Roboto', sans-serif !important; }
-.prose .ql-font-Open\ Sans { font-family: 'Open Sans', sans-serif !important; }
-.prose .ql-font-Playfair\ Display { font-family: 'Playfair Display', serif !important; }
-.prose .ql-font-Lora { font-family: 'Lora', serif !important; }
-
-.prose .ql-size-12px { font-size: 12px !important; }
-.prose .ql-size-14px { font-size: 14px !important; }
-.prose .ql-size-16px { font-size: 16px !important; }
-.prose .ql-size-18px { font-size: 18px !important; }
-.prose .ql-size-24px { font-size: 24px !important; }
-.prose .ql-size-32px { font-size: 32px !important; }
-
 /* Enhanced ReactQuill image support with proper sizing */
 .ql-editor img {
   border-radius: 8px !important;
@@ -240,29 +226,132 @@
   font-size: 14px;
 }
 
-/* Ensure prose styles don't override our image sizing */
-.prose img {
+/* CRITICAL: Ultra-high specificity prose image overrides */
+/* These rules override Tailwind's prose-lg defaults with maximum specificity */
+
+/* Base prose image styling - override prose defaults */
+.prose img,
+.prose-lg img,
+.prose-xl img,
+.prose-sm img {
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+  margin: 16px 0 !important;
+  height: auto !important;
+  display: block !important;
+}
+
+/* Ultra-high specificity size overrides for prose containers */
+.prose img[style*="width: 200px"],
+.prose-lg img[style*="width: 200px"],
+.prose-xl img[style*="width: 200px"],
+.prose-sm img[style*="width: 200px"] {
+  width: 200px !important;
+  max-width: 200px !important;
+  min-width: 200px !important;
+}
+
+.prose img[style*="width: 400px"],
+.prose-lg img[style*="width: 400px"],
+.prose-xl img[style*="width: 400px"],
+.prose-sm img[style*="width: 400px"] {
+  width: 400px !important;
+  max-width: 400px !important;
+  min-width: 400px !important;
+}
+
+.prose img[style*="width: 600px"],
+.prose-lg img[style*="width: 600px"],
+.prose-xl img[style*="width: 600px"],
+.prose-sm img[style*="width: 600px"] {
+  width: 600px !important;
+  max-width: 600px !important;
+  min-width: 600px !important;
+}
+
+.prose img[style*="width: 100%"],
+.prose-lg img[style*="width: 100%"],
+.prose-xl img[style*="width: 100%"],
+.prose-sm img[style*="width: 100%"] {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: auto !important;
+}
+
+/* Defensive fallback rules for any prose variant */
+.prose .prose img,
+.prose-lg .prose-lg img,
+article .prose img,
+article .prose-lg img {
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+  margin: 16px 0 !important;
+  height: auto !important;
+}
+
+/* Specific overrides for inline styled images in prose */
+.prose img[style],
+.prose-lg img[style],
+.prose-xl img[style],
+.prose-sm img[style] {
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+  margin: 16px 0 !important;
+  height: auto !important;
+}
+
+/* Ensure prose alignment classes work with our sizing */
+.prose .ql-align-left img,
+.prose-lg .ql-align-left img {
+  float: left !important;
+  margin-right: 16px !important;
+  margin-bottom: 8px !important;
+}
+
+.prose .ql-align-right img,
+.prose-lg .ql-align-right img {
+  float: right !important;
+  margin-left: 16px !important;
+  margin-bottom: 8px !important;
+}
+
+.prose .ql-align-center img,
+.prose-lg .ql-align-center img {
+  display: block !important;
+  margin: 16px auto !important;
+}
+
+/* Additional defensive rules for complex prose structures */
+.prose div img,
+.prose-lg div img,
+.prose p img,
+.prose-lg p img {
   border-radius: 8px !important;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
   margin: 16px 0 !important;
 }
 
-.prose img[style*="width: 200px"] {
+/* Ensure our size classes always win in prose */
+.prose div img[style*="width: 200px"],
+.prose p img[style*="width: 200px"] {
   width: 200px !important;
   max-width: 200px !important;
 }
 
-.prose img[style*="width: 400px"] {
+.prose div img[style*="width: 400px"],
+.prose p img[style*="width: 400px"] {
   width: 400px !important;
   max-width: 400px !important;
 }
 
-.prose img[style*="width: 600px"] {
+.prose div img[style*="width: 600px"],
+.prose p img[style*="width: 600px"] {
   width: 600px !important;
   max-width: 600px !important;
 }
 
-.prose img[style*="width: 100%"] {
+.prose div img[style*="width: 100%"],
+.prose p img[style*="width: 100%"] {
   width: 100% !important;
   max-width: 100% !important;
 }
