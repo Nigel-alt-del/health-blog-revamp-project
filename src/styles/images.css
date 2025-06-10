@@ -1,5 +1,67 @@
+/*
+  Simplified Image Styling for Insure My Health Blog
+  This file aims to provide a consistent look and responsive behavior for images
+  within the blog content, especially when using the @tailwindcss/typography plugin (prose).
 
-/* Custom image container styles with proper sizing */
+  Goals:
+  1. Ensure images are responsive and don't overflow their containers.
+  2. Apply consistent styling (border-radius, shadow).
+  3. Support basic alignment (left, right, center).
+  4. Allow for custom sizing from the editor while respecting responsiveness.
+*/
+
+/* Base styling for all images within prose content */
+.prose img {
+  display: block; /* Make images block-level for consistent spacing and alignment */
+  max-width: 100%; /* Ensure images are never wider than their container */
+  height: auto; /* Maintain aspect ratio */
+  border-radius: 8px; /* Consistent border-radius */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Consistent shadow */
+  margin: 16px auto; /* Default margin and center alignment */
+}
+
+/* Override for specific width attributes (from editor) - ensures responsiveness */
+/* This allows images to be set to certain widths but still respect max-width: 100% */
+.prose img[style*="width"] {
+  max-width: 100% !important; /* IMPORTANT: Prioritize responsiveness over fixed inline widths */
+  height: auto !important; /* IMPORTANT: Maintain aspect ratio when inline width is set */
+}
+
+/* Alignment classes for images within prose */
+.prose .ql-align-left img {
+  float: left;
+  margin-right: 16px;
+  margin-left: 0; /* Override auto centering */
+  margin-bottom: 8px;
+}
+
+.prose .ql-align-right img {
+  float: right;
+  margin-left: 16px;
+  margin-right: 0; /* Override auto centering */
+  margin-bottom: 8px;
+}
+
+.prose .ql-align-center img {
+  display: block; /* Ensure it's block for margin: auto to work */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Clearfix for floated images to prevent text wrap issues with subsequent content */
+.prose .ql-align-left:after,
+.prose .ql-align-right:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* --- Legacy/Custom image-container classes if still in use (less recommended for prose) --- */
+/*
+  If you are still manually wrapping images in `image-container` divs,
+  keep these rules. Otherwise, you can remove them.
+  The .prose img rules above are generally sufficient for editor content.
+*/
 .image-container {
   margin: 20px 0;
   text-align: center;
@@ -23,162 +85,30 @@
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   height: auto;
+  max-width: 100%; /* Ensure these also respect container width */
 }
 
-/* Specific sizing for image containers */
+/* Specific sizing for image containers (if you still use them) */
 .image-container.size-small img {
-  width: 200px !important;
-  max-width: 200px !important;
+  width: 200px;
+  max-width: 100%; /* Ensure it doesn't exceed parent width */
+  height: auto;
 }
 
 .image-container.size-medium img {
-  width: 400px !important;
-  max-width: 400px !important;
+  width: 400px;
+  max-width: 100%;
+  height: auto;
 }
 
 .image-container.size-large img {
-  width: 600px !important;
-  max-width: 600px !important;
+  width: 600px;
+  max-width: 100%;
+  height: auto;
 }
 
 .image-container.size-full img {
-  width: 100% !important;
-  max-width: 100% !important;
-}
-
-.image-container .caption {
-  margin-top: 8px;
-  font-style: italic;
-  color: #666;
-  font-size: 14px;
-}
-
-/* CRITICAL: Ultra-high specificity prose image overrides */
-/* These rules override Tailwind's prose-lg defaults with maximum specificity */
-
-/* Base prose image styling - override prose defaults */
-.prose img,
-.prose-lg img,
-.prose-xl img,
-.prose-sm img {
-  border-radius: 8px !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
-  margin: 16px 0 !important;
-  height: auto !important;
-  display: block !important;
-}
-
-/* Ultra-high specificity size overrides for prose containers */
-.prose img[style*="width: 200px"],
-.prose-lg img[style*="width: 200px"],
-.prose-xl img[style*="width: 200px"],
-.prose-sm img[style*="width: 200px"] {
-  width: 200px !important;
-  max-width: 200px !important;
-  min-width: 200px !important;
-}
-
-.prose img[style*="width: 400px"],
-.prose-lg img[style*="width: 400px"],
-.prose-xl img[style*="width: 400px"],
-.prose-sm img[style*="width: 400px"] {
-  width: 400px !important;
-  max-width: 400px !important;
-  min-width: 400px !important;
-}
-
-.prose img[style*="width: 600px"],
-.prose-lg img[style*="width: 600px"],
-.prose-xl img[style*="width: 600px"],
-.prose-sm img[style*="width: 600px"] {
-  width: 600px !important;
-  max-width: 600px !important;
-  min-width: 600px !important;
-}
-
-.prose img[style*="width: 100%"],
-.prose-lg img[style*="width: 100%"],
-.prose-xl img[style*="width: 100%"],
-.prose-sm img[style*="width: 100%"] {
-  width: 100% !important;
-  max-width: 100% !important;
-  min-width: auto !important;
-}
-
-/* Defensive fallback rules for any prose variant */
-.prose .prose img,
-.prose-lg .prose-lg img,
-article .prose img,
-article .prose-lg img {
-  border-radius: 8px !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
-  margin: 16px 0 !important;
-  height: auto !important;
-}
-
-/* Specific overrides for inline styled images in prose */
-.prose img[style],
-.prose-lg img[style],
-.prose-xl img[style],
-.prose-sm img[style] {
-  border-radius: 8px !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
-  margin: 16px 0 !important;
-  height: auto !important;
-}
-
-/* Ensure prose alignment classes work with our sizing */
-.prose .ql-align-left img,
-.prose-lg .ql-align-left img {
-  float: left !important;
-  margin-right: 16px !important;
-  margin-bottom: 8px !important;
-}
-
-.prose .ql-align-right img,
-.prose-lg .ql-align-right img {
-  float: right !important;
-  margin-left: 16px !important;
-  margin-bottom: 8px !important;
-}
-
-.prose .ql-align-center img,
-.prose-lg .ql-align-center img {
-  display: block !important;
-  margin: 16px auto !important;
-}
-
-/* Additional defensive rules for complex prose structures */
-.prose div img,
-.prose-lg div img,
-.prose p img,
-.prose-lg p img {
-  border-radius: 8px !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
-  margin: 16px 0 !important;
-}
-
-/* Ensure our size classes always win in prose */
-.prose div img[style*="width: 200px"],
-.prose p img[style*="width: 200px"] {
-  width: 200px !important;
-  max-width: 200px !important;
-}
-
-.prose div img[style*="width: 400px"],
-.prose p img[style*="width: 400px"] {
-  width: 400px !important;
-  max-width: 400px !important;
-}
-
-.prose div img[style*="width: 600px"],
-.prose p img[style*="width: 600px"] {
-  width: 600px !important;
-  max-width: 600px !important;
-}
-
-.prose div img[style*="width: 100%"],
-.prose p img[style*="width: 100%"] {
-  width: 100% !important;
-  max-width: 100% !important;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
 }
