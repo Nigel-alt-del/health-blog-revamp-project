@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Search } from "lucide-react";
-import { getStoredPosts, type BlogPost } from "@/utils/localStorage";
+import { getStoredPosts, isPostDeleted, type BlogPost } from "@/utils/localStorage";
 import { blogPosts } from "@/data/blogPosts";
 
 const BlogHome = () => {
@@ -22,21 +22,23 @@ const BlogHome = () => {
     const storedPosts = getStoredPosts();
     console.log("Stored posts:", storedPosts);
     
-    // Convert blogPosts to match our simplified BlogPost interface - safely handle optional properties
-    const simplifiedBlogPosts = blogPosts.map(post => ({
-      id: post.id,
-      title: post.title,
-      excerpt: post.excerpt,
-      content: post.content,
-      publishedAt: post.publishedAt,
-      readTime: post.readTime,
-      category: post.category,
-      tags: post.tags,
-      featured: post.featured,
-      image: post.image,
-      seoKeywords: (post as any).seoKeywords || '',
-      metaDescription: (post as any).metaDescription || post.excerpt
-    }));
+    // Convert blogPosts to match our simplified BlogPost interface and filter out deleted ones
+    const simplifiedBlogPosts = blogPosts
+      .filter(post => !isPostDeleted(post.id)) // Filter out deleted default posts
+      .map(post => ({
+        id: post.id,
+        title: post.title,
+        excerpt: post.excerpt,
+        content: post.content,
+        publishedAt: post.publishedAt,
+        readTime: post.readTime,
+        category: post.category,
+        tags: post.tags,
+        featured: post.featured,
+        image: post.image,
+        seoKeywords: (post as any).seoKeywords || '',
+        metaDescription: (post as any).metaDescription || post.excerpt
+      }));
 
     if (storedPosts.length > 0) {
       const combinedPosts = [

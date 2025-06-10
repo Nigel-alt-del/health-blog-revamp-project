@@ -1,3 +1,4 @@
+
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Clock, ArrowLeft, Share2, BookmarkPlus } from "lucide-react";
@@ -260,9 +261,9 @@ const BlogPost = () => {
           )}
         </div>
 
-        {/* Article Content */}
+        {/* Article Content - REMOVED max-w-none to allow image sizing rules to work */}
         <div 
-          className="prose prose-lg max-w-none mb-12 prose-headings:text-[#20466d] prose-a:text-[#22aee1] prose-strong:text-[#20466d]"
+          className="prose prose-lg prose-headings:text-[#20466d] prose-a:text-[#22aee1] prose-strong:text-[#20466d] mb-12"
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
 

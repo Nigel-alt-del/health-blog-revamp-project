@@ -19,6 +19,7 @@ interface BlogPost {
 }
 
 const STORAGE_KEY = 'blog_posts';
+const DELETED_POSTS_KEY = 'deleted_post_ids';
 
 export const getStoredPosts = (): BlogPost[] => {
   try {
@@ -70,6 +71,46 @@ export const deletePostFromStorage = (postId: string): void => {
   const updatedPosts = posts.filter(post => post.id !== postId);
   savePostsToStorage(updatedPosts);
   console.log('Post deleted from storage:', postId);
+};
+
+// New deletion tracking functions for default posts
+export const getDeletedPostIds = (): string[] => {
+  try {
+    const stored = localStorage.getItem(DELETED_POSTS_KEY);
+    const deletedIds = stored ? JSON.parse(stored) : [];
+    console.log('Retrieved deleted post IDs from localStorage:', deletedIds);
+    return deletedIds;
+  } catch (error) {
+    console.error('Error reading deleted post IDs from localStorage:', error);
+    return [];
+  }
+};
+
+export const addDeletedPostId = (postId: string): void => {
+  try {
+    const deletedIds = getDeletedPostIds();
+    if (!deletedIds.includes(postId)) {
+      deletedIds.push(postId);
+      localStorage.setItem(DELETED_POSTS_KEY, JSON.stringify(deletedIds));
+      console.log('Added post ID to deleted list:', postId);
+    }
+  } catch (error) {
+    console.error('Error adding deleted post ID:', error);
+  }
+};
+
+export const clearDeletedPosts = (): void => {
+  try {
+    localStorage.removeItem(DELETED_POSTS_KEY);
+    console.log('Cleared deleted posts tracking');
+  } catch (error) {
+    console.error('Error clearing deleted posts:', error);
+  }
+};
+
+export const isPostDeleted = (postId: string): boolean => {
+  const deletedIds = getDeletedPostIds();
+  return deletedIds.includes(postId);
 };
 
 export type { BlogPost };

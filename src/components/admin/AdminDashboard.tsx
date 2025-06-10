@@ -5,7 +5,7 @@ import BlogLayout from "@/components/BlogLayout";
 import { PostListView } from "./PostListView";
 import { CreatePostForm } from "./CreatePostForm";
 import { EditPostForm } from "./EditPostForm";
-import { getStoredPosts, addPostToStorage, updatePostInStorage, deletePostFromStorage, type BlogPost } from "@/utils/localStorage";
+import { getStoredPosts, addPostToStorage, updatePostInStorage, deletePostFromStorage, addDeletedPostId, isPostDeleted, type BlogPost } from "@/utils/localStorage";
 import { blogPosts } from "@/data/blogPosts";
 
 const AdminDashboard = () => {
@@ -19,35 +19,10 @@ const AdminDashboard = () => {
     const storedPosts = getStoredPosts();
     console.log("Stored posts from localStorage:", storedPosts);
     
-    if (storedPosts.length > 0) {
-      // If we have stored posts, use them as the primary source
-      const storedPostIds = storedPosts.map(p => p.id);
-      
-      // Convert blogPosts to match our simplified BlogPost interface
-      const simplifiedBlogPosts = blogPosts
-        .filter(post => !storedPostIds.includes(post.id)) // Only include default posts that haven't been modified
-        .map(post => ({
-          id: post.id,
-          title: post.title,
-          excerpt: post.excerpt,
-          content: post.content,
-          publishedAt: post.publishedAt,
-          readTime: post.readTime,
-          category: post.category,
-          tags: post.tags,
-          featured: post.featured,
-          image: post.image,
-          seoKeywords: (post as any).seoKeywords || '',
-          metaDescription: (post as any).metaDescription || post.excerpt
-        }));
-
-      // Combine stored posts with unmodified default posts
-      const combinedPosts = [...storedPosts, ...simplifiedBlogPosts];
-      console.log("Combined posts (prioritizing stored):", combinedPosts);
-      setPosts(combinedPosts);
-    } else {
-      // No stored posts, use default blog posts
-      const simplifiedBlogPosts = blogPosts.map(post => ({
+    // Convert blogPosts to match our simplified BlogPost interface and filter out deleted ones
+    const simplifiedBlogPosts = blogPosts
+      .filter(post => !isPostDeleted(post.id)) // Filter out deleted default posts
+      .map(post => ({
         id: post.id,
         title: post.title,
         excerpt: post.excerpt,
@@ -61,7 +36,17 @@ const AdminDashboard = () => {
         seoKeywords: (post as any).seoKeywords || '',
         metaDescription: (post as any).metaDescription || post.excerpt
       }));
-      console.log("Using default blog posts:", simplifiedBlogPosts);
+
+    if (storedPosts.length > 0) {
+      // If we have stored posts, combine with undeleted default posts
+      const storedPostIds = storedPosts.map(p => p.id);
+      const unmodifiedDefaultPosts = simplifiedBlogPosts.filter(p => !storedPostIds.includes(p.id));
+      const combinedPosts = [...storedPosts, ...unmodifiedDefaultPosts];
+      console.log("Combined posts (with deletion tracking):", combinedPosts);
+      setPosts(combinedPosts);
+    } else {
+      // No stored posts, use default blog posts (filtered by deletion tracking)
+      console.log("Using filtered default blog posts:", simplifiedBlogPosts);
       setPosts(simplifiedBlogPosts);
     }
   };
@@ -138,8 +123,18 @@ const AdminDashboard = () => {
   const handleDeletePost = (postId: string) => {
     console.log("Deleting post:", postId);
     
-    // Remove from localStorage
-    deletePostFromStorage(postId);
+    // Check if this is a default post or stored post
+    const isDefaultPost = blogPosts.some(p => p.id === postId);
+    
+    if (isDefaultPost) {
+      // Mark default post as deleted
+      addDeletedPostId(postId);
+      console.log("Marked default post as deleted:", postId);
+    } else {
+      // Remove custom post from localStorage
+      deletePostFromStorage(postId);
+      console.log("Removed custom post from storage:", postId);
+    }
     
     // Update state directly
     setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));

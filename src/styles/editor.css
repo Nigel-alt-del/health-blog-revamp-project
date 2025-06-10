@@ -1,0 +1,55 @@
+
+/* Enhanced ReactQuill image support with proper sizing */
+.ql-editor img {
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+  margin: 16px 0 !important;
+  height: auto !important;
+  display: block !important;
+}
+
+/* Specific image size classes that override defaults */
+.ql-editor img[style*="width: 200px"] {
+  width: 200px !important;
+  max-width: 200px !important;
+}
+
+.ql-editor img[style*="width: 400px"] {
+  width: 400px !important;
+  max-width: 400px !important;
+}
+
+.ql-editor img[style*="width: 600px"] {
+  width: 600px !important;
+  max-width: 600px !important;
+}
+
+.ql-editor img[style*="width: 100%"] {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Image alignment classes for ReactQuill */
+.ql-align-left img {
+  float: left !important;
+  margin-right: 16px !important;
+  margin-bottom: 8px !important;
+}
+
+.ql-align-right img {
+  float: right !important;
+  margin-left: 16px !important;
+  margin-bottom: 8px !important;
+}
+
+.ql-align-center img {
+  display: block !important;
+  margin: 16px auto !important;
+}
+
+/* Clear floats after images */
+.ql-editor p:after {
+  content: "";
+  display: table;
+  clear: both;
+}
