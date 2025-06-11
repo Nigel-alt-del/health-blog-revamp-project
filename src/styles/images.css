@@ -1,12 +1,13 @@
+
 /*
   Simplified Image Styling for Insure My Health Blog
-  This file aims to provide a consistent look and responsive behavior for images
+  This file provides consistent styling and responsive behavior for images
   within the blog content, especially when using the @tailwindcss/typography plugin (prose).
 
   Goals:
   1. Ensure images are responsive and don't overflow their containers.
   2. Apply consistent styling (border-radius, shadow).
-  3. Support basic alignment (left, right, center).
+  3. Support basic alignment (left, right, center) from the editor.
   4. Allow for custom sizing from the editor while respecting responsiveness.
 */
 
@@ -17,7 +18,7 @@
   height: auto; /* Maintain aspect ratio */
   border-radius: 8px; /* Consistent border-radius */
   box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Consistent shadow */
-  margin: 16px auto; /* Default margin and center alignment */
+  margin: 16px auto; /* Default vertical margin and center alignment */
 }
 
 /* Override for specific width attributes (from editor) - ensures responsiveness */
@@ -25,9 +26,10 @@
 .prose img[style*="width"] {
   max-width: 100% !important; /* IMPORTANT: Prioritize responsiveness over fixed inline widths */
   height: auto !important; /* IMPORTANT: Maintain aspect ratio when inline width is set */
+  min-width: 0 !important; /* IMPORTANT: Prevent fixed min-width causing overflow on small screens */
 }
 
-/* Alignment classes for images within prose */
+/* Alignment classes for images within prose (from editor classes like ql-align-left) */
 .prose .ql-align-left img {
   float: left;
   margin-right: 16px;
@@ -56,11 +58,12 @@
   clear: both;
 }
 
-/* --- Legacy/Custom image-container classes if still in use (less recommended for prose) --- */
+/* --- Legacy/Custom image-container classes (if still actively used in custom HTML) --- */
 /*
-  If you are still manually wrapping images in `image-container` divs,
-  keep these rules. Otherwise, you can remove them.
-  The .prose img rules above are generally sufficient for editor content.
+  If images are *not* exclusively placed via the rich text editor's markdown,
+  and are manually wrapped in `.image-container` divs in other parts of the site,
+  keep these rules. Otherwise, they can be safely removed.
+  The .prose img rules above handle editor-generated content.
 */
 .image-container {
   margin: 20px 0;

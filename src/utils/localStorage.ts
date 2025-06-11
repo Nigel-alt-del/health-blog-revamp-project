@@ -1,4 +1,3 @@
-
 interface BlogPost {
   id: string;
   title: string;
@@ -21,7 +20,24 @@ interface BlogPost {
 const STORAGE_KEY = 'blog_posts';
 const DELETED_POSTS_KEY = 'deleted_post_ids';
 
-export const getStoredPosts = (): BlogPost[] => {
+/**
+ * Saves a list of posts to localStorage.
+ * @param posts The array of BlogPost objects to save.
+ */
+export const savePosts = (posts: BlogPost[]): void => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+    console.log('Posts saved to localStorage:', posts);
+  } catch (error) {
+    console.error('Error saving posts to localStorage:', error);
+  }
+};
+
+/**
+ * Loads posts from localStorage.
+ * @returns An array of BlogPost objects, or an empty array if none exist or an error occurs.
+ */
+export const loadPosts = (): BlogPost[] => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     const posts = stored ? JSON.parse(stored) : [];
@@ -33,14 +49,10 @@ export const getStoredPosts = (): BlogPost[] => {
   }
 };
 
-export const savePostsToStorage = (posts: BlogPost[]): void => {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
-    console.log('Posts saved to localStorage:', posts);
-  } catch (error) {
-    console.error('Error saving to localStorage:', error);
-  }
-};
+// Keep getStoredPosts for backward compatibility if other components use it
+export const getStoredPosts = loadPosts;
+
+export const savePostsToStorage = savePosts;
 
 export const addPostToStorage = (post: BlogPost): void => {
   const posts = getStoredPosts();
@@ -73,7 +85,10 @@ export const deletePostFromStorage = (postId: string): void => {
   console.log('Post deleted from storage:', postId);
 };
 
-// New deletion tracking functions for default posts
+/**
+ * Retrieves the list of IDs of posts that have been marked as deleted.
+ * @returns An array of string IDs.
+ */
 export const getDeletedPostIds = (): string[] => {
   try {
     const stored = localStorage.getItem(DELETED_POSTS_KEY);
@@ -86,6 +101,10 @@ export const getDeletedPostIds = (): string[] => {
   }
 };
 
+/**
+ * Adds a post ID to the list of deleted posts.
+ * @param postId The ID of the post to mark as deleted.
+ */
 export const addDeletedPostId = (postId: string): void => {
   try {
     const deletedIds = getDeletedPostIds();

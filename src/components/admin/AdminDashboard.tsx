@@ -127,7 +127,7 @@ const AdminDashboard = () => {
     const isDefaultPost = blogPosts.some(p => p.id === postId);
     
     if (isDefaultPost) {
-      // Mark default post as deleted
+      // Mark default post as deleted - THIS WAS THE CRITICAL MISSING PIECE!
       addDeletedPostId(postId);
       console.log("Marked default post as deleted:", postId);
     } else {
