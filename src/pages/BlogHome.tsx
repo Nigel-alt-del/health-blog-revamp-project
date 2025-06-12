@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import BlogLayout from "@/components/BlogLayout";
 import FeaturedPost from "@/components/FeaturedPost";
@@ -23,7 +24,7 @@ const BlogHome = () => {
     
     // Convert blogPosts to match our simplified BlogPost interface and filter out deleted ones
     const simplifiedBlogPosts = blogPosts
-      .filter(post => !isPostDeleted(post.id)) // Filter out deleted default posts - THIS IS THE KEY FIX!
+      .filter(post => !isPostDeleted(post.id)) // CRITICAL FIX: Filter out deleted default posts
       .map(post => ({
         id: post.id,
         title: post.title,

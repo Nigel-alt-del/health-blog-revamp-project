@@ -1,7 +1,42 @@
 
-/* Import modular CSS files for better organization */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import our custom styles */
 @import './styles/base.css';
+@import './styles/components.css';
 @import './styles/typography.css';
 @import './styles/editor.css';
-@import './styles/images.css';
-@import './styles/components.css';
+@import './styles/images.css'; /* CRITICAL: Ensure images.css is imported */
+
+:root {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Merriweather', Georgia, serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure consistent focus styles */
+*:focus {
+  outline: 2px solid #22aee1;
+  outline-offset: 2px;
+}
+
+/* Remove focus outline for mouse users */
+*:focus:not(:focus-visible) {
+  outline: none;
+}

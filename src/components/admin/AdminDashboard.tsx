@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ArrowLeft } from "lucide-react";
@@ -21,7 +22,7 @@ const AdminDashboard = () => {
     
     // Convert blogPosts to match our simplified BlogPost interface and filter out deleted ones
     const simplifiedBlogPosts = blogPosts
-      .filter(post => !isPostDeleted(post.id)) // Filter out deleted default posts
+      .filter(post => !isPostDeleted(post.id)) // CRITICAL FIX: Filter out deleted default posts
       .map(post => ({
         id: post.id,
         title: post.title,
@@ -127,7 +128,7 @@ const AdminDashboard = () => {
     const isDefaultPost = blogPosts.some(p => p.id === postId);
     
     if (isDefaultPost) {
-      // Mark default post as deleted - THIS WAS THE CRITICAL MISSING PIECE!
+      // Mark default post as deleted - CRITICAL FIX: This was missing!
       addDeletedPostId(postId);
       console.log("Marked default post as deleted:", postId);
     } else {
