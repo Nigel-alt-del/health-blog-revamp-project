@@ -3,7 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { PostBasicInfo } from "./PostBasicInfo";
 import { FeaturedImageUpload } from "./FeaturedImageUpload";
 import { AdminSidebar } from "./AdminSidebar";
-import SimplifiedRichTextEditor from "./SimplifiedRichTextEditor";
+import { SimpleContentEditor } from "./SimpleContentEditor";
 import { ReportPreview } from "../ReportPreview";
 import { updatePostInStorage, type BlogPost } from "@/utils/localStorage";
 
@@ -246,11 +246,10 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
             onInsertToContent={insertFeaturedImage}
           />
 
-          <SimplifiedRichTextEditor
+          <SimpleContentEditor
             value={formData.content}
             onChange={(content) => handleFormDataChange({ ...formData, content })}
-            placeholder="Edit your report content here. Use the formatting tools above to style your text. Click the image button in the toolbar to insert images directly at your cursor position..."
-            hideImageButton={false}
+            placeholder="Edit your report content here. Paste from Word, Google Docs, or type directly. You can use HTML tags for formatting."
           />
         </div>
 
