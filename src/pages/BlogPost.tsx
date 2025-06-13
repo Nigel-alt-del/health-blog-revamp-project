@@ -1,4 +1,3 @@
-
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Clock, ArrowLeft, Share2, BookmarkPlus } from "lucide-react";
@@ -22,11 +21,17 @@ const BlogPost = () => {
     console.log("BlogPost - Loading posts for slug:", slug);
     
     const loadPostData = () => {
-      // Check if we need to force refresh (coming from admin)
+      // CRITICAL FIX: Check for admin view flags and force refresh
       const forceRefresh = sessionStorage.getItem('forceRefresh');
-      if (forceRefresh) {
+      const viewFromAdmin = sessionStorage.getItem('viewFromAdmin');
+      
+      if (forceRefresh || viewFromAdmin === slug) {
+        console.log("BlogPost - Force refreshing post data from admin for:", slug);
+        // Clear the flags after use
         sessionStorage.removeItem('forceRefresh');
-        console.log("BlogPost - Force refreshing post data from admin");
+        if (viewFromAdmin === slug) {
+          sessionStorage.removeItem('viewFromAdmin');
+        }
       }
       
       const storedPosts = getStoredPosts();
@@ -51,10 +56,11 @@ const BlogPost = () => {
       let combinedPosts: BlogPost[] = [];
 
       if (storedPosts.length > 0) {
-        // Prioritize stored posts and add default posts that haven't been modified
+        // CRITICAL FIX: Prioritize stored posts completely over default posts
         const storedPostIds = storedPosts.map(p => p.id);
         const unmodifiedDefaultPosts = simplifiedBlogPosts.filter(p => !storedPostIds.includes(p.id));
         combinedPosts = [...storedPosts, ...unmodifiedDefaultPosts];
+        console.log("BlogPost - Using stored posts with priority for:", slug);
       } else {
         combinedPosts = simplifiedBlogPosts;
       }
@@ -261,9 +267,9 @@ const BlogPost = () => {
           )}
         </div>
 
-        {/* Article Content - REMOVED max-w-none to allow image sizing rules to work */}
+        {/* Article Content - CRITICAL FIX: Use font-montserrat class to ensure Montserrat font */}
         <div 
-          className="prose prose-lg prose-headings:text-[#20466d] prose-a:text-[#22aee1] prose-strong:text-[#20466d] mb-12"
+          className="prose prose-lg prose-headings:text-[#20466d] prose-a:text-[#22aee1] prose-strong:text-[#20466d] mb-12 font-montserrat"
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
 

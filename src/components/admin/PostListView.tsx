@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Edit, Trash2, Star, StarOff } from "lucide-react";
@@ -39,10 +40,17 @@ export const PostListView = ({ posts, onDeletePost, onEditPost, onToggleFeatured
   };
 
   const handleViewPost = (postId: string) => {
-    // Set flag to indicate coming from admin and force fresh data load
+    // CRITICAL FIX: Set multiple flags to ensure fresh data load and indicate admin origin
     sessionStorage.setItem('cameFromAdmin', 'true');
     sessionStorage.setItem('forceRefresh', 'true');
-    window.open(`/post/${postId}?from=admin&t=${Date.now()}`, '_blank');
+    sessionStorage.setItem('viewFromAdmin', postId); // Track which post was viewed from admin
+    
+    // Add timestamp to force fresh load and prevent caching
+    const timestamp = Date.now();
+    const url = `/post/${postId}?from=admin&t=${timestamp}&refresh=true`;
+    
+    console.log("Opening post from admin:", url);
+    window.open(url, '_blank');
   };
 
   const handleToggleFeatured = (postId: string, currentFeatured: boolean) => {
@@ -72,6 +80,7 @@ export const PostListView = ({ posts, onDeletePost, onEditPost, onToggleFeatured
                   variant="outline" 
                   size="sm"
                   onClick={() => handleViewPost(post.id)}
+                  title="View latest content (opens in new tab)"
                 >
                   View
                 </Button>

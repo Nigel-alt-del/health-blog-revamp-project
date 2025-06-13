@@ -34,6 +34,57 @@ div[class*="prose"] * {
   font-family: inherit !important; /* Force all child elements to inherit Montserrat */
 }
 
+/* CRITICAL FIX: Preserve original heading sizes from pasted content */
+.prose h1,
+.prose-lg h1,
+div[class*="prose"] h1 {
+  font-size: inherit !important; /* Preserve original size from pasted content */
+  line-height: inherit !important;
+  margin-top: 1.5em !important;
+  margin-bottom: 0.5em !important;
+  font-weight: 700 !important;
+  color: #20466d !important;
+}
+
+.prose h2,
+.prose-lg h2,
+div[class*="prose"] h2 {
+  font-size: inherit !important; /* Preserve original size from pasted content */
+  line-height: inherit !important;
+  margin-top: 1.25em !important;
+  margin-bottom: 0.5em !important;
+  font-weight: 600 !important;
+  color: #20466d !important;
+}
+
+.prose h3,
+.prose-lg h3,
+div[class*="prose"] h3 {
+  font-size: inherit !important; /* Preserve original size from pasted content */
+  line-height: inherit !important;
+  margin-top: 1em !important;
+  margin-bottom: 0.5em !important;
+  font-weight: 600 !important;
+  color: #20466d !important;
+}
+
+.prose h4,
+.prose-lg h4,
+div[class*="prose"] h4,
+.prose h5,
+.prose-lg h5,
+div[class*="prose"] h5,
+.prose h6,
+.prose-lg h6,
+div[class*="prose"] h6 {
+  font-size: inherit !important; /* Preserve original size from pasted content */
+  line-height: inherit !important;
+  margin-top: 1em !important;
+  margin-bottom: 0.5em !important;
+  font-weight: 500 !important;
+  color: #20466d !important;
+}
+
 /* Override for specific width attributes (from editor) - ensures responsiveness */
 .prose img[style*="width"],
 .prose-lg img[style*="width"],
