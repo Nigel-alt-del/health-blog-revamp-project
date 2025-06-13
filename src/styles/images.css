@@ -21,6 +21,19 @@ div[class*="prose"] img {
   margin: 16px auto !important; /* Default vertical margin and center alignment */
 }
 
+/* Font consistency for prose content - FORCE MONTSERRAT */
+.prose,
+.prose-lg,
+div[class*="prose"] {
+  font-family: 'Montserrat', sans-serif !important;
+}
+
+.prose *,
+.prose-lg *,
+div[class*="prose"] * {
+  font-family: inherit !important; /* Force all child elements to inherit Montserrat */
+}
+
 /* Override for specific width attributes (from editor) - ensures responsiveness */
 .prose img[style*="width"],
 .prose-lg img[style*="width"],

@@ -22,7 +22,18 @@ export const SimpleContentEditor = ({ value, onChange, placeholder }: SimpleCont
     const textData = event.clipboardData.getData('text/plain');
     
     // Use HTML if available (from Word/Google Docs), otherwise use plain text
-    const contentToPaste = htmlData || textData;
+    let contentToPaste = htmlData || textData;
+    
+    // Force Montserrat font by wrapping content or replacing font families
+    if (contentToPaste && htmlData) {
+      // Remove any existing font-family declarations and replace with Montserrat
+      contentToPaste = contentToPaste.replace(/font-family:[^;"]*(;|")/g, 'font-family: "Montserrat", sans-serif$1');
+      
+      // If no font-family was found, wrap the content to ensure Montserrat
+      if (!contentToPaste.includes('font-family')) {
+        contentToPaste = `<div style="font-family: 'Montserrat', sans-serif;">${contentToPaste}</div>`;
+      }
+    }
     
     if (contentToPaste) {
       onChange(value + contentToPaste);
@@ -66,7 +77,7 @@ export const SimpleContentEditor = ({ value, onChange, placeholder }: SimpleCont
                   <li>Use Preview to see exactly how it will appear</li>
                   <li>Publish when ready</li>
                 </ol>
-                <p className="mt-2 text-sm">✓ Images and formatting will be preserved automatically</p>
+                <p className="mt-2 text-sm">✓ Images and formatting will be preserved with Montserrat font</p>
               </div>
             </div>
           </div>
@@ -74,7 +85,7 @@ export const SimpleContentEditor = ({ value, onChange, placeholder }: SimpleCont
           {showPreview ? (
             <div className="space-y-2">
               <Label>Preview (exactly how it will appear on your website):</Label>
-              <div className="min-h-[400px] border rounded-lg p-6 bg-white prose prose-lg max-w-none overflow-auto">
+              <div className="min-h-[400px] border rounded-lg p-6 bg-white prose prose-lg max-w-none overflow-auto font-montserrat">
                 <div dangerouslySetInnerHTML={{ __html: value }} />
                 {!value && (
                   <p className="text-gray-400 italic">Your pasted content will appear here...</p>
@@ -85,16 +96,19 @@ export const SimpleContentEditor = ({ value, onChange, placeholder }: SimpleCont
             <div className="space-y-2">
               <Label>Paste your formatted document here:</Label>
               <div
-                className="min-h-[400px] border rounded-lg p-4 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 prose prose-lg max-w-none overflow-auto"
+                className="min-h-[400px] border rounded-lg p-4 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 prose prose-lg max-w-none overflow-auto font-montserrat"
                 contentEditable
                 onPaste={handlePaste}
                 onInput={handleDirectEdit}
                 dangerouslySetInnerHTML={{ __html: value }}
-                style={{ minHeight: '400px' }}
+                style={{ 
+                  minHeight: '400px',
+                  fontFamily: '"Montserrat", sans-serif'
+                }}
               />
               {!value && (
                 <p className="text-sm text-gray-500 mt-2">
-                  Click here and paste your content from Word or Google Docs. All formatting and images will be preserved.
+                  Click here and paste your content from Word or Google Docs. All formatting and images will be preserved with Montserrat font.
                 </p>
               )}
             </div>
