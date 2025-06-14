@@ -1,5 +1,25 @@
+
 import { supabase } from "@/integrations/supabase/client";
-import { type BlogPost } from "./localStorage";
+
+// Export the BlogPost type
+export interface BlogPost {
+  id: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  publishedAt: string;
+  readTime: string;
+  category: string;
+  tags: string[];
+  featured: boolean;
+  image: string;
+  seoKeywords?: string;
+  metaDescription?: string;
+  author?: string;
+  authorRole?: string;
+  authorLinkedin?: string;
+  authorBio?: string;
+}
 
 export const savePosts = async (posts: BlogPost[]): Promise<void> => {
   try {
@@ -17,10 +37,12 @@ export const savePosts = async (posts: BlogPost[]): Promise<void> => {
 
 export const loadPosts = async (): Promise<BlogPost[]> => {
   try {
-    const { data, error } = await supabase
+    const result = await supabase
       .from('blog_posts')
       .select('*')
       .order('created_at', { ascending: false });
+
+    const { data, error } = result;
 
     if (error) {
       console.error('❌ Error loading posts from Supabase:', error);
@@ -49,7 +71,7 @@ export const updatePostInStorage = async (updatedPost: BlogPost): Promise<void> 
   try {
     console.log('✏️ Updating post in Supabase:', updatedPost);
     
-    const { error } = await supabase
+    const result = await supabase
       .from('blog_posts')
       .update({
         title: updatedPost.title,
@@ -69,6 +91,8 @@ export const updatePostInStorage = async (updatedPost: BlogPost): Promise<void> 
       })
       .eq('id', updatedPost.id);
 
+    const { error } = result;
+
     if (error) {
       console.error('❌ Error updating post in Supabase:', error);
       throw error;
@@ -83,10 +107,12 @@ export const deletePostFromStorage = async (postId: string): Promise<void> => {
   try {
     console.log('🗑️ Deleting post from Supabase:', postId);
     
-    const { error } = await supabase
+    const result = await supabase
       .from('blog_posts')
       .delete()
       .eq('id', postId);
+
+    const { error } = result;
 
     if (error) {
       console.error('❌ Error deleting post from Supabase:', error);
@@ -100,9 +126,11 @@ export const deletePostFromStorage = async (postId: string): Promise<void> => {
 
 export const getDeletedPostIds = async (): Promise<string[]> => {
   try {
-    const { data, error } = await supabase
+    const result = await supabase
       .from('deleted_posts')
       .select('post_id');
+
+    const { data, error } = result;
 
     if (error) {
       console.error('❌ Error loading deleted post IDs from Supabase:', error);
@@ -121,9 +149,11 @@ export const addDeletedPostId = async (postId: string): Promise<void> => {
   try {
     console.log('🚫 Adding post ID to deleted list in Supabase:', postId);
     
-    const { error } = await supabase
+    const result = await supabase
       .from('deleted_posts')
       .upsert({ post_id: postId }, { onConflict: 'post_id' });
+
+    const { error } = result;
 
     if (error) {
       console.error('❌ Error adding deleted post ID to Supabase:', error);
@@ -136,7 +166,7 @@ export const addDeletedPostId = async (postId: string): Promise<void> => {
 };
 
 const savePostToSupabase = async (post: BlogPost): Promise<void> => {
-  const { error } = await supabase
+  const result = await supabase
     .from('blog_posts')
     .upsert({
       id: post.id,
@@ -158,6 +188,8 @@ const savePostToSupabase = async (post: BlogPost): Promise<void> => {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     }, { onConflict: 'id' });
+
+  const { error } = result;
 
   if (error) {
     console.error('❌ Error saving post to Supabase:', error);
