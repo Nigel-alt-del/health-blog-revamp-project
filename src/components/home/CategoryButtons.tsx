@@ -4,10 +4,26 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
 const categoryButtons = [
-  { name: "PMI Insights", slug: "pmi-insights", color: "bg-blue-500 hover:bg-blue-600" },
-  { name: "Healthcare", slug: "healthcare", color: "bg-green-500 hover:bg-green-600" },
-  { name: "Digital Health", slug: "digital-health", color: "bg-purple-500 hover:bg-purple-600" },
-  { name: "Mental Health", slug: "mental-health", color: "bg-teal-500 hover:bg-teal-600" }
+  { 
+    name: "PMI Insights", 
+    slug: "pmi-insights", 
+    color: "bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 hover:from-blue-700 hover:via-blue-600 hover:to-blue-800" 
+  },
+  { 
+    name: "Healthcare", 
+    slug: "healthcare", 
+    color: "bg-gradient-to-br from-emerald-600 via-green-500 to-teal-600 hover:from-emerald-700 hover:via-green-600 hover:to-teal-700" 
+  },
+  { 
+    name: "Digital Health", 
+    slug: "digital-health", 
+    color: "bg-gradient-to-br from-purple-600 via-indigo-500 to-purple-700 hover:from-purple-700 hover:via-indigo-600 hover:to-purple-800" 
+  },
+  { 
+    name: "Mental Health", 
+    slug: "mental-health", 
+    color: "bg-gradient-to-br from-teal-600 via-cyan-500 to-blue-600 hover:from-teal-700 hover:via-cyan-600 hover:to-blue-700" 
+  }
 ];
 
 const CategoryButtons = () => {
@@ -20,7 +36,7 @@ const CategoryButtons = () => {
         {categoryButtons.map((category) => (
           <Link key={category.slug} to={`/category/${category.slug}`}>
             <Button 
-              className={`w-full h-24 text-lg font-semibold text-white ${category.color} transition-all duration-300 hover:shadow-lg hover:scale-105 flex items-center justify-between`}
+              className={`w-full h-24 text-lg font-semibold text-white ${category.color} transition-all duration-300 hover:shadow-lg hover:scale-105 flex items-center justify-between shadow-md`}
             >
               <span>{category.name}</span>
               <ArrowRight className="h-5 w-5" />
