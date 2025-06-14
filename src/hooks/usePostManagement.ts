@@ -58,11 +58,9 @@ export const usePostManagement = () => {
       metaDescription: newPost.metaDescription || newPost.excerpt
     };
 
-    // SAVE TO LOCALSTORAGE (THE BOSS)
     addPostToStorage(post);
     console.log("usePostManagement - SAVED TO LOCALSTORAGE");
     
-    // IMMEDIATE REFRESH - NO DELAYS
     refreshPosts();
     forceRefreshPosts();
     
@@ -77,11 +75,9 @@ export const usePostManagement = () => {
       tags: Array.isArray(updatedPost.tags) ? updatedPost.tags : (updatedPost.tags || '').split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag)
     };
 
-    // UPDATE IN LOCALSTORAGE (THE BOSS)
     updatePostInStorage(formattedPost);
     console.log("usePostManagement - UPDATED IN LOCALSTORAGE");
     
-    // IMMEDIATE REFRESH - NO DELAYS
     refreshPosts();
     forceRefreshPosts();
     
@@ -90,31 +86,56 @@ export const usePostManagement = () => {
   };
 
   const handleDeletePost = (postId: string) => {
-    console.log("usePostManagement - RUTHLESS DELETION:", postId);
+    console.log("🗑️ DELETION DIAGNOSIS - Starting deletion for post ID:", postId);
+    
+    // STEP 1: Check what's in localStorage BEFORE deletion
+    const postsBeforeDeletion = JSON.parse(localStorage.getItem('blog_posts') || '[]');
+    console.log("🗑️ POSTS IN LOCALSTORAGE BEFORE DELETION:", postsBeforeDeletion);
     
     const isDefaultPost = blogPosts.some(p => p.id === postId);
+    console.log("🗑️ IS DEFAULT POST?", isDefaultPost);
     
     if (isDefaultPost) {
       // Mark default post as deleted
       addDeletedPostId(postId);
-      console.log("usePostManagement - DEFAULT POST MARKED AS DELETED:", postId);
+      console.log("🗑️ DEFAULT POST MARKED AS DELETED:", postId);
+      
+      // Check deleted IDs list
+      const deletedIds = JSON.parse(localStorage.getItem('deleted_post_ids') || '[]');
+      console.log("🗑️ DELETED IDS LIST AFTER MARKING:", deletedIds);
     } else {
       // Remove custom post from storage
       deletePostFromStorage(postId);
-      console.log("usePostManagement - CUSTOM POST REMOVED FROM STORAGE:", postId);
+      console.log("🗑️ CUSTOM POST REMOVAL ATTEMPTED");
+      
+      // STEP 2: Check what's in localStorage AFTER deletion
+      const postsAfterDeletion = JSON.parse(localStorage.getItem('blog_posts') || '[]');
+      console.log("🗑️ POSTS IN LOCALSTORAGE AFTER DELETION:", postsAfterDeletion);
+      
+      // Verify the post was actually removed
+      const postStillExists = postsAfterDeletion.some((p: BlogPost) => p.id === postId);
+      console.log("🗑️ POST STILL EXISTS IN LOCALSTORAGE?", postStillExists);
     }
     
-    // IMMEDIATE REFRESH - NO DELAYS
-    refreshPosts();
+    // STEP 3: Force immediate refresh and check what loadAllPosts returns
+    console.log("🗑️ FORCING REFRESH - BEFORE");
+    const postsFromLoadFunction = loadAllPosts();
+    console.log("🗑️ POSTS FROM LOADALLPOSTS AFTER DELETION:", postsFromLoadFunction);
+    
+    // Check if deleted post is still in the loaded posts
+    const deletedPostStillInList = postsFromLoadFunction.some(p => p.id === postId);
+    console.log("🗑️ DELETED POST STILL IN LOADED LIST?", deletedPostStillInList);
+    
+    // STEP 4: Update the UI state
+    setPosts(postsFromLoadFunction);
     forceRefreshPosts();
     
-    console.log("usePostManagement - RUTHLESS DELETION COMPLETE");
+    console.log("🗑️ DELETION DIAGNOSIS COMPLETE - UI STATE UPDATED");
   };
 
   const handleToggleFeatured = (postId: string) => {
     console.log("usePostManagement - TOGGLING FEATURED:", postId);
     
-    // Load fresh data
     const currentPosts = loadAllPosts();
     
     const updatedPosts = currentPosts.map(post => {
