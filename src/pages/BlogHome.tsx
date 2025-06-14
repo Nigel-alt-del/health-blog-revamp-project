@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Search } from "lucide-react";
-import { type BlogPost } from "@/utils/localStorage";
+import { type BlogPost } from "@/utils/supabaseStorage";
 import { loadAllPosts } from "@/utils/postManager";
 
 const BlogHome = () => {
@@ -20,6 +20,7 @@ const BlogHome = () => {
     console.log("BlogHome - CRYSTAL CLEAR REFRESH");
     const posts = await loadAllPosts();
     console.log("BlogHome - LOADED POSTS:", posts);
+    console.log("BlogHome - Featured posts:", posts.filter(p => p.featured));
     setAllPosts(posts);
     setFilteredPosts(posts);
   };
@@ -60,7 +61,29 @@ const BlogHome = () => {
     let filtered = allPosts;
 
     if (selectedCategory !== "All") {
-      filtered = filtered.filter(post => post.category === selectedCategory);
+      filtered = filtered.filter(post => {
+        // Map categories to display values for filtering
+        const getCategoryDisplay = (category: string) => {
+          switch (category.toLowerCase()) {
+            case "healthcare":
+            case "health policy":
+            case "health":
+              return "Healthcare";
+            case "pmi insights":
+            case "insurance tips":
+            case "insurance":
+            case "pmi":
+              return "PMI Insights";
+            case "industry news":
+            case "news":
+              return "Industry News";
+            default:
+              return "Healthcare";
+          }
+        };
+        
+        return getCategoryDisplay(post.category) === selectedCategory;
+      });
     }
 
     if (searchTerm) {
@@ -74,9 +97,35 @@ const BlogHome = () => {
     setFilteredPosts(filtered);
   }, [searchTerm, selectedCategory, allPosts]);
 
-  const categories = ["All", ...Array.from(new Set(allPosts.map(post => post.category)))];
+  // Map categories for display in filter buttons
+  const getCategoryDisplay = (category: string) => {
+    switch (category.toLowerCase()) {
+      case "healthcare":
+      case "health policy":
+      case "health":
+        return "Healthcare";
+      case "pmi insights":
+      case "insurance tips":
+      case "insurance":
+      case "pmi":
+        return "PMI Insights";
+      case "industry news":
+      case "news":
+        return "Industry News";
+      default:
+        return "Healthcare";
+    }
+  };
+
+  // Get unique display categories for filter buttons
+  const displayCategories = Array.from(new Set(allPosts.map(post => getCategoryDisplay(post.category))));
+  const categories = ["All", ...displayCategories];
+
   const featuredPost = allPosts.find(post => post.featured);
   const regularPosts = filteredPosts.filter(post => !post.featured);
+
+  console.log("BlogHome - Featured post found:", featuredPost);
+  console.log("BlogHome - Regular posts count:", regularPosts.length);
 
   return (
     <BlogLayout>
