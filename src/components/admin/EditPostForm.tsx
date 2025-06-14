@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { PostBasicInfo } from "./PostBasicInfo";
@@ -18,6 +19,7 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
   const [showPreview, setShowPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -104,13 +106,14 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
       console.log("EditPostForm - Saving draft to Supabase:", updatedPost);
       
       await updatePostInStorage(updatedPost);
+      setLastSaved(new Date());
       
       toast({
         title: "Draft Saved",
-        description: "Your changes have been saved successfully to Supabase."
+        description: "Your changes have been saved successfully."
       });
       
-      // Trigger a refresh of the posts list
+      // Single refresh event - the debounced system will handle it efficiently
       window.dispatchEvent(new CustomEvent('postsRefreshed'));
     } catch (error) {
       console.error("Error saving draft:", error);
@@ -268,7 +271,7 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
           canPreview={canPreview}
           isEditing={true}
           isSaving={isSaving}
-          lastSaved={null}
+          lastSaved={lastSaved}
           hasUnsavedChanges={false}
         />
       </div>

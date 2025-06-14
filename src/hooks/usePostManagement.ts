@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { addPostToStorage, updatePostInStorage, deletePostFromStorage, addDeletedPostId, type BlogPost } from "@/utils/supabaseStorage";
 import { loadAllPosts, forceRefreshPosts } from "@/utils/postManager";
 import { blogPosts } from "@/data/blogPosts";
@@ -7,20 +7,39 @@ import { blogPosts } from "@/data/blogPosts";
 export const usePostManagement = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isRefreshingRef = useRef(false);
 
-  const refreshPosts = async () => {
-    console.log("usePostManagement - REFRESHING POSTS (SUPABASE)");
-    try {
-      setLoading(true);
-      const allPosts = await loadAllPosts();
-      console.log("usePostManagement - NEW POSTS STATE:", allPosts);
-      setPosts(allPosts);
-    } catch (error) {
-      console.error("usePostManagement - Error refreshing posts:", error);
-    } finally {
-      setLoading(false);
+  // Debounced refresh to prevent multiple simultaneous refreshes
+  const debouncedRefresh = useCallback(async () => {
+    if (refreshTimeoutRef.current) {
+      clearTimeout(refreshTimeoutRef.current);
     }
-  };
+
+    refreshTimeoutRef.current = setTimeout(async () => {
+      if (isRefreshingRef.current) return;
+      
+      console.log("usePostManagement - DEBOUNCED REFRESH (SUPABASE)");
+      isRefreshingRef.current = true;
+      
+      try {
+        setLoading(true);
+        const allPosts = await loadAllPosts();
+        console.log("usePostManagement - NEW POSTS STATE:", allPosts);
+        setPosts(allPosts);
+      } catch (error) {
+        console.error("usePostManagement - Error refreshing posts:", error);
+      } finally {
+        setLoading(false);
+        isRefreshingRef.current = false;
+      }
+    }, 300); // 300ms debounce
+  }, []);
+
+  // Optimized refresh function
+  const refreshPosts = useCallback(async () => {
+    await debouncedRefresh();
+  }, [debouncedRefresh]);
 
   useEffect(() => {
     console.log("usePostManagement - INITIAL LOAD (SUPABASE)");
@@ -35,8 +54,11 @@ export const usePostManagement = () => {
     
     return () => {
       window.removeEventListener('postsRefreshed', handlePostsRefreshed);
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
+      }
     };
-  }, []);
+  }, [refreshPosts]);
 
   const generateId = (title: string): string => {
     const baseId = title.toLowerCase()
@@ -76,9 +98,8 @@ export const usePostManagement = () => {
       
       console.log("📝 ✅ POST SUCCESSFULLY SAVED TO SUPABASE");
       
-      // Refresh the posts list
+      // Optimized refresh - only refresh once
       await refreshPosts();
-      forceRefreshPosts();
       
       console.log("📝 POST CREATION PROCESS COMPLETE");
     } catch (error) {
@@ -99,8 +120,8 @@ export const usePostManagement = () => {
       await updatePostInStorage(formattedPost);
       console.log("usePostManagement - UPDATED IN SUPABASE");
       
+      // Optimized refresh - only refresh once
       await refreshPosts();
-      forceRefreshPosts();
       
       console.log("usePostManagement - POST EDIT COMPLETE");
       sessionStorage.setItem('cameFromAdmin', 'true');
@@ -128,9 +149,8 @@ export const usePostManagement = () => {
       
       console.log("🚨 ✅ DELETION COMPLETED IN SUPABASE");
       
-      // Refresh the posts list
+      // Optimized refresh - only refresh once
       await refreshPosts();
-      forceRefreshPosts();
       
       console.log("🚨 DELETION PROCESS COMPLETE");
     } catch (error) {
@@ -158,20 +178,22 @@ export const usePostManagement = () => {
         post.id === postId || post.featured
       );
       
-      // Update all posts that need changes in Supabase first
-      for (const post of postsToUpdate) {
+      // Batch update all posts that need changes in Supabase
+      const updatePromises = postsToUpdate.map(post => {
         const updatedPost = {
           ...post,
           featured: post.id === postId ? newFeaturedState : false
         };
         
         console.log("usePostManagement - Updating post in Supabase:", post.id, "featured:", updatedPost.featured);
-        await updatePostInStorage(updatedPost);
-      }
+        return updatePostInStorage(updatedPost);
+      });
+      
+      await Promise.all(updatePromises);
       
       console.log("usePostManagement - All Supabase updates complete, refreshing UI");
       
-      // Only refresh once after all updates are complete - no forceRefreshPosts to avoid race condition
+      // Single refresh after all updates are complete
       await refreshPosts();
       
       console.log("usePostManagement - FEATURED TOGGLE COMPLETE");
