@@ -23,9 +23,10 @@ const BlogFooter = () => {
           <div>
             <h4 className="font-semibold mb-4">Categories</h4>
             <ul className="space-y-2 text-sm text-gray-300">
-              <li><Link to="/category/healthcare" className="hover:text-[#22aee1] transition-colors">Healthcare</Link></li>
               <li><Link to="/category/pmi-insights" className="hover:text-[#22aee1] transition-colors">PMI Insights</Link></li>
-              <li><Link to="/category/industry-news" className="hover:text-[#22aee1] transition-colors">Industry News</Link></li>
+              <li><Link to="/category/healthcare" className="hover:text-[#22aee1] transition-colors">Healthcare</Link></li>
+              <li><Link to="/category/digital-health" className="hover:text-[#22aee1] transition-colors">Digital Health</Link></li>
+              <li><Link to="/category/mental-health" className="hover:text-[#22aee1] transition-colors">Mental Health</Link></li>
             </ul>
           </div>
           <div>

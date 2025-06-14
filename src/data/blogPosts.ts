@@ -1,3 +1,4 @@
+
 import { smeInsurancePosts } from './smeInsurancePosts';
 
 export const blogPosts = [
@@ -113,7 +114,7 @@ export const blogPosts = [
     authorLink: "https://www.cipd.co.uk/knowledge/fundamentals/emp-law/terms/benefits-factsheet",
     publishedAt: "Dec 10, 2024",
     readTime: "7 min read",
-    category: "Industry News",
+    category: "Digital Health",
     tags: ["Benefits Trends", "UK SMEs", "Workplace Culture"],
     featured: false,
     image: "/placeholder.svg"
@@ -149,7 +150,7 @@ export const blogPosts = [
     authorLink: "https://www.mind.org.uk/workplace/mental-health-at-work/",
     publishedAt: "Dec 8, 2024",
     readTime: "5 min read",
-    category: "Healthcare",
+    category: "Mental Health",
     tags: ["Mental Health", "Employee Support", "Workplace Wellbeing"],
     featured: false,
     image: "/placeholder.svg"
@@ -184,7 +185,7 @@ export const blogPosts = [
     authorLink: "https://www.linkedin.com/in/robertkim-digital",
     publishedAt: "Dec 5, 2024",
     readTime: "6 min read",
-    category: "Industry News",
+    category: "Digital Health",
     tags: ["Digital Transformation", "Benefits Technology", "Employee Experience"],
     featured: false,
     image: "/placeholder.svg"
@@ -227,7 +228,8 @@ export const blogPosts = [
 ];
 
 export const categories = [
-  "Healthcare",
-  "PMI Insights", 
-  "Industry News"
+  "PMI Insights",
+  "Healthcare", 
+  "Digital Health",
+  "Mental Health"
 ];

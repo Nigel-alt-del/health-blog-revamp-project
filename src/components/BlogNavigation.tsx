@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
@@ -51,22 +52,28 @@ const BlogNavigation = () => {
                 HOME
               </Link>
               <Link 
-                to="/category/healthcare" 
-                className="text-[#79858D] hover:text-[#20466d] px-3 py-2 text-sm font-medium transition-colors"
-              >
-                HEALTHCARE
-              </Link>
-              <Link 
                 to="/category/pmi-insights" 
                 className="text-[#79858D] hover:text-[#20466d] px-3 py-2 text-sm font-medium transition-colors"
               >
                 PMI INSIGHTS
               </Link>
               <Link 
-                to="/category/industry-news" 
+                to="/category/healthcare" 
                 className="text-[#79858D] hover:text-[#20466d] px-3 py-2 text-sm font-medium transition-colors"
               >
-                INDUSTRY NEWS
+                HEALTHCARE
+              </Link>
+              <Link 
+                to="/category/digital-health" 
+                className="text-[#79858D] hover:text-[#20466d] px-3 py-2 text-sm font-medium transition-colors"
+              >
+                DIGITAL HEALTH
+              </Link>
+              <Link 
+                to="/category/mental-health" 
+                className="text-[#79858D] hover:text-[#20466d] px-3 py-2 text-sm font-medium transition-colors"
+              >
+                MENTAL HEALTH
               </Link>
               <Link 
                 to="/about" 
@@ -111,13 +118,6 @@ const BlogNavigation = () => {
               HOME
             </Link>
             <Link 
-              to="/category/healthcare" 
-              className="text-[#79858D] hover:text-[#20466d] block px-3 py-2 text-base font-medium transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              HEALTHCARE
-            </Link>
-            <Link 
               to="/category/pmi-insights" 
               className="text-[#79858D] hover:text-[#20466d] block px-3 py-2 text-base font-medium transition-colors"
               onClick={() => setIsMenuOpen(false)}
@@ -125,11 +125,25 @@ const BlogNavigation = () => {
               PMI INSIGHTS
             </Link>
             <Link 
-              to="/category/industry-news" 
+              to="/category/healthcare" 
               className="text-[#79858D] hover:text-[#20466d] block px-3 py-2 text-base font-medium transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
-              INDUSTRY NEWS
+              HEALTHCARE
+            </Link>
+            <Link 
+              to="/category/digital-health" 
+              className="text-[#79858D] hover:text-[#20466d] block px-3 py-2 text-base font-medium transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              DIGITAL HEALTH
+            </Link>
+            <Link 
+              to="/category/mental-health" 
+              className="text-[#79858D] hover:text-[#20466d] block px-3 py-2 text-base font-medium transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              MENTAL HEALTH
             </Link>
             <Link 
               to="/about" 

@@ -1,4 +1,3 @@
-
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Filter } from "lucide-react";
@@ -31,14 +30,12 @@ const BlogCategory = () => {
     cat => cat.toLowerCase().replace(/\s+/g, '-') === category
   ) || category;
 
-  // Update category display names
-  const displayCategoryName = categoryName === "Health Policy" ? "Healthcare" : categoryName;
-
   const getHeroTitle = () => {
-    if (category === 'industry-news') return 'Industry News';
     if (category === 'pmi-insights') return 'PMI Insights';
     if (category === 'healthcare') return 'Healthcare Intelligence';
-    return `${displayCategoryName} Intelligence`;
+    if (category === 'digital-health') return 'Digital Health';
+    if (category === 'mental-health') return 'Mental Health';
+    return `${categoryName} Intelligence`;
   };
 
   return (

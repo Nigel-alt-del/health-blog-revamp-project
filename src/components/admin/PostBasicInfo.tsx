@@ -4,9 +4,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const categories = [
-  "Healthcare",
-  "PMI Insights", 
-  "Industry News"
+  "PMI Insights",
+  "Healthcare", 
+  "Digital Health",
+  "Mental Health"
 ];
 
 interface PostBasicInfoProps {

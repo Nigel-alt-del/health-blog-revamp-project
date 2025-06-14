@@ -24,22 +24,27 @@ const FeaturedPost = ({ post }: FeaturedPostProps) => {
 
   // Map categories to display the correct badge labels
   const getCategoryDisplay = (category: string) => {
-    // Map any legacy categories to the three main ones
-    switch (category.toLowerCase()) {
-      case "healthcare":
-      case "health policy":
-      case "health":
-        return "Healthcare";
+    const normalizedCategory = category.toLowerCase();
+    switch (normalizedCategory) {
       case "pmi insights":
       case "insurance tips":
       case "insurance":
       case "pmi":
         return "PMI Insights";
-      case "industry news":
-      case "news":
-        return "Industry News";
+      case "healthcare":
+      case "health policy":
+      case "health":
+        return "Healthcare";
+      case "digital health":
+      case "digital transformation":
+      case "benefits technology":
+        return "Digital Health";
+      case "mental health":
+      case "workplace wellbeing":
+      case "employee support":
+        return "Mental Health";
       default:
-        return "Healthcare"; // Default fallback
+        return category;
     }
   };
 
