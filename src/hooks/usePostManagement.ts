@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { addPostToStorage, updatePostInStorage, deletePostFromStorage, addDeletedPostId, type BlogPost } from "@/utils/supabaseStorage";
 import { loadAllPosts, forceRefreshPosts } from "@/utils/postManager";
@@ -142,7 +143,7 @@ export const usePostManagement = () => {
     console.log("usePostManagement - TOGGLING FEATURED FOR POST:", postId);
     
     try {
-      // Get current posts state
+      // Get current post
       const currentPost = posts.find(p => p.id === postId);
       if (!currentPost) {
         console.error("usePostManagement - Post not found:", postId);
@@ -150,39 +151,29 @@ export const usePostManagement = () => {
       }
 
       console.log("usePostManagement - Current featured state:", currentPost.featured);
+      const newFeaturedState = !currentPost.featured;
       
-      // Create updated posts array - only one post can be featured at a time
-      const updatedPosts = posts.map(post => {
-        if (post.id === postId) {
-          console.log("usePostManagement - Setting post as featured:", !post.featured);
-          return { ...post, featured: !post.featured };
-        } else if (post.featured && postId !== post.id) {
-          console.log("usePostManagement - Removing featured from post:", post.id);
-          return { ...post, featured: false };
-        }
-        return post;
-      });
+      // Update the clicked post and unfeatured all others in Supabase
+      const postsToUpdate = posts.filter(post => 
+        post.id === postId || post.featured
+      );
       
-      // Update posts state immediately for UI responsiveness
-      setPosts(updatedPosts);
-      
-      // Update all modified posts in Supabase
-      for (const post of updatedPosts) {
-        const originalPost = posts.find(p => p.id === post.id);
-        if (originalPost && originalPost.featured !== post.featured) {
-          console.log("usePostManagement - Updating post in Supabase:", post.id, "featured:", post.featured);
-          await updatePostInStorage(post);
-        }
+      for (const post of postsToUpdate) {
+        const updatedPost = {
+          ...post,
+          featured: post.id === postId ? newFeaturedState : false
+        };
+        
+        console.log("usePostManagement - Updating post in Supabase:", post.id, "featured:", updatedPost.featured);
+        await updatePostInStorage(updatedPost);
       }
       
-      // Force refresh to ensure consistency
-      forceRefreshPosts();
+      // Refresh posts after all updates are complete
+      await refreshPosts();
       
       console.log("usePostManagement - FEATURED TOGGLE COMPLETE");
     } catch (error) {
       console.error("usePostManagement - Error toggling featured:", error);
-      // Revert state on error
-      await refreshPosts();
       throw error;
     }
   };
