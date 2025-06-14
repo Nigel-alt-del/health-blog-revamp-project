@@ -60,19 +60,11 @@ const BlogHome = () => {
 
   console.log("BlogHome - All posts count:", filteredPosts.length);
 
-  const heroSubtitle = `Introducing The Health Compass – Your Strategic Edge in Healthcare Insight
-
-In a world where healthcare landscapes shift fast and compliance pressures grow by the day, staying ahead isn't just an advantage — it's a necessity. The Health Compass is your go-to source for clear, actionable insights designed specifically for SME owners, HR professionals, directors, and those working within the private medical insurance sector.
-
-We cut through the noise to deliver research that matters — data-driven, expertly analysed, and directly relevant to the challenges you face. Whether it's navigating policy changes, optimising employee health benefits, or benchmarking against industry trends, we give you the intelligence you need to act confidently and lead decisively.
-
-You don't need to be a healthcare expert. That's why we are here.`;
-
   return (
     <BlogLayout>
       <HeroSection
         title="The Health Compass"
-        subtitle={heroSubtitle}
+        subtitle="Your Strategic Edge in Healthcare and PMI Insights"
         backgroundImage="/lovable-uploads/b61ae919-b75e-409d-a884-8437e2befc15.png"
       />
 

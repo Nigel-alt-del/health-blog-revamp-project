@@ -1,4 +1,5 @@
 
+
 interface HeroSectionProps {
   title: string;
   subtitle: string;
@@ -23,16 +24,13 @@ const HeroSection = ({ title, subtitle, backgroundImage }: HeroSectionProps) => 
             )
           )}
         </h1>
-        <div className="text-lg leading-relaxed opacity-95 space-y-4 max-w-4xl mx-auto">
-          {subtitle.split('\n\n').map((paragraph, index) => (
-            <p key={index} className={index === 0 ? "text-xl font-medium text-[#22aee1] mb-6" : ""}>
-              {paragraph}
-            </p>
-          ))}
-        </div>
+        <p className="text-xl leading-relaxed opacity-95 max-w-4xl mx-auto">
+          {subtitle}
+        </p>
       </div>
     </section>
   );
 };
 
 export default HeroSection;
+
