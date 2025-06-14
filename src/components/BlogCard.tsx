@@ -22,6 +22,20 @@ interface BlogCardProps {
 const BlogCard = ({ post }: BlogCardProps) => {
   const hasCustomImage = post.image && post.image !== "/placeholder.svg";
 
+  // Map categories to display the correct badge labels
+  const getCategoryDisplay = (category: string) => {
+    switch (category) {
+      case "Healthcare":
+        return "Healthcare";
+      case "PMI Insights":
+        return "PMI Insights";
+      case "Industry News":
+        return "Industry News";
+      default:
+        return category;
+    }
+  };
+
   return (
     <Card className="h-full hover:shadow-lg transition-shadow duration-300 group border-[#79858D]/20">
       <CardHeader className="pb-4">
@@ -38,13 +52,13 @@ const BlogCard = ({ post }: BlogCardProps) => {
                 <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center mx-auto mb-2">
                   <span className="text-[#20466d] font-bold">IMH</span>
                 </div>
-                <p className="text-white text-sm font-medium">{post.category}</p>
+                <p className="text-white text-sm font-medium">{getCategoryDisplay(post.category)}</p>
               </div>
             </div>
           )}
         </div>
         <Badge variant="secondary" className="w-fit bg-[#22aee1] text-white">
-          {post.category}
+          {getCategoryDisplay(post.category)}
         </Badge>
       </CardHeader>
       
