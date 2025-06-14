@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 
 // Export the BlogPost type
@@ -42,7 +43,28 @@ export const loadPosts = async (): Promise<BlogPost[]> => {
       .order('created_at', { ascending: false });
 
     console.log('📖 Retrieved posts from Supabase:', result.data);
-    return result.data || [];
+    
+    // Map database format to BlogPost interface format
+    const mappedPosts = (result.data || []).map(post => ({
+      id: post.id,
+      title: post.title,
+      excerpt: post.excerpt,
+      content: post.content,
+      publishedAt: post.published_at,
+      readTime: post.read_time,
+      category: post.category,
+      tags: post.tags,
+      featured: post.featured,
+      image: post.image,
+      seoKeywords: post.seo_keywords,
+      metaDescription: post.meta_description,
+      author: post.author,
+      authorRole: post.author_role,
+      authorLinkedin: post.author_linkedin,
+      authorBio: post.author_bio
+    }));
+    
+    return mappedPosts;
   } catch (error) {
     console.error('❌ Error reading from Supabase:', error);
     return [];
