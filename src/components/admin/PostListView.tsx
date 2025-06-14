@@ -53,12 +53,16 @@ export const PostListView = ({ posts, onDeletePost, onEditPost, onToggleFeatured
     window.open(url, '_blank');
   };
 
-  const handleToggleFeatured = (postId: string, currentFeatured: boolean) => {
-    onToggleFeatured(postId);
-    toast({
-      title: "Success",
-      description: currentFeatured ? "Report removed from featured" : "Report set as featured"
-    });
+  const handleToggleFeatured = (postId: string) => {
+    console.log("PostListView - Toggling featured for:", postId);
+    const post = posts.find(p => p.id === postId);
+    if (post) {
+      onToggleFeatured(postId);
+      toast({
+        title: "Success",
+        description: post.featured ? "Report removed from featured" : "Report set as featured"
+      });
+    }
   };
 
   return (
@@ -87,8 +91,9 @@ export const PostListView = ({ posts, onDeletePost, onEditPost, onToggleFeatured
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => handleToggleFeatured(post.id, post.featured)}
+                  onClick={() => handleToggleFeatured(post.id)}
                   title={post.featured ? "Remove from featured" : "Set as featured"}
+                  className={post.featured ? "text-yellow-600 border-yellow-600" : ""}
                 >
                   {post.featured ? <StarOff className="h-4 w-4" /> : <Star className="h-4 w-4" />}
                 </Button>
