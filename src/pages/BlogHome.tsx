@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import BlogLayout from "@/components/BlogLayout";
 import FeaturedPost from "@/components/FeaturedPost";
@@ -15,9 +16,9 @@ const BlogHome = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const refreshPosts = () => {
+  const refreshPosts = async () => {
     console.log("BlogHome - CRYSTAL CLEAR REFRESH");
-    const posts = loadAllPosts();
+    const posts = await loadAllPosts();
     console.log("BlogHome - LOADED POSTS:", posts);
     setAllPosts(posts);
     setFilteredPosts(posts);
