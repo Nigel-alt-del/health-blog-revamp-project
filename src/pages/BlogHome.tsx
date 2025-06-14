@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import BlogLayout from "@/components/BlogLayout";
 import FeaturedPost from "@/components/FeaturedPost";
@@ -17,21 +16,19 @@ const BlogHome = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
 
   const refreshPosts = () => {
-    console.log("BlogHome - Refreshing posts");
+    console.log("BlogHome - CRYSTAL CLEAR REFRESH");
     const posts = loadAllPosts();
-    console.log("BlogHome - Loaded posts:", posts);
+    console.log("BlogHome - LOADED POSTS:", posts);
     setAllPosts(posts);
     setFilteredPosts(posts);
   };
 
-  // Load posts using centralized function
   useEffect(() => {
-    console.log("BlogHome - Initial load of posts");
+    console.log("BlogHome - INITIAL LOAD");
     refreshPosts();
 
-    // Listen for forced refresh events
     const handlePostsRefreshed = () => {
-      console.log("BlogHome - Handling posts refreshed event");
+      console.log("BlogHome - HANDLING REFRESH EVENT");
       refreshPosts();
     };
 
@@ -42,11 +39,11 @@ const BlogHome = () => {
     };
   }, []);
 
-  // Also refresh when the page becomes visible again (handles browser refresh)
+  // Also refresh when page becomes visible
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden) {
-        console.log("BlogHome - Page became visible, refreshing posts");
+        console.log("BlogHome - PAGE VISIBLE, REFRESHING");
         refreshPosts();
       }
     };

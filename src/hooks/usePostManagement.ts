@@ -8,19 +8,18 @@ export const usePostManagement = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
 
   const refreshPosts = () => {
-    console.log("usePostManagement - Refreshing posts");
+    console.log("usePostManagement - REFRESHING POSTS");
     const allPosts = loadAllPosts();
-    console.log("usePostManagement - Setting posts to:", allPosts);
+    console.log("usePostManagement - NEW POSTS STATE:", allPosts);
     setPosts(allPosts);
   };
 
   useEffect(() => {
-    console.log("usePostManagement - Initial load");
+    console.log("usePostManagement - INITIAL LOAD");
     refreshPosts();
     
-    // Listen for refresh events
     const handlePostsRefreshed = () => {
-      console.log("usePostManagement - Handling refresh event");
+      console.log("usePostManagement - HANDLING REFRESH EVENT");
       refreshPosts();
     };
 
@@ -42,7 +41,7 @@ export const usePostManagement = () => {
   };
 
   const handleCreatePost = (newPost: any) => {
-    console.log("usePostManagement - Creating new post:", newPost);
+    console.log("usePostManagement - CREATING NEW POST:", newPost);
     
     const post: BlogPost = {
       id: generateId(newPost.title),
@@ -59,86 +58,66 @@ export const usePostManagement = () => {
       metaDescription: newPost.metaDescription || newPost.excerpt
     };
 
-    console.log("usePostManagement - Formatted post:", post);
-    
-    // Save to localStorage
+    // SAVE TO LOCALSTORAGE (THE BOSS)
     addPostToStorage(post);
+    console.log("usePostManagement - SAVED TO LOCALSTORAGE");
     
-    // IMMEDIATE UI update - add the new post to current state
-    setPosts(prevPosts => {
-      const updatedPosts = [post, ...prevPosts];
-      console.log("usePostManagement - Immediately updating UI with:", updatedPosts);
-      return updatedPosts;
-    });
+    // IMMEDIATE REFRESH - NO DELAYS
+    refreshPosts();
+    forceRefreshPosts();
     
-    // Also trigger refresh for other components
-    setTimeout(() => {
-      forceRefreshPosts();
-    }, 100);
-    
-    console.log("usePostManagement - Post creation completed");
+    console.log("usePostManagement - POST CREATION COMPLETE");
   };
 
   const handleEditPost = (updatedPost: any) => {
-    console.log("usePostManagement - Updating post:", updatedPost);
+    console.log("usePostManagement - EDITING POST:", updatedPost);
     
     const formattedPost: BlogPost = {
       ...updatedPost,
       tags: Array.isArray(updatedPost.tags) ? updatedPost.tags : (updatedPost.tags || '').split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag)
     };
 
+    // UPDATE IN LOCALSTORAGE (THE BOSS)
     updatePostInStorage(formattedPost);
+    console.log("usePostManagement - UPDATED IN LOCALSTORAGE");
     
-    // IMMEDIATE UI update
-    setPosts(prevPosts => {
-      const updatedPosts = prevPosts.map(post => 
-        post.id === formattedPost.id ? formattedPost : post
-      );
-      console.log("usePostManagement - Immediately updating edited post in UI");
-      return updatedPosts;
-    });
+    // IMMEDIATE REFRESH - NO DELAYS
+    refreshPosts();
+    forceRefreshPosts();
     
-    // Trigger refresh for other components
-    setTimeout(() => {
-      forceRefreshPosts();
-    }, 100);
-    
-    console.log("usePostManagement - Post update completed");
+    console.log("usePostManagement - POST EDIT COMPLETE");
     sessionStorage.setItem('cameFromAdmin', 'true');
   };
 
   const handleDeletePost = (postId: string) => {
-    console.log("usePostManagement - Deleting post:", postId);
+    console.log("usePostManagement - RUTHLESS DELETION:", postId);
     
     const isDefaultPost = blogPosts.some(p => p.id === postId);
     
     if (isDefaultPost) {
+      // Mark default post as deleted
       addDeletedPostId(postId);
-      console.log("usePostManagement - Marked default post as deleted:", postId);
+      console.log("usePostManagement - DEFAULT POST MARKED AS DELETED:", postId);
     } else {
+      // Remove custom post from storage
       deletePostFromStorage(postId);
-      console.log("usePostManagement - Removed custom post from storage:", postId);
+      console.log("usePostManagement - CUSTOM POST REMOVED FROM STORAGE:", postId);
     }
     
-    // IMMEDIATE UI update - remove from current state
-    setPosts(prevPosts => {
-      const updatedPosts = prevPosts.filter(post => post.id !== postId);
-      console.log("usePostManagement - Immediately removing post from UI");
-      return updatedPosts;
-    });
+    // IMMEDIATE REFRESH - NO DELAYS
+    refreshPosts();
+    forceRefreshPosts();
     
-    // Trigger refresh for other components
-    setTimeout(() => {
-      forceRefreshPosts();
-    }, 100);
-    
-    console.log("usePostManagement - Post deletion completed");
+    console.log("usePostManagement - RUTHLESS DELETION COMPLETE");
   };
 
   const handleToggleFeatured = (postId: string) => {
-    console.log("usePostManagement - Toggling featured for post:", postId);
+    console.log("usePostManagement - TOGGLING FEATURED:", postId);
     
-    const updatedPosts = posts.map(post => {
+    // Load fresh data
+    const currentPosts = loadAllPosts();
+    
+    const updatedPosts = currentPosts.map(post => {
       if (post.id === postId) {
         const updatedPost = { ...post, featured: !post.featured };
         updatePostInStorage(updatedPost);
@@ -152,13 +131,9 @@ export const usePostManagement = () => {
     });
     
     setPosts(updatedPosts);
+    forceRefreshPosts();
     
-    // Trigger refresh for other components
-    setTimeout(() => {
-      forceRefreshPosts();
-    }, 100);
-    
-    console.log("usePostManagement - Featured toggle completed");
+    console.log("usePostManagement - FEATURED TOGGLE COMPLETE");
   };
 
   return {

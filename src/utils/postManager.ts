@@ -1,24 +1,24 @@
 
-import { getStoredPosts, isPostDeleted, type BlogPost } from "./localStorage";
+import { getStoredPosts, getDeletedPostIds, type BlogPost } from "./localStorage";
 import { blogPosts } from "@/data/blogPosts";
 
 /**
- * Centralized function to load all posts with proper deletion filtering
+ * SIMPLIFIED: localStorage is the boss. Default posts only show if not deleted.
  */
 export const loadAllPosts = (): BlogPost[] => {
-  console.log("PostManager - Loading all posts");
+  console.log("PostManager - Loading all posts (SIMPLIFIED)");
   
-  // Get stored posts (custom posts created by user)
+  // Step 1: Get all stored posts (these are the boss)
   const storedPosts = getStoredPosts();
-  console.log("PostManager - Stored posts from localStorage:", storedPosts);
+  console.log("PostManager - Stored posts (THE BOSS):", storedPosts);
   
-  // Get default posts that haven't been deleted
+  // Step 2: Get deleted post IDs
+  const deletedIds = getDeletedPostIds();
+  console.log("PostManager - Deleted post IDs:", deletedIds);
+  
+  // Step 3: Get default posts that haven't been deleted
   const availableDefaultPosts = blogPosts
-    .filter(post => {
-      const isDeleted = isPostDeleted(post.id);
-      console.log(`PostManager - Checking default post ${post.id}: deleted=${isDeleted}`);
-      return !isDeleted;
-    })
+    .filter(post => !deletedIds.includes(post.id))
     .map(post => ({
       id: post.id,
       title: post.title,
@@ -36,13 +36,12 @@ export const loadAllPosts = (): BlogPost[] => {
 
   console.log("PostManager - Available default posts:", availableDefaultPosts);
 
-  // Combine: stored posts first, then default posts that don't conflict
+  // Step 4: SIMPLE COMBINATION - stored posts first, then non-conflicting defaults
   const storedPostIds = new Set(storedPosts.map(p => p.id));
-  const nonConflictingDefaultPosts = availableDefaultPosts.filter(p => !storedPostIds.has(p.id));
+  const finalDefaultPosts = availableDefaultPosts.filter(p => !storedPostIds.has(p.id));
   
-  const allPosts = [...storedPosts, ...nonConflictingDefaultPosts];
-  
-  console.log("PostManager - Final combined posts:", allPosts);
+  const allPosts = [...storedPosts, ...finalDefaultPosts];
+  console.log("PostManager - FINAL RESULT:", allPosts);
   
   return allPosts;
 };
@@ -62,21 +61,13 @@ export const getPostsByCategory = (category: string): BlogPost[] => {
  */
 export const getPostById = (id: string): BlogPost | undefined => {
   const allPosts = loadAllPosts();
-  const post = allPosts.find(post => post.id === id);
-  
-  // Double check that the post isn't deleted
-  if (post && isPostDeleted(post.id)) {
-    console.log("PostManager - Post found but is deleted:", id);
-    return undefined;
-  }
-  
-  return post;
+  return allPosts.find(post => post.id === id);
 };
 
 /**
- * Force refresh all post data
+ * EUREKA! Force refresh all post data
  */
 export const forceRefreshPosts = (): void => {
-  console.log("PostManager - Dispatching posts refresh event");
+  console.log("PostManager - EUREKA! Dispatching posts refresh event");
   window.dispatchEvent(new CustomEvent('postsRefreshed'));
 };
