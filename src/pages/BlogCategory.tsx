@@ -15,12 +15,16 @@ const BlogCategory = () => {
 
   // Load posts using centralized function
   useEffect(() => {
-    if (category) {
-      console.log("BlogCategory - Loading posts for category:", category);
-      const posts = getPostsByCategory(category);
-      console.log("BlogCategory - Filtered posts for category:", category, posts);
-      setCategoryPosts(posts);
-    }
+    const loadCategoryPosts = async () => {
+      if (category) {
+        console.log("BlogCategory - Loading posts for category:", category);
+        const posts = await getPostsByCategory(category);
+        console.log("BlogCategory - Filtered posts for category:", category, posts);
+        setCategoryPosts(posts);
+      }
+    };
+    
+    loadCategoryPosts();
   }, [category]);
   
   const categoryName = categories.find(

@@ -21,39 +21,43 @@ const BlogPost = () => {
   
   // Load posts using centralized function
   useEffect(() => {
-    if (slug) {
-      console.log("BlogPost - Loading post for slug:", slug);
-      
-      // CRITICAL FIX: Check for admin view flags and force refresh
-      const forceRefresh = sessionStorage.getItem('forceRefresh');
-      const viewFromAdmin = sessionStorage.getItem('viewFromAdmin');
-      
-      if (forceRefresh || viewFromAdmin === slug) {
-        console.log("BlogPost - Force refreshing post data from admin for:", slug);
-        // Clear the flags after use
-        sessionStorage.removeItem('forceRefresh');
-        if (viewFromAdmin === slug) {
-          sessionStorage.removeItem('viewFromAdmin');
-        }
-      }
-      
-      // Load the specific post using centralized function
-      const foundPost = getPostById(slug);
-      console.log("BlogPost - Found post:", foundPost);
-      
-      if (foundPost) {
-        setPost(foundPost);
+    const loadPostData = async () => {
+      if (slug) {
+        console.log("BlogPost - Loading post for slug:", slug);
         
-        // Load related posts
-        const allPosts = loadAllPosts();
-        const related = allPosts
-          .filter(p => p.id !== foundPost.id && p.category === foundPost.category)
-          .slice(0, 3);
-        setRelatedPosts(related);
+        // CRITICAL FIX: Check for admin view flags and force refresh
+        const forceRefresh = sessionStorage.getItem('forceRefresh');
+        const viewFromAdmin = sessionStorage.getItem('viewFromAdmin');
+        
+        if (forceRefresh || viewFromAdmin === slug) {
+          console.log("BlogPost - Force refreshing post data from admin for:", slug);
+          // Clear the flags after use
+          sessionStorage.removeItem('forceRefresh');
+          if (viewFromAdmin === slug) {
+            sessionStorage.removeItem('viewFromAdmin');
+          }
+        }
+        
+        // Load the specific post using centralized function
+        const foundPost = await getPostById(slug);
+        console.log("BlogPost - Found post:", foundPost);
+        
+        if (foundPost) {
+          setPost(foundPost);
+          
+          // Load related posts
+          const allPosts = await loadAllPosts();
+          const related = allPosts
+            .filter(p => p.id !== foundPost.id && p.category === foundPost.category)
+            .slice(0, 3);
+          setRelatedPosts(related);
+        }
+        
+        setIsLoading(false);
       }
-      
-      setIsLoading(false);
-    }
+    };
+    
+    loadPostData();
   }, [slug]);
   
   // Check if user came from admin
