@@ -12,7 +12,7 @@ const BlogCategory = () => {
   const { category } = useParams();
   const [categoryPosts, setCategoryPosts] = useState<BlogPost[]>([]);
 
-  // Map URL slugs to category names
+  // Map URL slugs to category names and handle variations
   const getCategoryNameFromSlug = (slug: string) => {
     switch (slug) {
       case 'pmi-insights':
@@ -28,6 +28,47 @@ const BlogCategory = () => {
     }
   };
 
+  // Enhanced category matching function
+  const doesPostMatchCategory = (post: BlogPost, targetCategory: string): boolean => {
+    const postCategory = post.category.toLowerCase().trim();
+    const target = targetCategory.toLowerCase();
+
+    console.log("BlogCategory - Checking post category:", postCategory, "against target:", target);
+
+    // Direct match
+    if (postCategory === target) {
+      return true;
+    }
+
+    // Handle category variations
+    switch (target) {
+      case 'pmi insights':
+        return postCategory.includes('pmi') || 
+               postCategory.includes('insurance') || 
+               postCategory === 'insurance tips';
+      
+      case 'healthcare':
+        return postCategory.includes('healthcare') || 
+               postCategory.includes('health policy') || 
+               postCategory === 'health' ||
+               postCategory.includes('mental health') ||
+               postCategory.includes('workplace wellbeing');
+      
+      case 'digital health':
+        return postCategory.includes('digital') || 
+               postCategory.includes('benefits technology') || 
+               postCategory === 'digital transformation';
+      
+      case 'mental health':
+        return postCategory.includes('mental health') || 
+               postCategory.includes('workplace wellbeing') || 
+               postCategory.includes('employee support');
+      
+      default:
+        return false;
+    }
+  };
+
   // Load posts and filter by category
   useEffect(() => {
     const loadCategoryPosts = async () => {
@@ -36,13 +77,17 @@ const BlogCategory = () => {
         const allPosts = await loadAllPosts();
         const categoryName = getCategoryNameFromSlug(category);
         
-        // Filter posts that match the category
-        const filteredPosts = allPosts.filter(post => {
-          return post.category === categoryName;
-        });
-        
         console.log("BlogCategory - All posts:", allPosts);
         console.log("BlogCategory - Looking for category:", categoryName);
+        console.log("BlogCategory - Post categories:", allPosts.map(p => p.category));
+        
+        // Filter posts that match the category using enhanced matching
+        const filteredPosts = allPosts.filter(post => {
+          const matches = doesPostMatchCategory(post, categoryName);
+          console.log(`BlogCategory - Post "${post.title}" (${post.category}) matches ${categoryName}:`, matches);
+          return matches;
+        });
+        
         console.log("BlogCategory - Filtered posts:", filteredPosts);
         setCategoryPosts(filteredPosts);
       }

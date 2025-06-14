@@ -18,17 +18,51 @@ export const useCategoryFiltering = (allPosts: BlogPost[]) => {
       case "healthcare":
       case "health policy":
       case "health":
+      case "mental health":
+      case "workplace wellbeing":
+      case "employee support":
         return "Healthcare";
       case "digital health":
       case "digital transformation":
       case "benefits technology":
         return "Digital Health";
-      case "mental health":
-      case "workplace wellbeing":
-      case "employee support":
-        return "Mental Health";
       default:
         return category;
+    }
+  };
+
+  // Enhanced category matching function
+  const doesPostMatchCategory = (post: BlogPost, targetCategory: string): boolean => {
+    const postCategory = post.category.toLowerCase().trim();
+    const target = targetCategory.toLowerCase();
+
+    // Direct match
+    if (postCategory === target) {
+      return true;
+    }
+
+    // Handle category variations
+    switch (target) {
+      case 'pmi insights':
+        return postCategory.includes('pmi') || 
+               postCategory.includes('insurance') || 
+               postCategory === 'insurance tips';
+      
+      case 'healthcare':
+        return postCategory.includes('healthcare') || 
+               postCategory.includes('health policy') || 
+               postCategory === 'health' ||
+               postCategory.includes('mental health') ||
+               postCategory.includes('workplace wellbeing') ||
+               postCategory.includes('employee support');
+      
+      case 'digital health':
+        return postCategory.includes('digital') || 
+               postCategory.includes('benefits technology') || 
+               postCategory === 'digital transformation';
+      
+      default:
+        return false;
     }
   };
 
@@ -37,7 +71,7 @@ export const useCategoryFiltering = (allPosts: BlogPost[]) => {
 
     if (selectedCategory !== "All") {
       filtered = filtered.filter(post => {
-        return getCategoryDisplay(post.category) === selectedCategory;
+        return doesPostMatchCategory(post, selectedCategory);
       });
     }
 
