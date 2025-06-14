@@ -9,10 +9,6 @@ import { blogPosts } from "@/data/blogPosts";
 export const loadAllPosts = (): BlogPost[] => {
   console.log("PostManager - Loading all posts with deletion filtering");
   
-  // Force clear any cached data by checking timestamp
-  const lastClearTime = localStorage.getItem('lastPostClear');
-  const currentTime = Date.now();
-  
   const storedPosts = getStoredPosts();
   console.log("PostManager - Stored posts:", storedPosts);
   
@@ -40,19 +36,13 @@ export const loadAllPosts = (): BlogPost[] => {
       metaDescription: (post as any).metaDescription || post.excerpt
     }));
 
-  let combinedPosts: BlogPost[] = [];
-
-  if (storedPosts.length > 0) {
-    // Filter stored posts to ensure no deleted ones slip through
-    const validStoredPosts = storedPosts.filter(post => !isPostDeleted(post.id));
-    
-    // Combine valid stored posts with unmodified default posts
-    const storedPostIds = validStoredPosts.map(p => p.id);
-    const unmodifiedDefaultPosts = filteredDefaultPosts.filter(p => !storedPostIds.includes(p.id));
-    combinedPosts = [...validStoredPosts, ...unmodifiedDefaultPosts];
-  } else {
-    combinedPosts = filteredDefaultPosts;
-  }
+  // CRITICAL FIX: Combine stored posts (custom posts) with unmodified default posts
+  // Stored posts take precedence over default posts with the same ID
+  const storedPostIds = storedPosts.map(p => p.id);
+  const unmodifiedDefaultPosts = filteredDefaultPosts.filter(p => !storedPostIds.includes(p.id));
+  
+  // Combine: custom posts first, then unmodified default posts
+  const combinedPosts = [...storedPosts, ...unmodifiedDefaultPosts];
   
   // Final safety check - remove any posts that might have been marked as deleted
   const finalFilteredPosts = combinedPosts.filter(post => !isPostDeleted(post.id));
@@ -94,7 +84,6 @@ export const getPostById = (id: string): BlogPost | undefined => {
  */
 export const forceRefreshPosts = (): void => {
   console.log("PostManager - Force refreshing all post data");
-  localStorage.setItem('lastPostClear', Date.now().toString());
   
   // Clear any component-level caches by dispatching a custom event
   window.dispatchEvent(new CustomEvent('postsRefreshed'));

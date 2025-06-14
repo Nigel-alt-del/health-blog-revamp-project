@@ -16,6 +16,18 @@ export const usePostManagement = () => {
 
   useEffect(() => {
     loadPosts();
+    
+    // Listen for forced refresh events
+    const handlePostsRefreshed = () => {
+      console.log("usePostManagement - Handling posts refreshed event");
+      loadPosts();
+    };
+
+    window.addEventListener('postsRefreshed', handlePostsRefreshed);
+    
+    return () => {
+      window.removeEventListener('postsRefreshed', handlePostsRefreshed);
+    };
   }, []);
 
   const generateId = (title: string): string => {
@@ -47,12 +59,17 @@ export const usePostManagement = () => {
     };
 
     console.log("Formatted post:", post);
-    addPostToStorage(post);
-    setPosts(prevPosts => [post, ...prevPosts]);
     
-    // Force refresh to ensure consistency
+    // Save to storage first
+    addPostToStorage(post);
+    
+    // CRITICAL FIX: Reload all posts to ensure proper state
+    const updatedPosts = loadAllPosts();
+    setPosts(updatedPosts);
+    
+    // Force refresh to ensure consistency across all components
     forceRefreshPosts();
-    console.log("Post created successfully");
+    console.log("Post created successfully and UI updated");
   };
 
   const handleEditPost = (updatedPost: any) => {
@@ -64,9 +81,10 @@ export const usePostManagement = () => {
     };
 
     updatePostInStorage(formattedPost);
-    setPosts(prevPosts => prevPosts.map(post => 
-      post.id === formattedPost.id ? formattedPost : post
-    ));
+    
+    // CRITICAL FIX: Reload all posts to ensure proper state
+    const updatedPosts = loadAllPosts();
+    setPosts(updatedPosts);
     
     // Force refresh to ensure consistency
     forceRefreshPosts();
@@ -87,11 +105,9 @@ export const usePostManagement = () => {
       console.log("usePostManagement - Removed custom post from storage:", postId);
     }
     
-    setPosts(prevPosts => {
-      const updatedPosts = prevPosts.filter(post => post.id !== postId);
-      console.log("usePostManagement - Updated posts after deletion:", updatedPosts.length);
-      return updatedPosts;
-    });
+    // CRITICAL FIX: Reload all posts to ensure proper state
+    const updatedPosts = loadAllPosts();
+    setPosts(updatedPosts);
     
     // CRITICAL: Force refresh to ensure deleted posts don't reappear
     forceRefreshPosts();
@@ -101,25 +117,27 @@ export const usePostManagement = () => {
   const handleToggleFeatured = (postId: string) => {
     console.log("Toggling featured status for post:", postId);
     
-    setPosts(prevPosts => {
-      const updatedPosts = prevPosts.map(post => {
-        if (post.id === postId) {
-          const updatedPost = { ...post, featured: !post.featured };
-          updatePostInStorage(updatedPost);
-          return updatedPost;
-        } else if (post.featured) {
-          const updatedPost = { ...post, featured: false };
-          updatePostInStorage(updatedPost);
-          return updatedPost;
-        }
-        return post;
-      });
-      
-      // Force refresh to ensure consistency
-      forceRefreshPosts();
-      console.log("Featured status updated");
-      return updatedPosts;
+    // Load current posts to get latest state
+    const currentPosts = loadAllPosts();
+    
+    const updatedPosts = currentPosts.map(post => {
+      if (post.id === postId) {
+        const updatedPost = { ...post, featured: !post.featured };
+        updatePostInStorage(updatedPost);
+        return updatedPost;
+      } else if (post.featured) {
+        const updatedPost = { ...post, featured: false };
+        updatePostInStorage(updatedPost);
+        return updatedPost;
+      }
+      return post;
     });
+    
+    setPosts(updatedPosts);
+    
+    // Force refresh to ensure consistency
+    forceRefreshPosts();
+    console.log("Featured status updated");
   };
 
   return {
