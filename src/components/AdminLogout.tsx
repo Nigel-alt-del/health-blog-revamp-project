@@ -2,13 +2,20 @@
 import { useNavigate } from "react-router-dom";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { useToast } from "@/hooks/use-toast";
 
 const AdminLogout = () => {
   const navigate = useNavigate();
+  const { logout } = useAdminAuth();
+  const { toast } = useToast();
 
   const handleLogout = () => {
-    localStorage.removeItem("isAdminAuthenticated");
-    localStorage.removeItem("adminAuthTime");
+    logout();
+    toast({
+      title: "Logged Out",
+      description: "You have been logged out of the admin area."
+    });
     navigate("/");
   };
 

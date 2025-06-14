@@ -5,6 +5,7 @@ import { AdminDashboardView } from "./AdminDashboardView";
 import { AdminCreateView } from "./AdminCreateView";
 import { AdminEditView } from "./AdminEditView";
 import { usePostManagement } from "@/hooks/usePostManagement";
+import AdminLogout from "../AdminLogout";
 
 const AdminDashboard = () => {
   const [isCreating, setIsCreating] = useState(false);
@@ -42,6 +43,10 @@ const AdminDashboard = () => {
   if (isCreating) {
     return (
       <BlogLayout>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-[#20466d]">Create New Post</h1>
+          <AdminLogout />
+        </div>
         <AdminCreateView
           onSubmit={onCreatePost}
           onCancel={() => setIsCreating(false)}
@@ -53,6 +58,10 @@ const AdminDashboard = () => {
   if (editingPostId && editingPost) {
     return (
       <BlogLayout>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-[#20466d]">Edit Post</h1>
+          <AdminLogout />
+        </div>
         <AdminEditView
           post={editingPost}
           onSubmit={onEditPost}
@@ -64,6 +73,10 @@ const AdminDashboard = () => {
 
   return (
     <BlogLayout>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-[#20466d]">Admin Dashboard</h1>
+        <AdminLogout />
+      </div>
       <AdminDashboardView
         posts={posts}
         onCreateNew={() => setIsCreating(true)}
