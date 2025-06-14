@@ -2,17 +2,16 @@
 import { useState, useEffect } from "react";
 import BlogLayout from "@/components/BlogLayout";
 import BlogCard from "@/components/BlogCard";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import { type BlogPost } from "@/utils/supabaseStorage";
 import { loadAllPosts } from "@/utils/postManager";
 
 const BlogHome = () => {
   const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
   const refreshPosts = async () => {
@@ -90,16 +89,8 @@ const BlogHome = () => {
       });
     }
 
-    if (searchTerm) {
-      filtered = filtered.filter(post =>
-        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
-    }
-
     setFilteredPosts(filtered);
-  }, [searchTerm, selectedCategory, allPosts]);
+  }, [selectedCategory, allPosts]);
 
   // Map categories for display in filter buttons
   const getCategoryDisplay = (category: string) => {
@@ -131,6 +122,13 @@ const BlogHome = () => {
   const displayCategories = Array.from(new Set(allPosts.map(post => getCategoryDisplay(post.category))));
   const categories = ["All", ...displayCategories];
 
+  const categoryButtons = [
+    { name: "PMI Insights", slug: "pmi-insights", color: "bg-blue-500 hover:bg-blue-600" },
+    { name: "Healthcare", slug: "healthcare", color: "bg-green-500 hover:bg-green-600" },
+    { name: "Digital Health", slug: "digital-health", color: "bg-purple-500 hover:bg-purple-600" },
+    { name: "Mental Health", slug: "mental-health", color: "bg-teal-500 hover:bg-teal-600" }
+  ];
+
   console.log("BlogHome - All posts count:", filteredPosts.length);
 
   return (
@@ -155,21 +153,28 @@ const BlogHome = () => {
       </section>
 
       <div className="max-w-6xl mx-auto px-4 py-12">
-        {/* Search and Filter */}
+        {/* Category Navigation Buttons */}
         <div className="mb-12">
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-[#79858D]" />
-              <Input
-                placeholder="Search reports..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
+          <h2 className="text-3xl font-bold text-[#20466d] mb-8 text-center">
+            Explore Our Categories
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {categoryButtons.map((category) => (
+              <Link key={category.slug} to={`/category/${category.slug}`}>
+                <Button 
+                  className={`w-full h-24 text-lg font-semibold text-white ${category.color} transition-all duration-300 hover:shadow-lg hover:scale-105 flex items-center justify-between`}
+                >
+                  <span>{category.name}</span>
+                  <ArrowRight className="h-5 w-5" />
+                </Button>
+              </Link>
+            ))}
           </div>
-          
-          <div className="flex flex-wrap gap-2">
+        </div>
+
+        {/* Filter Buttons */}
+        <div className="mb-12">
+          <div className="flex flex-wrap gap-2 justify-center">
             {categories.map((category) => (
               <Badge
                 key={category}
@@ -190,7 +195,7 @@ const BlogHome = () => {
         {/* Latest Reports */}
         <div>
           <h2 className="text-3xl font-bold text-[#20466d] mb-8">
-            {searchTerm || selectedCategory !== "All" ? "Filtered" : "Latest"} Reports
+            {selectedCategory !== "All" ? `${selectedCategory}` : "Latest"} Reports
           </h2>
           
           {filteredPosts.length > 0 ? (
@@ -202,13 +207,10 @@ const BlogHome = () => {
           ) : (
             <div className="text-center py-12">
               <p className="text-[#79858D] text-lg">No reports found matching your criteria.</p>
-              {(searchTerm || selectedCategory !== "All") && (
+              {selectedCategory !== "All" && (
                 <Button
                   variant="outline"
-                  onClick={() => {
-                    setSearchTerm("");
-                    setSelectedCategory("All");
-                  }}
+                  onClick={() => setSelectedCategory("All")}
                   className="mt-4"
                 >
                   Clear Filters
