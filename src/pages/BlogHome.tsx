@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import BlogLayout from "@/components/BlogLayout";
 import FeaturedPost from "@/components/FeaturedPost";
@@ -7,8 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Search } from "lucide-react";
-import { getStoredPosts, isPostDeleted, type BlogPost } from "@/utils/localStorage";
-import { blogPosts } from "@/data/blogPosts";
+import { type BlogPost } from "@/utils/localStorage";
+import { loadAllPosts } from "@/utils/postManager";
 
 const BlogHome = () => {
   const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
@@ -16,41 +15,13 @@ const BlogHome = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  // Load posts from localStorage on component mount
+  // Load posts using centralized function
   useEffect(() => {
-    console.log("Loading posts in BlogHome");
-    const storedPosts = getStoredPosts();
-    console.log("Stored posts:", storedPosts);
-    
-    // Convert blogPosts to match our simplified BlogPost interface and filter out deleted ones
-    const simplifiedBlogPosts = blogPosts
-      .filter(post => !isPostDeleted(post.id)) // CRITICAL FIX: Filter out deleted default posts
-      .map(post => ({
-        id: post.id,
-        title: post.title,
-        excerpt: post.excerpt,
-        content: post.content,
-        publishedAt: post.publishedAt,
-        readTime: post.readTime,
-        category: post.category,
-        tags: post.tags,
-        featured: post.featured,
-        image: post.image,
-        seoKeywords: (post as any).seoKeywords || '',
-        metaDescription: (post as any).metaDescription || post.excerpt
-      }));
-
-    if (storedPosts.length > 0) {
-      const combinedPosts = [
-        ...storedPosts,
-        ...simplifiedBlogPosts.filter(p => !storedPosts.some(sp => sp.id === p.id))
-      ];
-      setAllPosts(combinedPosts);
-      setFilteredPosts(combinedPosts);
-    } else {
-      setAllPosts(simplifiedBlogPosts);
-      setFilteredPosts(simplifiedBlogPosts);
-    }
+    console.log("BlogHome - Loading posts with centralized function");
+    const posts = loadAllPosts();
+    console.log("BlogHome - Loaded posts:", posts);
+    setAllPosts(posts);
+    setFilteredPosts(posts);
   }, []);
 
   useEffect(() => {

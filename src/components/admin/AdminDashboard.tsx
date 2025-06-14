@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ArrowLeft } from "lucide-react";
@@ -6,7 +5,8 @@ import BlogLayout from "@/components/BlogLayout";
 import { PostListView } from "./PostListView";
 import { CreatePostForm } from "./CreatePostForm";
 import { EditPostForm } from "./EditPostForm";
-import { getStoredPosts, addPostToStorage, updatePostInStorage, deletePostFromStorage, addDeletedPostId, isPostDeleted, type BlogPost } from "@/utils/localStorage";
+import { addPostToStorage, updatePostInStorage, deletePostFromStorage, addDeletedPostId, type BlogPost } from "@/utils/localStorage";
+import { loadAllPosts } from "@/utils/postManager";
 import { blogPosts } from "@/data/blogPosts";
 
 const AdminDashboard = () => {
@@ -14,42 +14,12 @@ const AdminDashboard = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
 
-  // Load posts from localStorage on component mount
+  // Load posts using centralized function
   const loadPosts = () => {
-    console.log("Loading posts in AdminDashboard");
-    const storedPosts = getStoredPosts();
-    console.log("Stored posts from localStorage:", storedPosts);
-    
-    // Convert blogPosts to match our simplified BlogPost interface and filter out deleted ones
-    const simplifiedBlogPosts = blogPosts
-      .filter(post => !isPostDeleted(post.id)) // CRITICAL FIX: Filter out deleted default posts
-      .map(post => ({
-        id: post.id,
-        title: post.title,
-        excerpt: post.excerpt,
-        content: post.content,
-        publishedAt: post.publishedAt,
-        readTime: post.readTime,
-        category: post.category,
-        tags: post.tags,
-        featured: post.featured,
-        image: post.image,
-        seoKeywords: (post as any).seoKeywords || '',
-        metaDescription: (post as any).metaDescription || post.excerpt
-      }));
-
-    if (storedPosts.length > 0) {
-      // If we have stored posts, combine with undeleted default posts
-      const storedPostIds = storedPosts.map(p => p.id);
-      const unmodifiedDefaultPosts = simplifiedBlogPosts.filter(p => !storedPostIds.includes(p.id));
-      const combinedPosts = [...storedPosts, ...unmodifiedDefaultPosts];
-      console.log("Combined posts (with deletion tracking):", combinedPosts);
-      setPosts(combinedPosts);
-    } else {
-      // No stored posts, use default blog posts (filtered by deletion tracking)
-      console.log("Using filtered default blog posts:", simplifiedBlogPosts);
-      setPosts(simplifiedBlogPosts);
-    }
+    console.log("AdminDashboard - Loading posts with centralized function");
+    const allPosts = loadAllPosts();
+    console.log("AdminDashboard - Loaded posts:", allPosts);
+    setPosts(allPosts);
   };
 
   useEffect(() => {
@@ -122,25 +92,29 @@ const AdminDashboard = () => {
   };
 
   const handleDeletePost = (postId: string) => {
-    console.log("Deleting post:", postId);
+    console.log("AdminDashboard - Deleting post:", postId);
     
-    // Check if this is a default post or stored post
+    // CRITICAL FIX: Always check if it's a default post first
     const isDefaultPost = blogPosts.some(p => p.id === postId);
     
     if (isDefaultPost) {
-      // Mark default post as deleted - CRITICAL FIX: This was missing!
+      // Mark default post as deleted - this prevents it from ever appearing again
       addDeletedPostId(postId);
-      console.log("Marked default post as deleted:", postId);
+      console.log("AdminDashboard - Marked default post as permanently deleted:", postId);
     } else {
       // Remove custom post from localStorage
       deletePostFromStorage(postId);
-      console.log("Removed custom post from storage:", postId);
+      console.log("AdminDashboard - Removed custom post from storage:", postId);
     }
     
-    // Update state directly
-    setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
+    // CRITICAL FIX: Immediately remove from state to reflect deletion
+    setPosts(prevPosts => {
+      const updatedPosts = prevPosts.filter(post => post.id !== postId);
+      console.log("AdminDashboard - Updated posts after deletion:", updatedPosts.length);
+      return updatedPosts;
+    });
     
-    console.log("Post deleted successfully");
+    console.log("AdminDashboard - Post deletion completed successfully");
   };
 
   const handleToggleFeatured = (postId: string) => {

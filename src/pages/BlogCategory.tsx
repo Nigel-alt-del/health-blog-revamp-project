@@ -5,61 +5,23 @@ import { Filter } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import BlogLayout from "@/components/BlogLayout";
 import BlogCard from "@/components/BlogCard";
-import { getStoredPosts, isPostDeleted, type BlogPost } from "@/utils/localStorage";
-import { blogPosts, categories } from "@/data/blogPosts";
+import { type BlogPost } from "@/utils/localStorage";
+import { getPostsByCategory } from "@/utils/postManager";
+import { categories } from "@/data/blogPosts";
 
 const BlogCategory = () => {
   const { category } = useParams();
-  const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
   const [categoryPosts, setCategoryPosts] = useState<BlogPost[]>([]);
 
-  // Load posts from localStorage on component mount
+  // Load posts using centralized function
   useEffect(() => {
-    console.log("BlogCategory - Loading posts for category:", category);
-    const storedPosts = getStoredPosts();
-    console.log("BlogCategory - Stored posts:", storedPosts);
-    
-    // Convert blogPosts to match our simplified BlogPost interface and filter out deleted ones
-    const simplifiedBlogPosts = blogPosts
-      .filter(post => !isPostDeleted(post.id)) // CRITICAL FIX: Filter out deleted default posts
-      .map(post => ({
-        id: post.id,
-        title: post.title,
-        excerpt: post.excerpt,
-        content: post.content,
-        publishedAt: post.publishedAt,
-        readTime: post.readTime,
-        category: post.category,
-        tags: post.tags,
-        featured: post.featured,
-        image: post.image,
-        seoKeywords: (post as any).seoKeywords || '',
-        metaDescription: (post as any).metaDescription || post.excerpt
-      }));
-
-    let combinedPosts: BlogPost[] = [];
-
-    if (storedPosts.length > 0) {
-      // Prioritize stored posts and add default posts that haven't been modified
-      const storedPostIds = storedPosts.map(p => p.id);
-      const unmodifiedDefaultPosts = simplifiedBlogPosts.filter(p => !storedPostIds.includes(p.id));
-      combinedPosts = [...storedPosts, ...unmodifiedDefaultPosts];
-    } else {
-      combinedPosts = simplifiedBlogPosts;
+    if (category) {
+      console.log("BlogCategory - Loading posts for category:", category);
+      const posts = getPostsByCategory(category);
+      console.log("BlogCategory - Filtered posts for category:", category, posts);
+      setCategoryPosts(posts);
     }
-    
-    console.log("BlogCategory - Combined posts:", combinedPosts);
-    setAllPosts(combinedPosts);
-  }, []);
-
-  // Filter posts by category when allPosts changes
-  useEffect(() => {
-    const filtered = allPosts.filter(
-      post => post.category.toLowerCase().replace(/\s+/g, '-') === category
-    );
-    console.log("BlogCategory - Filtered posts for category:", category, filtered);
-    setCategoryPosts(filtered);
-  }, [allPosts, category]);
+  }, [category]);
   
   const categoryName = categories.find(
     cat => cat.toLowerCase().replace(/\s+/g, '-') === category

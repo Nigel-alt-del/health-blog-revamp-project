@@ -7,20 +7,21 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import BlogLayout from "@/components/BlogLayout";
 import BlogCard from "@/components/BlogCard";
-import { getStoredPosts, type BlogPost } from "@/utils/localStorage";
-import { blogPosts } from "@/data/blogPosts";
+import { type BlogPost } from "@/utils/localStorage";
+import { loadAllPosts, getPostById } from "@/utils/postManager";
 
 const BlogPost = () => {
   const { slug } = useParams();
   const { toast } = useToast();
-  const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
+  const [post, setPost] = useState<BlogPost | null>(null);
+  const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
-  // Load posts from localStorage on component mount
+  // Load posts using centralized function
   useEffect(() => {
-    console.log("BlogPost - Loading posts for slug:", slug);
-    
-    const loadPostData = () => {
+    if (slug) {
+      console.log("BlogPost - Loading post for slug:", slug);
+      
       // CRITICAL FIX: Check for admin view flags and force refresh
       const forceRefresh = sessionStorage.getItem('forceRefresh');
       const viewFromAdmin = sessionStorage.getItem('viewFromAdmin');
@@ -34,51 +35,24 @@ const BlogPost = () => {
         }
       }
       
-      const storedPosts = getStoredPosts();
-      console.log("BlogPost - Stored posts:", storedPosts);
-      
-      // Convert blogPosts to match our simplified BlogPost interface
-      const simplifiedBlogPosts = blogPosts.map(post => ({
-        id: post.id,
-        title: post.title,
-        excerpt: post.excerpt,
-        content: post.content,
-        publishedAt: post.publishedAt,
-        readTime: post.readTime,
-        category: post.category,
-        tags: post.tags,
-        featured: post.featured,
-        image: post.image,
-        seoKeywords: (post as any).seoKeywords || '',
-        metaDescription: (post as any).metaDescription || post.excerpt
-      }));
-
-      let combinedPosts: BlogPost[] = [];
-
-      if (storedPosts.length > 0) {
-        // CRITICAL FIX: Prioritize stored posts completely over default posts
-        const storedPostIds = storedPosts.map(p => p.id);
-        const unmodifiedDefaultPosts = simplifiedBlogPosts.filter(p => !storedPostIds.includes(p.id));
-        combinedPosts = [...storedPosts, ...unmodifiedDefaultPosts];
-        console.log("BlogPost - Using stored posts with priority for:", slug);
-      } else {
-        combinedPosts = simplifiedBlogPosts;
-      }
-      
-      console.log("BlogPost - Combined posts:", combinedPosts);
-      console.log("BlogPost - Looking for post with slug:", slug);
-      
-      const foundPost = combinedPosts.find(p => p.id === slug);
+      // Load the specific post using centralized function
+      const foundPost = getPostById(slug);
       console.log("BlogPost - Found post:", foundPost);
       
-      setAllPosts(combinedPosts);
+      if (foundPost) {
+        setPost(foundPost);
+        
+        // Load related posts
+        const allPosts = loadAllPosts();
+        const related = allPosts
+          .filter(p => p.id !== foundPost.id && p.category === foundPost.category)
+          .slice(0, 3);
+        setRelatedPosts(related);
+      }
+      
       setIsLoading(false);
-    };
-
-    loadPostData();
+    }
   }, [slug]);
-
-  const post = allPosts.find(p => p.id === slug);
   
   // Check if user came from admin
   const cameFromAdmin = document.referrer.includes('/admin') || 
@@ -97,7 +71,6 @@ const BlogPost = () => {
 
   if (!post) {
     console.error("BlogPost - Post not found for slug:", slug);
-    console.error("BlogPost - Available post IDs:", allPosts.map(p => p.id));
     
     return (
       <BlogLayout>
@@ -189,10 +162,6 @@ const BlogPost = () => {
       });
     }
   };
-
-  const relatedPosts = allPosts
-    .filter(p => p.id !== post.id && p.category === post.category)
-    .slice(0, 3);
 
   return (
     <BlogLayout>
