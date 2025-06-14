@@ -1,9 +1,8 @@
 
+
 const IntroSection = () => {
   return (
-    <section className="relative py-8 px-4 bg-cover bg-center bg-no-repeat min-h-[200px]" style={{
-      backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url('/lovable-uploads/80089a9e-ad3b-4f90-bf3d-a3a94498537d.png')`
-    }}>
+    <section className="relative py-8 px-4 bg-gradient-to-r from-gray-50 to-blue-50 min-h-[200px]">
       <div className="relative max-w-4xl mx-auto">
         <div className="space-y-4 text-base leading-relaxed text-gray-700 max-w-3xl mx-auto">
           <p>
@@ -26,3 +25,4 @@ const IntroSection = () => {
 };
 
 export default IntroSection;
+
