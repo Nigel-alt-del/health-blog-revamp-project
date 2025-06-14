@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 // Export the BlogPost type
@@ -42,15 +41,8 @@ export const loadPosts = async (): Promise<BlogPost[]> => {
       .select('*')
       .order('created_at', { ascending: false });
 
-    const { data, error } = result;
-
-    if (error) {
-      console.error('❌ Error loading posts from Supabase:', error);
-      return [];
-    }
-
-    console.log('📖 Retrieved posts from Supabase:', data);
-    return data || [];
+    console.log('📖 Retrieved posts from Supabase:', result.data);
+    return result.data || [];
   } catch (error) {
     console.error('❌ Error reading from Supabase:', error);
     return [];
@@ -130,15 +122,8 @@ export const getDeletedPostIds = async (): Promise<string[]> => {
       .from('deleted_posts')
       .select('post_id');
 
-    const { data, error } = result;
-
-    if (error) {
-      console.error('❌ Error loading deleted post IDs from Supabase:', error);
-      return [];
-    }
-
-    console.log('📋 Retrieved deleted post IDs from Supabase:', data);
-    return data?.map(item => item.post_id) || [];
+    console.log('📋 Retrieved deleted post IDs from Supabase:', result.data);
+    return result.data?.map(item => item.post_id) || [];
   } catch (error) {
     console.error('❌ Error reading deleted post IDs from Supabase:', error);
     return [];
