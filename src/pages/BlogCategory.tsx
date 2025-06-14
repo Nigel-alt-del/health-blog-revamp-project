@@ -1,34 +1,57 @@
+
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Filter } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import BlogLayout from "@/components/BlogLayout";
 import BlogCard from "@/components/BlogCard";
-import { type BlogPost } from "@/utils/localStorage";
-import { getPostsByCategory } from "@/utils/postManager";
-import { categories } from "@/data/blogPosts";
+import { type BlogPost } from "@/utils/supabaseStorage";
+import { loadAllPosts } from "@/utils/postManager";
 
 const BlogCategory = () => {
   const { category } = useParams();
   const [categoryPosts, setCategoryPosts] = useState<BlogPost[]>([]);
 
-  // Load posts using centralized function
+  // Map URL slugs to category names
+  const getCategoryNameFromSlug = (slug: string) => {
+    switch (slug) {
+      case 'pmi-insights':
+        return 'PMI Insights';
+      case 'healthcare':
+        return 'Healthcare';
+      case 'digital-health':
+        return 'Digital Health';
+      case 'mental-health':
+        return 'Mental Health';
+      default:
+        return slug;
+    }
+  };
+
+  // Load posts and filter by category
   useEffect(() => {
     const loadCategoryPosts = async () => {
       if (category) {
         console.log("BlogCategory - Loading posts for category:", category);
-        const posts = await getPostsByCategory(category);
-        console.log("BlogCategory - Filtered posts for category:", category, posts);
-        setCategoryPosts(posts);
+        const allPosts = await loadAllPosts();
+        const categoryName = getCategoryNameFromSlug(category);
+        
+        // Filter posts that match the category
+        const filteredPosts = allPosts.filter(post => {
+          return post.category === categoryName;
+        });
+        
+        console.log("BlogCategory - All posts:", allPosts);
+        console.log("BlogCategory - Looking for category:", categoryName);
+        console.log("BlogCategory - Filtered posts:", filteredPosts);
+        setCategoryPosts(filteredPosts);
       }
     };
     
     loadCategoryPosts();
   }, [category]);
   
-  const categoryName = categories.find(
-    cat => cat.toLowerCase().replace(/\s+/g, '-') === category
-  ) || category;
+  const categoryName = getCategoryNameFromSlug(category || '');
 
   const getHeroTitle = () => {
     if (category === 'pmi-insights') return 'PMI Insights';

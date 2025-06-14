@@ -52,30 +52,6 @@ const BlogNavigation = () => {
                 HOME
               </Link>
               <Link 
-                to="/category/pmi-insights" 
-                className="text-[#79858D] hover:text-[#20466d] px-3 py-2 text-sm font-medium transition-colors"
-              >
-                PMI INSIGHTS
-              </Link>
-              <Link 
-                to="/category/healthcare" 
-                className="text-[#79858D] hover:text-[#20466d] px-3 py-2 text-sm font-medium transition-colors"
-              >
-                HEALTHCARE
-              </Link>
-              <Link 
-                to="/category/digital-health" 
-                className="text-[#79858D] hover:text-[#20466d] px-3 py-2 text-sm font-medium transition-colors"
-              >
-                DIGITAL HEALTH
-              </Link>
-              <Link 
-                to="/category/mental-health" 
-                className="text-[#79858D] hover:text-[#20466d] px-3 py-2 text-sm font-medium transition-colors"
-              >
-                MENTAL HEALTH
-              </Link>
-              <Link 
                 to="/about" 
                 className="text-[#79858D] hover:text-[#20466d] px-3 py-2 text-sm font-medium transition-colors"
               >
@@ -116,34 +92,6 @@ const BlogNavigation = () => {
               onClick={() => setIsMenuOpen(false)}
             >
               HOME
-            </Link>
-            <Link 
-              to="/category/pmi-insights" 
-              className="text-[#79858D] hover:text-[#20466d] block px-3 py-2 text-base font-medium transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              PMI INSIGHTS
-            </Link>
-            <Link 
-              to="/category/healthcare" 
-              className="text-[#79858D] hover:text-[#20466d] block px-3 py-2 text-base font-medium transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              HEALTHCARE
-            </Link>
-            <Link 
-              to="/category/digital-health" 
-              className="text-[#79858D] hover:text-[#20466d] block px-3 py-2 text-base font-medium transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              DIGITAL HEALTH
-            </Link>
-            <Link 
-              to="/category/mental-health" 
-              className="text-[#79858D] hover:text-[#20466d] block px-3 py-2 text-base font-medium transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              MENTAL HEALTH
             </Link>
             <Link 
               to="/about" 
