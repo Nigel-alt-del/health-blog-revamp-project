@@ -86,51 +86,81 @@ export const usePostManagement = () => {
   };
 
   const handleDeletePost = (postId: string) => {
-    console.log("🗑️ DELETION DIAGNOSIS - Starting deletion for post ID:", postId);
+    console.log("🚨 ENHANCED DELETION DIAGNOSIS - STARTING FOR POST:", postId);
+    console.log("🚨 TIME:", new Date().toISOString());
     
-    // STEP 1: Check what's in localStorage BEFORE deletion
-    const postsBeforeDeletion = JSON.parse(localStorage.getItem('blog_posts') || '[]');
-    console.log("🗑️ POSTS IN LOCALSTORAGE BEFORE DELETION:", postsBeforeDeletion);
+    // STEP 1: What do we have before deletion?
+    const currentPosts = loadAllPosts();
+    const currentLocalStorage = JSON.parse(localStorage.getItem('blog_posts') || '[]');
+    const currentDeletedIds = JSON.parse(localStorage.getItem('deleted_post_ids') || '[]');
+    
+    console.log("🚨 CURRENT UI POSTS (what you see):", currentPosts.length, "posts");
+    currentPosts.forEach(p => console.log("  - UI POST:", p.id, p.title));
+    
+    console.log("🚨 CURRENT LOCALSTORAGE:", currentLocalStorage.length, "posts");
+    currentLocalStorage.forEach((p: any) => console.log("  - STORAGE POST:", p.id, p.title));
+    
+    console.log("🚨 CURRENT DELETED IDS:", currentDeletedIds);
+    
+    // STEP 2: Is this the post we're trying to delete?
+    const postToDelete = currentPosts.find(p => p.id === postId);
+    console.log("🚨 POST TO DELETE:", postToDelete ? postToDelete.title : "NOT FOUND!");
     
     const isDefaultPost = blogPosts.some(p => p.id === postId);
-    console.log("🗑️ IS DEFAULT POST?", isDefaultPost);
+    console.log("🚨 IS DEFAULT POST?", isDefaultPost);
     
+    // STEP 3: Perform the deletion
     if (isDefaultPost) {
-      // Mark default post as deleted
+      console.log("🚨 MARKING DEFAULT POST AS DELETED");
       addDeletedPostId(postId);
-      console.log("🗑️ DEFAULT POST MARKED AS DELETED:", postId);
-      
-      // Check deleted IDs list
-      const deletedIds = JSON.parse(localStorage.getItem('deleted_post_ids') || '[]');
-      console.log("🗑️ DELETED IDS LIST AFTER MARKING:", deletedIds);
     } else {
-      // Remove custom post from storage
+      console.log("🚨 DELETING CUSTOM POST FROM STORAGE");
       deletePostFromStorage(postId);
-      console.log("🗑️ CUSTOM POST REMOVAL ATTEMPTED");
-      
-      // STEP 2: Check what's in localStorage AFTER deletion
-      const postsAfterDeletion = JSON.parse(localStorage.getItem('blog_posts') || '[]');
-      console.log("🗑️ POSTS IN LOCALSTORAGE AFTER DELETION:", postsAfterDeletion);
-      
-      // Verify the post was actually removed
-      const postStillExists = postsAfterDeletion.some((p: BlogPost) => p.id === postId);
-      console.log("🗑️ POST STILL EXISTS IN LOCALSTORAGE?", postStillExists);
     }
     
-    // STEP 3: Force immediate refresh and check what loadAllPosts returns
-    console.log("🗑️ FORCING REFRESH - BEFORE");
-    const postsFromLoadFunction = loadAllPosts();
-    console.log("🗑️ POSTS FROM LOADALLPOSTS AFTER DELETION:", postsFromLoadFunction);
-    
-    // Check if deleted post is still in the loaded posts
-    const deletedPostStillInList = postsFromLoadFunction.some(p => p.id === postId);
-    console.log("🗑️ DELETED POST STILL IN LOADED LIST?", deletedPostStillInList);
-    
-    // STEP 4: Update the UI state
-    setPosts(postsFromLoadFunction);
-    forceRefreshPosts();
-    
-    console.log("🗑️ DELETION DIAGNOSIS COMPLETE - UI STATE UPDATED");
+    // STEP 4: What do we have after deletion?
+    setTimeout(() => {
+      const afterPosts = loadAllPosts();
+      const afterLocalStorage = JSON.parse(localStorage.getItem('blog_posts') || '[]');
+      const afterDeletedIds = JSON.parse(localStorage.getItem('deleted_post_ids') || '[]');
+      
+      console.log("🚨 AFTER DELETION - UI POSTS:", afterPosts.length, "posts");
+      afterPosts.forEach(p => console.log("  - AFTER UI POST:", p.id, p.title));
+      
+      console.log("🚨 AFTER DELETION - LOCALSTORAGE:", afterLocalStorage.length, "posts");
+      afterLocalStorage.forEach((p: any) => console.log("  - AFTER STORAGE POST:", p.id, p.title));
+      
+      console.log("🚨 AFTER DELETION - DELETED IDS:", afterDeletedIds);
+      
+      // STEP 5: The smoking gun - is the post still there?
+      const postStillInUI = afterPosts.some(p => p.id === postId);
+      const postStillInStorage = afterLocalStorage.some((p: any) => p.id === postId);
+      const postInDeletedList = afterDeletedIds.includes(postId);
+      
+      console.log("🚨 SMOKING GUN RESULTS:");
+      console.log("  - Post still in UI?", postStillInUI ? "YES - PROBLEM!" : "No - Good");
+      console.log("  - Post still in localStorage?", postStillInStorage ? "YES - PROBLEM!" : "No - Good");
+      console.log("  - Post in deleted list?", postInDeletedList ? "Yes - Good" : "NO - PROBLEM for default posts!");
+      
+      if (postStillInUI) {
+        console.log("🚨 CONCLUSION: The post is still visible! The deletion failed.");
+        if (isDefaultPost && !postInDeletedList) {
+          console.log("🚨 ROOT CAUSE: Default post not added to deleted list properly");
+        } else if (!isDefaultPost && postStillInStorage) {
+          console.log("🚨 ROOT CAUSE: Custom post not removed from localStorage properly");
+        } else {
+          console.log("🚨 ROOT CAUSE: UI refresh failed - storage is correct but UI didn't update");
+        }
+      } else {
+        console.log("🚨 CONCLUSION: Deletion worked! Post is gone.");
+      }
+      
+      // STEP 6: Force refresh and check again
+      refreshPosts();
+      forceRefreshPosts();
+      
+      console.log("🚨 DELETION DIAGNOSIS COMPLETE");
+    }, 100);
   };
 
   const handleToggleFeatured = (postId: string) => {
