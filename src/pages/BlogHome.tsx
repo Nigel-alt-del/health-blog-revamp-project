@@ -63,7 +63,7 @@ const BlogHome = () => {
   return (
     <BlogLayout>
       <HeroSection
-        title="InsureMyHealth Reports"
+        title="The Health Compass"
         subtitle="Stay informed with the latest insights on healthcare policy, insurance trends, and industry analysis. Our expert team delivers comprehensive reports to help you navigate the complex world of health insurance."
         backgroundImage="/lovable-uploads/b61ae919-b75e-409d-a884-8437e2befc15.png"
       />
