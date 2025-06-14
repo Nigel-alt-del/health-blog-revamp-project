@@ -1,4 +1,3 @@
-
 import { smeInsurancePosts } from './smeInsurancePosts';
 
 export const blogPosts = [
@@ -38,7 +37,7 @@ export const blogPosts = [
     authorLink: "https://www.linkedin.com/in/sarahmitchell-benefits",
     publishedAt: "Dec 15, 2024",
     readTime: "8 min read",
-    category: "Health Policy",
+    category: "Healthcare",
     tags: ["Employee Benefits", "UK Regulation", "Compliance"],
     featured: true,
     image: "/placeholder.svg"
@@ -78,7 +77,7 @@ export const blogPosts = [
     authorLink: "https://www.gov.uk/workplace-pensions",
     publishedAt: "Dec 12, 2024",
     readTime: "6 min read",
-    category: "Insurance Tips",
+    category: "PMI Insights",
     tags: ["Plan Selection", "Employee Benefits", "SME Guide"],
     featured: false,
     image: "/placeholder.svg"
@@ -150,7 +149,7 @@ export const blogPosts = [
     authorLink: "https://www.mind.org.uk/workplace/mental-health-at-work/",
     publishedAt: "Dec 8, 2024",
     readTime: "5 min read",
-    category: "Insurance Tips",
+    category: "Healthcare",
     tags: ["Mental Health", "Employee Support", "Workplace Wellbeing"],
     featured: false,
     image: "/placeholder.svg"
@@ -220,7 +219,7 @@ export const blogPosts = [
     authorLink: "https://www.abi.org.uk/products-and-issues/topics-and-issues/health-and-protection/",
     publishedAt: "Dec 3, 2024",
     readTime: "7 min read",
-    category: "Insurance Tips",
+    category: "PMI Insights",
     tags: ["Cost Management", "SME Strategy", "Benefits Planning"],
     featured: false,
     image: "/placeholder.svg"
@@ -228,7 +227,7 @@ export const blogPosts = [
 ];
 
 export const categories = [
-  "Health Policy",
-  "Insurance Tips", 
+  "Healthcare",
+  "PMI Insights", 
   "Industry News"
 ];

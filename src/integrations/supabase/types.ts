@@ -9,7 +9,84 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      blog_posts: {
+        Row: {
+          author: string | null
+          author_bio: string | null
+          author_linkedin: string | null
+          author_role: string | null
+          category: string
+          content: string
+          created_at: string | null
+          excerpt: string
+          featured: boolean
+          id: string
+          image: string
+          meta_description: string | null
+          published_at: string
+          read_time: string
+          seo_keywords: string | null
+          tags: string[]
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          author?: string | null
+          author_bio?: string | null
+          author_linkedin?: string | null
+          author_role?: string | null
+          category: string
+          content: string
+          created_at?: string | null
+          excerpt: string
+          featured?: boolean
+          id: string
+          image: string
+          meta_description?: string | null
+          published_at: string
+          read_time: string
+          seo_keywords?: string | null
+          tags?: string[]
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          author?: string | null
+          author_bio?: string | null
+          author_linkedin?: string | null
+          author_role?: string | null
+          category?: string
+          content?: string
+          created_at?: string | null
+          excerpt?: string
+          featured?: boolean
+          id?: string
+          image?: string
+          meta_description?: string | null
+          published_at?: string
+          read_time?: string
+          seo_keywords?: string | null
+          tags?: string[]
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      deleted_posts: {
+        Row: {
+          created_at: string | null
+          post_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          post_id: string
+        }
+        Update: {
+          created_at?: string | null
+          post_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

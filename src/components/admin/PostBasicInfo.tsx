@@ -6,8 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 const categories = [
   "Healthcare",
   "PMI Insights", 
-  "Industry News",
-  "Insure My Health Updates"
+  "Industry News"
 ];
 
 interface PostBasicInfoProps {
