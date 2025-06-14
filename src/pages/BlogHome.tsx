@@ -65,7 +65,7 @@ const BlogHome = () => {
     <BlogLayout>
       <HeroSection
         title="The Health Compass"
-        subtitle="Your Strategic Edge in Healthcare and PMI Insights"
+        subtitle="Actionable Healthcare Insights for SMEs & Private Medical Insurance Professionals"
         backgroundImage="/lovable-uploads/b61ae919-b75e-409d-a884-8437e2befc15.png"
       />
 
@@ -91,3 +91,4 @@ const BlogHome = () => {
 };
 
 export default BlogHome;
+
