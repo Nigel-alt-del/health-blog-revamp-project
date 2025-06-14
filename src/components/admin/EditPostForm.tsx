@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { PostBasicInfo } from "./PostBasicInfo";
@@ -7,6 +6,7 @@ import { AdminSidebar } from "./AdminSidebar";
 import { SimpleContentEditor } from "./SimpleContentEditor";
 import { ReportPreview } from "../ReportPreview";
 import { type BlogPost } from "@/utils/supabaseStorage";
+import { updatePostInStorage } from "@/utils/supabaseStorage";
 
 interface EditPostFormProps {
   post: any;
@@ -66,7 +66,7 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
     }
   }, [post, toast]);
 
-  const formatPostData = (data: typeof formData) => ({
+  const formatPostData = (data: typeof formData, isDraft: boolean = false) => ({
     id: post.id,
     title: data.title,
     excerpt: data.excerpt,
@@ -83,7 +83,8 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
     authorLinkedin: post.authorLinkedin || "",
     authorBio: post.authorBio || "",
     seoKeywords: post.seoKeywords || '',
-    metaDescription: data.excerpt
+    metaDescription: data.excerpt,
+    isDraft: isDraft
   });
 
   const handleSaveDraft = async () => {
@@ -99,13 +100,18 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
     setIsSaving(true);
     
     try {
-      const updatedPost = formatPostData(formData);
+      const updatedPost = formatPostData(formData, true);
       console.log("EditPostForm - Saving draft to Supabase:", updatedPost);
+      
+      await updatePostInStorage(updatedPost);
       
       toast({
         title: "Draft Saved",
         description: "Your changes have been saved successfully to Supabase."
       });
+      
+      // Trigger a refresh of the posts list
+      window.dispatchEvent(new CustomEvent('postsRefreshed'));
     } catch (error) {
       console.error("Error saving draft:", error);
       toast({

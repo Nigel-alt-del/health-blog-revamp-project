@@ -5,6 +5,7 @@ import { FeaturedImageUpload } from "./FeaturedImageUpload";
 import { AdminSidebar } from "./AdminSidebar";
 import { SimpleContentEditor } from "./SimpleContentEditor";
 import { ReportPreview } from "../ReportPreview";
+import { addPostToStorage } from "@/utils/supabaseStorage";
 
 interface CreatePostFormProps {
   onSubmit: (post: any) => void;
@@ -14,6 +15,7 @@ interface CreatePostFormProps {
 export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
   const [showPreview, setShowPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [savedDraftId, setSavedDraftId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -26,7 +28,18 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
     imageSize: "medium" as "small" | "medium" | "large" | "full"
   });
 
-  const formatPostData = (data: typeof formData) => ({
+  const generateId = (title: string): string => {
+    const baseId = title.toLowerCase()
+      .replace(/[^a-z0-9\s]/g, '')
+      .replace(/\s+/g, '-')
+      .substring(0, 50);
+    
+    const timestamp = Date.now();
+    return `${baseId}-${timestamp}`;
+  };
+
+  const formatPostData = (data: typeof formData, isDraft: boolean = false) => ({
+    id: savedDraftId || generateId(data.title),
     title: data.title,
     excerpt: data.excerpt,
     content: data.content,
@@ -34,6 +47,7 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
     tags: data.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
     image: data.image,
     imageSize: data.imageSize,
+    publishedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
     readTime: "5 min read",
     featured: false,
     author: "InsureMyHealth Team",
@@ -41,7 +55,8 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
     authorLinkedin: "",
     authorBio: "",
     seoKeywords: '',
-    metaDescription: data.excerpt
+    metaDescription: data.excerpt,
+    isDraft: isDraft
   });
 
   const handleSaveDraft = async () => {
@@ -57,12 +72,19 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
     setIsSaving(true);
     
     try {
-      console.log("Saving draft:", formData);
+      const draftPost = formatPostData(formData, true);
+      console.log("Saving draft to Supabase:", draftPost);
+      
+      await addPostToStorage(draftPost);
+      setSavedDraftId(draftPost.id);
       
       toast({
         title: "Draft Saved",
-        description: "Your draft has been saved successfully."
+        description: "Your draft has been saved successfully to Supabase and will appear in your admin dashboard."
       });
+      
+      // Trigger a refresh of the posts list
+      window.dispatchEvent(new CustomEvent('postsRefreshed'));
     } catch (error) {
       console.error("Error saving draft:", error);
       toast({
@@ -96,7 +118,7 @@ export const CreatePostForm = ({ onSubmit, onCancel }: CreatePostFormProps) => {
       return;
     }
 
-    const post = formatPostData(formData);
+    const post = formatPostData(formData, false);
     console.log("Submitting new post:", post);
     
     onSubmit(post);
