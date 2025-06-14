@@ -1,5 +1,4 @@
 
-
 interface HeroSectionProps {
   title: string;
   subtitle: string;
@@ -11,10 +10,17 @@ const HeroSection = ({ title, subtitle, backgroundImage }: HeroSectionProps) => 
     <section 
       className="relative py-16 px-4 bg-cover bg-center bg-no-repeat"
       style={{
-        backgroundImage: `linear-gradient(rgba(15, 35, 60, 0.85), rgba(15, 35, 60, 0.85)), url('${backgroundImage}')`
+        backgroundImage: `linear-gradient(rgba(5, 25, 50, 0.9), rgba(5, 25, 50, 0.9)), url('${backgroundImage}')`
       }}
     >
       <div className="max-w-4xl mx-auto text-center text-white">
+        <div className="flex justify-center mb-6">
+          <img 
+            src="/lovable-uploads/3e00b04c-615f-4844-9c6b-aef28446924d.png" 
+            alt="The Health Compass Logo" 
+            className="h-20 w-auto"
+          />
+        </div>
         <h1 className="text-4xl font-bold mb-6 leading-tight">
           {title.split(' ').map((word, index) => 
             word === 'Reports' ? (
@@ -33,4 +39,3 @@ const HeroSection = ({ title, subtitle, backgroundImage }: HeroSectionProps) => 
 };
 
 export default HeroSection;
-
