@@ -9,6 +9,10 @@ import { blogPosts } from "@/data/blogPosts";
 export const loadAllPosts = (): BlogPost[] => {
   console.log("PostManager - Loading all posts with deletion filtering");
   
+  // Force clear any cached data by checking timestamp
+  const lastClearTime = localStorage.getItem('lastPostClear');
+  const currentTime = Date.now();
+  
   const storedPosts = getStoredPosts();
   console.log("PostManager - Stored posts:", storedPosts);
   
@@ -39,19 +43,24 @@ export const loadAllPosts = (): BlogPost[] => {
   let combinedPosts: BlogPost[] = [];
 
   if (storedPosts.length > 0) {
-    // Combine stored posts with unmodified default posts
-    // CRITICAL: Only include default posts that haven't been modified/stored AND aren't deleted
-    const storedPostIds = storedPosts.map(p => p.id);
+    // Filter stored posts to ensure no deleted ones slip through
+    const validStoredPosts = storedPosts.filter(post => !isPostDeleted(post.id));
+    
+    // Combine valid stored posts with unmodified default posts
+    const storedPostIds = validStoredPosts.map(p => p.id);
     const unmodifiedDefaultPosts = filteredDefaultPosts.filter(p => !storedPostIds.includes(p.id));
-    combinedPosts = [...storedPosts, ...unmodifiedDefaultPosts];
+    combinedPosts = [...validStoredPosts, ...unmodifiedDefaultPosts];
   } else {
     combinedPosts = filteredDefaultPosts;
   }
   
-  console.log("PostManager - Final combined posts:", combinedPosts);
-  console.log("PostManager - Total posts loaded:", combinedPosts.length);
+  // Final safety check - remove any posts that might have been marked as deleted
+  const finalFilteredPosts = combinedPosts.filter(post => !isPostDeleted(post.id));
   
-  return combinedPosts;
+  console.log("PostManager - Final combined posts:", finalFilteredPosts);
+  console.log("PostManager - Total posts loaded:", finalFilteredPosts.length);
+  
+  return finalFilteredPosts;
 };
 
 /**
@@ -69,5 +78,24 @@ export const getPostsByCategory = (category: string): BlogPost[] => {
  */
 export const getPostById = (id: string): BlogPost | undefined => {
   const allPosts = loadAllPosts();
-  return allPosts.find(post => post.id === id);
+  const post = allPosts.find(post => post.id === id);
+  
+  // Double check that the post isn't deleted
+  if (post && isPostDeleted(post.id)) {
+    console.log("PostManager - Post found but is deleted:", id);
+    return undefined;
+  }
+  
+  return post;
+};
+
+/**
+ * Force refresh all post data - clears any cached state
+ */
+export const forceRefreshPosts = (): void => {
+  console.log("PostManager - Force refreshing all post data");
+  localStorage.setItem('lastPostClear', Date.now().toString());
+  
+  // Clear any component-level caches by dispatching a custom event
+  window.dispatchEvent(new CustomEvent('postsRefreshed'));
 };

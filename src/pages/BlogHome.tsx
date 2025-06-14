@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import BlogLayout from "@/components/BlogLayout";
 import FeaturedPost from "@/components/FeaturedPost";
@@ -15,13 +16,46 @@ const BlogHome = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  // Load posts using centralized function
-  useEffect(() => {
-    console.log("BlogHome - Loading posts with centralized function");
+  const refreshPosts = () => {
+    console.log("BlogHome - Refreshing posts");
     const posts = loadAllPosts();
     console.log("BlogHome - Loaded posts:", posts);
     setAllPosts(posts);
     setFilteredPosts(posts);
+  };
+
+  // Load posts using centralized function
+  useEffect(() => {
+    console.log("BlogHome - Initial load of posts");
+    refreshPosts();
+
+    // Listen for forced refresh events
+    const handlePostsRefreshed = () => {
+      console.log("BlogHome - Handling posts refreshed event");
+      refreshPosts();
+    };
+
+    window.addEventListener('postsRefreshed', handlePostsRefreshed);
+    
+    return () => {
+      window.removeEventListener('postsRefreshed', handlePostsRefreshed);
+    };
+  }, []);
+
+  // Also refresh when the page becomes visible again (handles browser refresh)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        console.log("BlogHome - Page became visible, refreshing posts");
+        refreshPosts();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
 
   useEffect(() => {

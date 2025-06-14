@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { addPostToStorage, updatePostInStorage, deletePostFromStorage, addDeletedPostId, type BlogPost } from "@/utils/localStorage";
-import { loadAllPosts } from "@/utils/postManager";
+import { loadAllPosts, forceRefreshPosts } from "@/utils/postManager";
 import { blogPosts } from "@/data/blogPosts";
 
 export const usePostManagement = () => {
@@ -49,6 +49,9 @@ export const usePostManagement = () => {
     console.log("Formatted post:", post);
     addPostToStorage(post);
     setPosts(prevPosts => [post, ...prevPosts]);
+    
+    // Force refresh to ensure consistency
+    forceRefreshPosts();
     console.log("Post created successfully");
   };
 
@@ -65,6 +68,8 @@ export const usePostManagement = () => {
       post.id === formattedPost.id ? formattedPost : post
     ));
     
+    // Force refresh to ensure consistency
+    forceRefreshPosts();
     console.log("Post updated successfully:", formattedPost);
     sessionStorage.setItem('cameFromAdmin', 'true');
   };
@@ -88,7 +93,9 @@ export const usePostManagement = () => {
       return updatedPosts;
     });
     
-    console.log("usePostManagement - Post deletion completed successfully");
+    // CRITICAL: Force refresh to ensure deleted posts don't reappear
+    forceRefreshPosts();
+    console.log("usePostManagement - Post deletion completed successfully with forced refresh");
   };
 
   const handleToggleFeatured = (postId: string) => {
@@ -108,6 +115,8 @@ export const usePostManagement = () => {
         return post;
       });
       
+      // Force refresh to ensure consistency
+      forceRefreshPosts();
       console.log("Featured status updated");
       return updatedPosts;
     });
