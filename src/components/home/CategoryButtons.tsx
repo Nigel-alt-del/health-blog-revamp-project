@@ -7,12 +7,12 @@ const categoryButtons = [
   { 
     name: "PMI Insights", 
     slug: "pmi-insights", 
-    color: "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700" 
+    color: "bg-gradient-to-br from-red-600 via-rose-500 to-pink-600 hover:from-red-700 hover:via-rose-600 hover:to-pink-700" 
   },
   { 
     name: "Healthcare", 
     slug: "healthcare", 
-    color: "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700" 
+    color: "bg-gradient-to-br from-emerald-600 via-teal-500 to-cyan-600 hover:from-emerald-700 hover:via-teal-600 hover:to-cyan-700" 
   },
   { 
     name: "Digital Health", 
