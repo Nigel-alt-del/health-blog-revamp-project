@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { addPostToStorage, updatePostInStorage, deletePostFromStorage, addDeletedPostId, type BlogPost } from "@/utils/supabaseStorage";
 import { loadAllPosts, forceRefreshPosts } from "@/utils/postManager";
@@ -140,33 +139,50 @@ export const usePostManagement = () => {
   };
 
   const handleToggleFeatured = async (postId: string) => {
-    console.log("usePostManagement - TOGGLING FEATURED:", postId);
+    console.log("usePostManagement - TOGGLING FEATURED FOR POST:", postId);
     
     try {
-      const currentPosts = await loadAllPosts();
+      // Get current posts state
+      const currentPost = posts.find(p => p.id === postId);
+      if (!currentPost) {
+        console.error("usePostManagement - Post not found:", postId);
+        return;
+      }
+
+      console.log("usePostManagement - Current featured state:", currentPost.featured);
       
-      const updatedPosts = currentPosts.map(post => {
+      // Create updated posts array - only one post can be featured at a time
+      const updatedPosts = posts.map(post => {
         if (post.id === postId) {
+          console.log("usePostManagement - Setting post as featured:", !post.featured);
           return { ...post, featured: !post.featured };
-        } else if (post.featured) {
+        } else if (post.featured && postId !== post.id) {
+          console.log("usePostManagement - Removing featured from post:", post.id);
           return { ...post, featured: false };
         }
         return post;
       });
       
+      // Update posts state immediately for UI responsiveness
+      setPosts(updatedPosts);
+      
       // Update all modified posts in Supabase
       for (const post of updatedPosts) {
-        if (post.id === postId || currentPosts.find(p => p.id === post.id)?.featured !== post.featured) {
+        const originalPost = posts.find(p => p.id === post.id);
+        if (originalPost && originalPost.featured !== post.featured) {
+          console.log("usePostManagement - Updating post in Supabase:", post.id, "featured:", post.featured);
           await updatePostInStorage(post);
         }
       }
       
-      await refreshPosts();
+      // Force refresh to ensure consistency
       forceRefreshPosts();
       
       console.log("usePostManagement - FEATURED TOGGLE COMPLETE");
     } catch (error) {
       console.error("usePostManagement - Error toggling featured:", error);
+      // Revert state on error
+      await refreshPosts();
       throw error;
     }
   };
