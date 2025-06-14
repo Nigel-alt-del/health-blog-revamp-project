@@ -1,20 +1,22 @@
-import { useParams, Link } from "react-router-dom";
+
+import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Clock, ArrowLeft, Share2, BookmarkPlus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
 import BlogLayout from "@/components/BlogLayout";
-import BlogCard from "@/components/BlogCard";
-import { type BlogPost } from "@/utils/localStorage";
+import { type BlogPost as BlogPostType } from "@/utils/localStorage";
 import { loadAllPosts, getPostById } from "@/utils/postManager";
+import { BlogPostHeader } from "@/components/blog/BlogPostHeader";
+import { BlogPostImage } from "@/components/blog/BlogPostImage";
+import { BlogPostContent } from "@/components/blog/BlogPostContent";
+import { RelatedPosts } from "@/components/blog/RelatedPosts";
+import { BlogPostNotFound } from "@/components/blog/BlogPostNotFound";
+import { useBlogPostActions } from "@/hooks/useBlogPostActions";
 
 const BlogPost = () => {
   const { slug } = useParams();
-  const { toast } = useToast();
-  const [post, setPost] = useState<BlogPost | null>(null);
-  const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
+  const { handleShare, handleBookmark } = useBlogPostActions();
+  const [post, setPost] = useState<BlogPostType | null>(null);
+  const [relatedPosts, setRelatedPosts] = useState<BlogPostType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
   // Load posts using centralized function
@@ -74,196 +76,28 @@ const BlogPost = () => {
     
     return (
       <BlogLayout>
-        <div className="max-w-4xl mx-auto px-4 py-12 text-center">
-          <h1 className="text-3xl font-bold text-[#20466d] mb-4">Report Not Found</h1>
-          <p className="text-[#79858D] mb-4">The report you're looking for doesn't exist or may have been moved.</p>
-          <p className="text-sm text-[#79858D] mb-8">Searched for: {slug}</p>
-          {cameFromAdmin ? (
-            <Link to="/admin">
-              <Button className="bg-[#22aee1] hover:bg-[#20466d]">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Admin
-              </Button>
-            </Link>
-          ) : (
-            <Link to="/">
-              <Button className="bg-[#22aee1] hover:bg-[#20466d]">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Reports
-              </Button>
-            </Link>
-          )}
-        </div>
+        <BlogPostNotFound slug={slug} cameFromAdmin={cameFromAdmin} />
       </BlogLayout>
     );
   }
 
-  const handleShare = async () => {
-    const shareData = {
-      title: post.title,
-      text: post.excerpt,
-      url: window.location.href,
-    };
-
-    if (navigator.share && navigator.canShare(shareData)) {
-      try {
-        await navigator.share(shareData);
-        toast({
-          title: "Shared successfully",
-          description: "The report has been shared."
-        });
-      } catch (error) {
-        // User cancelled sharing
-      }
-    } else {
-      // Fallback to copying URL to clipboard
-      try {
-        await navigator.clipboard.writeText(window.location.href);
-        toast({
-          title: "Link copied",
-          description: "Report link has been copied to clipboard."
-        });
-      } catch (error) {
-        toast({
-          title: "Share failed",
-          description: "Unable to share or copy link.",
-          variant: "destructive"
-        });
-      }
-    }
-  };
-
-  const handleBookmark = () => {
-    try {
-      // Save to localStorage
-      const bookmarks = JSON.parse(localStorage.getItem('bookmarkedReports') || '[]');
-      const isBookmarked = bookmarks.some((b: any) => b.id === post.id);
-      
-      if (isBookmarked) {
-        const updatedBookmarks = bookmarks.filter((b: any) => b.id !== post.id);
-        localStorage.setItem('bookmarkedReports', JSON.stringify(updatedBookmarks));
-        toast({
-          title: "Bookmark removed",
-          description: "Report has been removed from bookmarks."
-        });
-      } else {
-        bookmarks.push({ id: post.id, title: post.title, url: window.location.href });
-        localStorage.setItem('bookmarkedReports', JSON.stringify(bookmarks));
-        toast({
-          title: "Bookmarked",
-          description: "Report has been added to bookmarks."
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Bookmark failed",
-        description: "Unable to bookmark this report.",
-        variant: "destructive"
-      });
-    }
-  };
-
   return (
     <BlogLayout>
-      {/* Article Header */}
       <article className="max-w-4xl mx-auto px-4 py-12">
-        <div className="mb-8">
-          {cameFromAdmin ? (
-            <Link 
-              to="/admin" 
-              className="inline-flex items-center text-[#22aee1] hover:text-[#20466d] mb-6"
-              onClick={() => sessionStorage.removeItem('cameFromAdmin')}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Admin
-            </Link>
-          ) : (
-            <Link to="/" className="inline-flex items-center text-[#22aee1] hover:text-[#20466d] mb-6">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Reports
-            </Link>
-          )}
-          
-          <Badge variant="secondary" className="mb-4 bg-[#22aee1] text-white">
-            {post.category}
-          </Badge>
-          
-          <h1 className="text-4xl font-bold text-[#20466d] mb-6 leading-tight">
-            {post.title}
-          </h1>
-          
-          <div className="flex items-center space-x-6 text-sm text-[#79858D] mb-8">
-            <span className="flex items-center">
-              <Clock className="h-4 w-4 mr-1" />
-              {post.readTime}
-            </span>
-            <span>{post.publishedAt}</span>
-          </div>
-          
-          <div className="flex items-center space-x-4 mb-8">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="border-[#22aee1] text-[#22aee1] hover:bg-[#22aee1] hover:text-white"
-              onClick={handleShare}
-            >
-              <Share2 className="h-4 w-4 mr-2" />
-              Share
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="border-[#22aee1] text-[#22aee1] hover:bg-[#22aee1] hover:text-white"
-              onClick={handleBookmark}
-            >
-              <BookmarkPlus className="h-4 w-4 mr-2" />
-              Bookmark
-            </Button>
-          </div>
-        </div>
-
-        {/* Featured Image */}
-        <div className="w-full h-64 bg-gradient-to-br from-[#22aee1] to-[#20466d] rounded-lg mb-12 flex items-center justify-center">
-          {post.image && post.image !== "/placeholder.svg" ? (
-            <img src={post.image} alt={post.title} className="w-full h-full object-cover rounded-lg" />
-          ) : (
-            <div className="text-center">
-              <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center mx-auto mb-4">
-                <span className="text-[#20466d] font-bold text-xl">IMH</span>
-              </div>
-              <p className="text-white font-medium">{post.category}</p>
-            </div>
-          )}
-        </div>
-
-        {/* Article Content - CRITICAL FIX: Use font-montserrat class to ensure Montserrat font */}
-        <div 
-          className="prose prose-lg prose-headings:text-[#20466d] prose-a:text-[#22aee1] prose-strong:text-[#20466d] mb-12 font-montserrat"
-          dangerouslySetInnerHTML={{ __html: post.content }}
+        <BlogPostHeader 
+          post={post}
+          cameFromAdmin={cameFromAdmin}
+          onShare={() => handleShare(post)}
+          onBookmark={() => handleBookmark(post)}
         />
 
-        {/* Tags at the end */}
-        <div className="flex flex-wrap gap-2 mb-8">
-          {post.tags.map((tag) => (
-            <Badge key={tag} variant="outline" className="border-[#22aee1] text-[#22aee1]">
-              {tag}
-            </Badge>
-          ))}
-        </div>
+        <BlogPostImage post={post} />
+
+        <BlogPostContent post={post} />
 
         <Separator className="my-12" />
 
-        {/* Related Articles */}
-        {relatedPosts.length > 0 && (
-          <section>
-            <h2 className="text-3xl font-bold text-[#20466d] mb-8">Related Reports</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {relatedPosts.map((relatedPost) => (
-                <BlogCard key={relatedPost.id} post={relatedPost} />
-              ))}
-            </div>
-          </section>
-        )}
+        <RelatedPosts relatedPosts={relatedPosts} />
       </article>
     </BlogLayout>
   );
