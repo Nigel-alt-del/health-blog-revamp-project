@@ -1,8 +1,6 @@
-
-
 const IntroSection = () => {
   return (
-    <section className="relative py-8 px-4 bg-gradient-to-r from-gray-50 to-blue-50 min-h-[200px]">
+    <section className="relative py-8 px-4 bg-slate-50 min-h-[200px]">
       <div className="relative max-w-4xl mx-auto">
         <div className="space-y-4 text-base leading-relaxed text-gray-700 max-w-3xl mx-auto">
           <p>
@@ -25,4 +23,3 @@ const IntroSection = () => {
 };
 
 export default IntroSection;
-
