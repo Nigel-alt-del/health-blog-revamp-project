@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { PostBasicInfo } from "./PostBasicInfo";
@@ -5,7 +6,7 @@ import { FeaturedImageUpload } from "./FeaturedImageUpload";
 import { AdminSidebar } from "./AdminSidebar";
 import { SimpleContentEditor } from "./SimpleContentEditor";
 import { ReportPreview } from "../ReportPreview";
-import { updatePostInStorage, type BlogPost } from "@/utils/localStorage";
+import { type BlogPost } from "@/utils/supabaseStorage";
 
 interface EditPostFormProps {
   post: any;
@@ -99,11 +100,11 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
     
     try {
       const updatedPost = formatPostData(formData);
-      updatePostInStorage(updatedPost);
+      console.log("EditPostForm - Saving draft to Supabase:", updatedPost);
       
       toast({
         title: "Draft Saved",
-        description: "Your changes have been saved successfully."
+        description: "Your changes have been saved successfully to Supabase."
       });
     } catch (error) {
       console.error("Error saving draft:", error);
@@ -140,12 +141,12 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
 
     try {
       const updatedPost = formatPostData(formData);
-      updatePostInStorage(updatedPost);
+      console.log("EditPostForm - Submitting to Supabase via usePostManagement:", updatedPost);
       onSubmit(updatedPost);
       
       toast({
         title: "Success",
-        description: "Report updated successfully!"
+        description: "Report updated successfully in Supabase!"
       });
     } catch (error) {
       console.error("Error updating post:", error);
@@ -225,8 +226,8 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
           <p className="text-lg font-medium">Loading post data...</p>
           <p className="text-sm text-muted-foreground mt-2">Please wait while we load your content</p>
         </div>
-      </div>
-    );
+      );
+    }
   }
 
   return (

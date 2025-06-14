@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { EditPostForm } from "./EditPostForm";
-import { type BlogPost } from "@/utils/localStorage";
+import { type BlogPost } from "@/utils/supabaseStorage";
 
 interface AdminEditViewProps {
   post: BlogPost;
