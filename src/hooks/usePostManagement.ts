@@ -7,20 +7,21 @@ import { blogPosts } from "@/data/blogPosts";
 export const usePostManagement = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
 
-  const loadPosts = () => {
-    console.log("usePostManagement - Loading posts with centralized function");
+  const refreshPosts = () => {
+    console.log("usePostManagement - Refreshing posts");
     const allPosts = loadAllPosts();
-    console.log("usePostManagement - Loaded posts:", allPosts);
+    console.log("usePostManagement - Setting posts to:", allPosts);
     setPosts(allPosts);
   };
 
   useEffect(() => {
-    loadPosts();
+    console.log("usePostManagement - Initial load");
+    refreshPosts();
     
-    // Listen for forced refresh events
+    // Listen for refresh events
     const handlePostsRefreshed = () => {
-      console.log("usePostManagement - Handling posts refreshed event");
-      loadPosts();
+      console.log("usePostManagement - Handling refresh event");
+      refreshPosts();
     };
 
     window.addEventListener('postsRefreshed', handlePostsRefreshed);
@@ -41,7 +42,7 @@ export const usePostManagement = () => {
   };
 
   const handleCreatePost = (newPost: any) => {
-    console.log("Creating new post:", newPost);
+    console.log("usePostManagement - Creating new post:", newPost);
     
     const post: BlogPost = {
       id: generateId(newPost.title),
@@ -58,22 +59,28 @@ export const usePostManagement = () => {
       metaDescription: newPost.metaDescription || newPost.excerpt
     };
 
-    console.log("Formatted post:", post);
+    console.log("usePostManagement - Formatted post:", post);
     
-    // Save to storage first
+    // Save to localStorage
     addPostToStorage(post);
     
-    // CRITICAL FIX: Reload all posts to ensure proper state
-    const updatedPosts = loadAllPosts();
-    setPosts(updatedPosts);
+    // IMMEDIATE UI update - add the new post to current state
+    setPosts(prevPosts => {
+      const updatedPosts = [post, ...prevPosts];
+      console.log("usePostManagement - Immediately updating UI with:", updatedPosts);
+      return updatedPosts;
+    });
     
-    // Force refresh to ensure consistency across all components
-    forceRefreshPosts();
-    console.log("Post created successfully and UI updated");
+    // Also trigger refresh for other components
+    setTimeout(() => {
+      forceRefreshPosts();
+    }, 100);
+    
+    console.log("usePostManagement - Post creation completed");
   };
 
   const handleEditPost = (updatedPost: any) => {
-    console.log("Updating post:", updatedPost);
+    console.log("usePostManagement - Updating post:", updatedPost);
     
     const formattedPost: BlogPost = {
       ...updatedPost,
@@ -82,13 +89,21 @@ export const usePostManagement = () => {
 
     updatePostInStorage(formattedPost);
     
-    // CRITICAL FIX: Reload all posts to ensure proper state
-    const updatedPosts = loadAllPosts();
-    setPosts(updatedPosts);
+    // IMMEDIATE UI update
+    setPosts(prevPosts => {
+      const updatedPosts = prevPosts.map(post => 
+        post.id === formattedPost.id ? formattedPost : post
+      );
+      console.log("usePostManagement - Immediately updating edited post in UI");
+      return updatedPosts;
+    });
     
-    // Force refresh to ensure consistency
-    forceRefreshPosts();
-    console.log("Post updated successfully:", formattedPost);
+    // Trigger refresh for other components
+    setTimeout(() => {
+      forceRefreshPosts();
+    }, 100);
+    
+    console.log("usePostManagement - Post update completed");
     sessionStorage.setItem('cameFromAdmin', 'true');
   };
 
@@ -99,28 +114,31 @@ export const usePostManagement = () => {
     
     if (isDefaultPost) {
       addDeletedPostId(postId);
-      console.log("usePostManagement - Marked default post as permanently deleted:", postId);
+      console.log("usePostManagement - Marked default post as deleted:", postId);
     } else {
       deletePostFromStorage(postId);
       console.log("usePostManagement - Removed custom post from storage:", postId);
     }
     
-    // CRITICAL FIX: Reload all posts to ensure proper state
-    const updatedPosts = loadAllPosts();
-    setPosts(updatedPosts);
+    // IMMEDIATE UI update - remove from current state
+    setPosts(prevPosts => {
+      const updatedPosts = prevPosts.filter(post => post.id !== postId);
+      console.log("usePostManagement - Immediately removing post from UI");
+      return updatedPosts;
+    });
     
-    // CRITICAL: Force refresh to ensure deleted posts don't reappear
-    forceRefreshPosts();
-    console.log("usePostManagement - Post deletion completed successfully with forced refresh");
+    // Trigger refresh for other components
+    setTimeout(() => {
+      forceRefreshPosts();
+    }, 100);
+    
+    console.log("usePostManagement - Post deletion completed");
   };
 
   const handleToggleFeatured = (postId: string) => {
-    console.log("Toggling featured status for post:", postId);
+    console.log("usePostManagement - Toggling featured for post:", postId);
     
-    // Load current posts to get latest state
-    const currentPosts = loadAllPosts();
-    
-    const updatedPosts = currentPosts.map(post => {
+    const updatedPosts = posts.map(post => {
       if (post.id === postId) {
         const updatedPost = { ...post, featured: !post.featured };
         updatePostInStorage(updatedPost);
@@ -135,9 +153,12 @@ export const usePostManagement = () => {
     
     setPosts(updatedPosts);
     
-    // Force refresh to ensure consistency
-    forceRefreshPosts();
-    console.log("Featured status updated");
+    // Trigger refresh for other components
+    setTimeout(() => {
+      forceRefreshPosts();
+    }, 100);
+    
+    console.log("usePostManagement - Featured toggle completed");
   };
 
   return {
