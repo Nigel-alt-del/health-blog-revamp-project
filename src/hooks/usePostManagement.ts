@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { addPostToStorage, updatePostInStorage, deletePostFromStorage, addDeletedPostId, type BlogPost } from "@/utils/localStorage";
 import { loadAllPosts, forceRefreshPosts } from "@/utils/postManager";
@@ -41,8 +40,15 @@ export const usePostManagement = () => {
   };
 
   const handleCreatePost = (newPost: any) => {
-    console.log("usePostManagement - CREATING NEW POST:", newPost);
+    console.log("📝 PHANTOM SAVE DIAGNOSIS - Starting creation process for:", newPost.title);
+    console.log("📝 TIME:", new Date().toISOString());
     
+    // STEP 1: What's currently in localStorage before we save?
+    const beforeSave = JSON.parse(localStorage.getItem('blog_posts') || '[]');
+    console.log("📝 BEFORE SAVE - Posts in localStorage:", beforeSave.length, "posts");
+    beforeSave.forEach((p: any, i: number) => console.log(`  📝 [${i}] BEFORE:`, p.id, p.title));
+    
+    // STEP 2: Generate the new post data
     const post: BlogPost = {
       id: generateId(newPost.title),
       title: newPost.title,
@@ -58,13 +64,55 @@ export const usePostManagement = () => {
       metaDescription: newPost.metaDescription || newPost.excerpt
     };
 
-    addPostToStorage(post);
-    console.log("usePostManagement - SAVED TO LOCALSTORAGE");
+    console.log("📝 NEW POST DATA CREATED:", post);
+    console.log("📝 NEW POST ID:", post.id);
+    console.log("📝 NEW POST TITLE:", post.title);
     
+    // STEP 3: Save to localStorage
+    console.log("📝 CALLING addPostToStorage...");
+    addPostToStorage(post);
+    console.log("📝 addPostToStorage CALL COMPLETED");
+    
+    // STEP 4: What's in localStorage immediately after saving?
+    setTimeout(() => {
+      const afterSave = JSON.parse(localStorage.getItem('blog_posts') || '[]');
+      console.log("📝 AFTER SAVE - Posts in localStorage:", afterSave.length, "posts");
+      afterSave.forEach((p: any, i: number) => console.log(`  📝 [${i}] AFTER:`, p.id, p.title));
+      
+      // STEP 5: Is our new post actually there?
+      const newPostFound = afterSave.some((p: any) => p.id === post.id);
+      const newPostFoundByTitle = afterSave.some((p: any) => p.title === post.title);
+      
+      console.log("📝 SMOKING GUN - NEW POST CHECKS:");
+      console.log("  📝 New post found by ID?", newPostFound ? "YES ✅" : "NO ❌");
+      console.log("  📝 New post found by title?", newPostFoundByTitle ? "YES ✅" : "NO ❌");
+      console.log("  📝 Post count increased?", afterSave.length > beforeSave.length ? "YES ✅" : "NO ❌");
+      
+      if (!newPostFound) {
+        console.log("📝 💥 PHANTOM SAVE CONFIRMED! Post not found in localStorage after save!");
+        console.log("📝 💥 This means addPostToStorage failed or something overwrote it!");
+      } else {
+        console.log("📝 ✅ POST SUCCESSFULLY SAVED TO LOCALSTORAGE");
+      }
+      
+      // STEP 6: What does loadAllPosts return after the save?
+      const loadedPosts = loadAllPosts();
+      console.log("📝 POSTS FROM loadAllPosts AFTER SAVE:", loadedPosts.length, "posts");
+      const newPostInLoadedList = loadedPosts.some(p => p.id === post.id);
+      console.log("📝 New post appears in loadAllPosts?", newPostInLoadedList ? "YES ✅" : "NO ❌");
+      
+      if (newPostFound && !newPostInLoadedList) {
+        console.log("📝 💥 FILTER PHANTOM! Post saved but filtered out by loadAllPosts!");
+      }
+      
+      console.log("📝 PHANTOM SAVE DIAGNOSIS COMPLETE");
+    }, 100);
+    
+    // Continue with existing logic
     refreshPosts();
     forceRefreshPosts();
     
-    console.log("usePostManagement - POST CREATION COMPLETE");
+    console.log("📝 POST CREATION PROCESS COMPLETE");
   };
 
   const handleEditPost = (updatedPost: any) => {
