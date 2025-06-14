@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from "react";
 import BlogLayout from "@/components/BlogLayout";
-import FeaturedPost from "@/components/FeaturedPost";
 import BlogCard from "@/components/BlogCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -20,7 +19,6 @@ const BlogHome = () => {
     console.log("BlogHome - CRYSTAL CLEAR REFRESH");
     const posts = await loadAllPosts();
     console.log("BlogHome - LOADED POSTS:", posts);
-    console.log("BlogHome - Featured posts:", posts.filter(p => p.featured));
     setAllPosts(posts);
     setFilteredPosts(posts);
   };
@@ -121,11 +119,7 @@ const BlogHome = () => {
   const displayCategories = Array.from(new Set(allPosts.map(post => getCategoryDisplay(post.category))));
   const categories = ["All", ...displayCategories];
 
-  const featuredPost = allPosts.find(post => post.featured);
-  const regularPosts = filteredPosts.filter(post => !post.featured);
-
-  console.log("BlogHome - Featured post found:", featuredPost);
-  console.log("BlogHome - Regular posts count:", regularPosts.length);
+  console.log("BlogHome - All posts count:", filteredPosts.length);
 
   return (
     <BlogLayout>
@@ -181,23 +175,15 @@ const BlogHome = () => {
           </div>
         </div>
 
-        {/* Featured Post */}
-        {featuredPost && (
-          <div className="mb-16">
-            <h2 className="text-3xl font-bold text-[#20466d] mb-8">Featured Report</h2>
-            <FeaturedPost post={featuredPost} />
-          </div>
-        )}
-
-        {/* Recent Posts */}
+        {/* Latest Reports */}
         <div>
           <h2 className="text-3xl font-bold text-[#20466d] mb-8">
             {searchTerm || selectedCategory !== "All" ? "Filtered" : "Latest"} Reports
           </h2>
           
-          {regularPosts.length > 0 ? (
+          {filteredPosts.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {regularPosts.map((post) => (
+              {filteredPosts.map((post) => (
                 <BlogCard key={post.id} post={post} />
               ))}
             </div>
