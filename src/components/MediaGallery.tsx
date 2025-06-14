@@ -7,6 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Upload, X, Image as ImageIcon, AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
+import { uploadImageToStorage, deleteImageFromStorage, isSupabaseStorageUrl } from '@/utils/supabaseImageStorage';
+import { useToast } from '@/hooks/use-toast';
 
 interface MediaGalleryProps {
   onInsert: (imageUrl: string, caption?: string, width?: string, height?: string, alignment?: string) => void;
@@ -22,6 +24,8 @@ export const MediaGallery = ({ onInsert, onClose }: MediaGalleryProps) => {
   const [alignment, setAlignment] = useState('center');
   const [customWidth, setCustomWidth] = useState('');
   const [customHeight, setCustomHeight] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const { toast } = useToast();
 
   // Enhanced size presets with proper values
   const sizePresets = {
@@ -38,28 +42,66 @@ export const MediaGallery = ({ onInsert, onClose }: MediaGalleryProps) => {
     { value: 'right', label: 'Right', icon: AlignRight }
   ];
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
-      Array.from(files).forEach(file => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const imageUrl = e.target?.result as string;
-          setUploadedImages(prev => [...prev, { url: imageUrl, name: file.name }]);
-          // Auto-select the first uploaded image
-          if (uploadedImages.length === 0) {
-            setSelectedImage(imageUrl);
-          }
-        };
-        reader.readAsDataURL(file);
-      });
+      setIsUploading(true);
+      
+      try {
+        const uploadPromises = Array.from(files).map(async (file) => {
+          console.log('Uploading file to Supabase Storage:', file.name);
+          const imageUrl = await uploadImageToStorage(file);
+          return { url: imageUrl, name: file.name };
+        });
+
+        const uploadedFiles = await Promise.all(uploadPromises);
+        setUploadedImages(prev => [...prev, ...uploadedFiles]);
+        
+        // Auto-select the first uploaded image
+        if (uploadedImages.length === 0 && uploadedFiles.length > 0) {
+          setSelectedImage(uploadedFiles[0].url);
+        }
+        
+        toast({
+          title: "Images Uploaded",
+          description: `${uploadedFiles.length} image(s) uploaded to Supabase Storage successfully.`
+        });
+      } catch (error) {
+        console.error('Error uploading images:', error);
+        toast({
+          title: "Upload Failed",
+          description: "Failed to upload one or more images. Please try again.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsUploading(false);
+      }
     }
   };
 
-  const removeImage = (urlToRemove: string) => {
-    setUploadedImages(prev => prev.filter(img => img.url !== urlToRemove));
-    if (selectedImage === urlToRemove) {
-      setSelectedImage('');
+  const removeImage = async (urlToRemove: string) => {
+    try {
+      // If it's a Supabase Storage URL, delete it from storage
+      if (isSupabaseStorageUrl(urlToRemove)) {
+        await deleteImageFromStorage(urlToRemove);
+      }
+      
+      setUploadedImages(prev => prev.filter(img => img.url !== urlToRemove));
+      if (selectedImage === urlToRemove) {
+        setSelectedImage('');
+      }
+      
+      toast({
+        title: "Image Removed",
+        description: "The image has been removed successfully."
+      });
+    } catch (error) {
+      console.error('Error removing image:', error);
+      toast({
+        title: "Remove Failed",
+        description: "Failed to remove image. Please try again.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -90,14 +132,22 @@ export const MediaGallery = ({ onInsert, onClose }: MediaGalleryProps) => {
             <CardContent className="pt-6">
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
                 <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                <p className="text-gray-600 mb-4">Upload images for your content</p>
+                <p className="text-gray-600 mb-4">
+                  {isUploading ? 'Uploading to Supabase Storage...' : 'Upload images for your content'}
+                </p>
                 <Input
                   type="file"
                   accept="image/*"
                   multiple
                   onChange={handleImageUpload}
                   className="max-w-xs mx-auto"
+                  disabled={isUploading}
                 />
+                {isUploading && (
+                  <div className="mt-4">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#20466d] mx-auto"></div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -261,7 +311,7 @@ export const MediaGallery = ({ onInsert, onClose }: MediaGalleryProps) => {
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={handleInsert} disabled={!selectedImage}>
+          <Button onClick={handleInsert} disabled={!selectedImage || isUploading}>
             Insert Image
           </Button>
         </div>

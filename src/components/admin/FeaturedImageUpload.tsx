@@ -1,10 +1,11 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Image, Plus } from "lucide-react";
+import { uploadImageToStorage, deleteImageFromStorage, isSupabaseStorageUrl } from "@/utils/supabaseImageStorage";
+import { useToast } from "@/hooks/use-toast";
 
 interface FeaturedImageUploadProps {
   image: string;
@@ -23,41 +24,53 @@ export const FeaturedImageUpload = ({
 }: FeaturedImageUploadProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setIsLoading(true);
       setError(null);
       
       try {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const imageUrl = e.target?.result as string;
-          if (imageUrl) {
-            onImageChange(imageUrl);
-          } else {
-            setError("Failed to load image");
-          }
-          setIsLoading(false);
-        };
-        reader.onerror = () => {
-          setError("Error reading file");
-          setIsLoading(false);
-        };
-        reader.readAsDataURL(file);
+        console.log('Starting image upload to Supabase Storage...');
+        const imageUrl = await uploadImageToStorage(file);
+        onImageChange(imageUrl);
+        
+        toast({
+          title: "Image Uploaded",
+          description: "Your image has been uploaded to Supabase Storage successfully."
+        });
       } catch (err) {
-        setError("Error processing file");
+        console.error('Error uploading image:', err);
+        setError("Failed to upload image. Please try again.");
+        toast({
+          title: "Upload Failed",
+          description: "Failed to upload image. Please try again.",
+          variant: "destructive"
+        });
+      } finally {
         setIsLoading(false);
       }
     }
   };
 
-  const removeImage = () => {
+  const removeImage = async () => {
     try {
+      // If it's a Supabase Storage URL, delete it from storage
+      if (image && isSupabaseStorageUrl(image)) {
+        await deleteImageFromStorage(image);
+      }
+      
       onImageChange("");
       setError(null);
+      
+      toast({
+        title: "Image Removed",
+        description: "The image has been removed successfully."
+      });
     } catch (err) {
+      console.error('Error removing image:', err);
       setError("Error removing image");
     }
   };
@@ -110,7 +123,8 @@ export const FeaturedImageUpload = ({
         
         {isLoading && (
           <div className="p-4 text-center">
-            <p className="text-sm text-gray-600">Loading image...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#20466d] mx-auto mb-4"></div>
+            <p className="text-sm text-gray-600">Uploading to Supabase Storage...</p>
           </div>
         )}
 
@@ -130,6 +144,7 @@ export const FeaturedImageUpload = ({
                 size="sm"
                 className="absolute top-2 right-2"
                 onClick={removeImage}
+                disabled={isLoading}
               >
                 Remove
               </Button>
