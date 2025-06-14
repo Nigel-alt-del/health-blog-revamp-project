@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
@@ -7,7 +6,7 @@ const categoryButtons = [
   { 
     name: "PMI Insights", 
     slug: "pmi-insights", 
-    color: "bg-gradient-to-br from-red-600 via-rose-500 to-pink-600 hover:from-red-700 hover:via-rose-600 hover:to-pink-700" 
+    color: "bg-gradient-to-br from-slate-700 via-slate-500 to-gray-600 hover:from-slate-800 hover:via-slate-600 hover:to-gray-700" 
   },
   { 
     name: "Healthcare", 
