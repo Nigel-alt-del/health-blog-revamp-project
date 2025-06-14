@@ -1,25 +1,22 @@
 
 const IntroSection = () => {
   return (
-    <section className="relative py-16 px-4 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <section className="relative py-8 px-4 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 via-transparent to-indigo-600/5"></div>
-      <div className="relative max-w-5xl mx-auto">
-        <div className="space-y-6 text-lg leading-relaxed text-gray-700 max-w-4xl mx-auto">
+      <div className="relative max-w-4xl mx-auto">
+        <div className="space-y-4 text-base leading-relaxed text-gray-700 max-w-3xl mx-auto">
           <p>
-            In an increasingly complex healthcare landscape, informed decisions are not just valuable — they're essential. 
-            The Health Compass delivers high-quality, data-driven insights tailored to the strategic and operational needs 
-            of SME owners, HR managers, directors, and professionals in the private medical insurance sector.
+            In today's complex healthcare landscape, informed decisions are essential. The Health Compass delivers 
+            data-driven insights tailored for SME owners, HR managers, and private medical insurance professionals.
           </p>
           
           <p>
-            We go beyond surface-level reporting. Our research is rooted in rigorous analysis, designed to uncover trends, 
-            clarify regulatory shifts, and identify actionable opportunities. With our expertly curated intelligence, 
-            you'll gain the clarity and confidence needed to navigate challenges, optimise benefits strategies, and stay 
-            ahead of industry developments.
+            Our research goes beyond surface-level reporting — we uncover trends, clarify regulatory shifts, 
+            and identify actionable opportunities to help you navigate challenges and optimize benefits strategies.
           </p>
           
-          <p className="text-xl font-medium text-[#20466d] text-center pt-4">
-            Let us handle the complexity. You focus on what matters most — your people and your business.
+          <p className="text-lg font-medium text-[#20466d] text-center pt-2">
+            Let us handle the complexity. You focus on your people and your business.
           </p>
         </div>
       </div>
