@@ -24,15 +24,22 @@ const FeaturedPost = ({ post }: FeaturedPostProps) => {
 
   // Map categories to display the correct badge labels
   const getCategoryDisplay = (category: string) => {
-    switch (category) {
-      case "Healthcare":
+    // Map any legacy categories to the three main ones
+    switch (category.toLowerCase()) {
+      case "healthcare":
+      case "health policy":
+      case "health":
         return "Healthcare";
-      case "PMI Insights":
+      case "pmi insights":
+      case "insurance tips":
+      case "insurance":
+      case "pmi":
         return "PMI Insights";
-      case "Industry News":
+      case "industry news":
+      case "news":
         return "Industry News";
       default:
-        return category;
+        return "Healthcare"; // Default fallback
     }
   };
 
