@@ -1,15 +1,9 @@
 
 const IntroSection = () => {
   return (
-    <section className="relative py-20 px-4 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <section className="relative py-16 px-4 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 via-transparent to-indigo-600/5"></div>
       <div className="relative max-w-5xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-[#20466d] mb-8 leading-tight">
-            The Health Compass: Strategic Intelligence for Healthcare Decision-Making
-          </h2>
-        </div>
-        
         <div className="space-y-6 text-lg leading-relaxed text-gray-700 max-w-4xl mx-auto">
           <p>
             In an increasingly complex healthcare landscape, informed decisions are not just valuable — they're essential. 
