@@ -10,7 +10,7 @@ const HeroSection = ({ title, subtitle, backgroundImage }: HeroSectionProps) => 
     <section 
       className="relative py-16 px-4 bg-cover bg-center bg-no-repeat"
       style={{
-        backgroundImage: `linear-gradient(rgba(5, 25, 50, 0.9), rgba(5, 25, 50, 0.9)), url('${backgroundImage}')`
+        backgroundImage: `linear-gradient(rgba(32, 70, 109, 0.8), rgba(32, 70, 109, 0.8)), url('${backgroundImage}')`
       }}
     >
       <div className="max-w-4xl mx-auto text-center text-white">
