@@ -26,6 +26,9 @@ interface PostListViewProps {
 
 export const PostListView = ({ posts, onDeletePost, onEditPost, onToggleFeatured }: PostListViewProps) => {
   const { toast } = useToast();
+  
+  // Temporarily disable featured toggle UI
+  const FEATURED_TOGGLE_ENABLED = false;
 
   const handleDeletePost = (postId: string) => {
     onDeletePost(postId);
@@ -88,15 +91,17 @@ export const PostListView = ({ posts, onDeletePost, onEditPost, onToggleFeatured
                 >
                   View
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => handleToggleFeatured(post.id)}
-                  title={post.featured ? "Remove from featured" : "Set as featured"}
-                  className={post.featured ? "text-yellow-600 border-yellow-600" : ""}
-                >
-                  {post.featured ? <StarOff className="h-4 w-4" /> : <Star className="h-4 w-4" />}
-                </Button>
+                {FEATURED_TOGGLE_ENABLED && (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleToggleFeatured(post.id)}
+                    title={post.featured ? "Remove from featured" : "Set as featured"}
+                    className={post.featured ? "text-yellow-600 border-yellow-600" : ""}
+                  >
+                    {post.featured ? <StarOff className="h-4 w-4" /> : <Star className="h-4 w-4" />}
+                  </Button>
+                )}
                 <Button 
                   variant="outline" 
                   size="sm"
