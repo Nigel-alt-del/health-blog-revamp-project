@@ -1,4 +1,3 @@
-
 import { getStoredPosts, getDeletedPostIds, type BlogPost } from "./localStorage";
 import { blogPosts } from "@/data/blogPosts";
 
@@ -8,22 +7,26 @@ import { blogPosts } from "@/data/blogPosts";
 export const loadAllPosts = (): BlogPost[] => {
   console.log("PostManager - Loading all posts (SIMPLIFIED)");
   
-  // Step 1: Get all stored posts (these are the boss)
-  const allStoredPosts = getStoredPosts();
-  console.log("PostManager - All stored posts before filtering:", allStoredPosts);
+  // Step 1: Get all custom/user-created posts from localStorage (THE BOSS)
+  // These should always be prioritised and shown unless explicitly deleted
+  const userCreatedPosts = getStoredPosts(); 
+  console.log("PostManager - User-created posts from localStorage (THE BOSS):", userCreatedPosts);
   
-  // Step 2: Get deleted post IDs
+  // Step 2: Get deleted post IDs (both custom and default)
   const deletedIds = getDeletedPostIds();
   console.log("PostManager - Deleted post IDs:", deletedIds);
   
-  // Step 3: CRUCIAL FIX - Filter stored posts by deleted IDs
-  const storedPosts = allStoredPosts.filter(post => !deletedIds.includes(post.id));
-  console.log("PostManager - Stored posts after filtering out deleted IDs:", storedPosts);
+  // Step 3: Filter out any user-created posts that have been explicitly deleted
+  const availableUserCreatedPosts = userCreatedPosts.filter(post => !deletedIds.includes(post.id));
+  console.log("PostManager - User-created posts AFTER filtering deleted:", availableUserCreatedPosts);
+
+  // Step 4: Get default posts that haven't been deleted AND don't conflict with available user-created posts
+  const userCreatedPostIds = new Set(availableUserCreatedPosts.map(p => p.id));
   
-  // Step 4: Get default posts that haven't been deleted
   const availableDefaultPosts = blogPosts
-    .filter(post => !deletedIds.includes(post.id))
-    .map(post => ({
+    .filter(post => !deletedIds.includes(post.id)) // Filter out default posts that are marked as deleted
+    .filter(post => !userCreatedPostIds.has(post.id)) // Filter out default posts if a user-created post with the same ID exists
+    .map(post => ({ // Ensure consistency in structure
       id: post.id,
       title: post.title,
       excerpt: post.excerpt,
@@ -38,16 +41,14 @@ export const loadAllPosts = (): BlogPost[] => {
       metaDescription: (post as any).metaDescription || post.excerpt
     }));
 
-  console.log("PostManager - Available default posts:", availableDefaultPosts);
+  console.log("PostManager - Available default posts (after all filtering):", availableDefaultPosts);
 
-  // Step 5: SIMPLE COMBINATION - stored posts first, then non-conflicting defaults
-  const storedPostIds = new Set(storedPosts.map(p => p.id));
-  const finalDefaultPosts = availableDefaultPosts.filter(p => !storedPostIds.has(p.id));
+  // Step 5: Combine available user-created posts first, then the available, non-conflicting default posts
+  const finalPosts = [...availableUserCreatedPosts, ...availableDefaultPosts];
   
-  const allPosts = [...storedPosts, ...finalDefaultPosts];
-  console.log("PostManager - FINAL RESULT (should exclude deleted posts):", allPosts);
+  console.log("PostManager - FINAL RESULT (should include new and exclude deleted):", finalPosts);
   
-  return allPosts;
+  return finalPosts;
 };
 
 /**
