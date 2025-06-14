@@ -153,11 +153,12 @@ export const usePostManagement = () => {
       console.log("usePostManagement - Current featured state:", currentPost.featured);
       const newFeaturedState = !currentPost.featured;
       
-      // Update the clicked post and unfeatured all others in Supabase
+      // Update the clicked post and unfeature all others in Supabase
       const postsToUpdate = posts.filter(post => 
         post.id === postId || post.featured
       );
       
+      // Update all posts that need changes in Supabase first
       for (const post of postsToUpdate) {
         const updatedPost = {
           ...post,
@@ -168,7 +169,9 @@ export const usePostManagement = () => {
         await updatePostInStorage(updatedPost);
       }
       
-      // Refresh posts after all updates are complete
+      console.log("usePostManagement - All Supabase updates complete, refreshing UI");
+      
+      // Only refresh once after all updates are complete - no forceRefreshPosts to avoid race condition
       await refreshPosts();
       
       console.log("usePostManagement - FEATURED TOGGLE COMPLETE");
