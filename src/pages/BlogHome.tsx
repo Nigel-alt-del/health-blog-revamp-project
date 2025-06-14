@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import BlogLayout from "@/components/BlogLayout";
 import HeroSection from "@/components/home/HeroSection";
+import IntroSection from "@/components/home/IntroSection";
 import CategoryButtons from "@/components/home/CategoryButtons";
 import FilterBadges from "@/components/home/FilterBadges";
 import PostsGrid from "@/components/home/PostsGrid";
@@ -67,6 +68,8 @@ const BlogHome = () => {
         subtitle="Your Strategic Edge in Healthcare and PMI Insights"
         backgroundImage="/lovable-uploads/b61ae919-b75e-409d-a884-8437e2befc15.png"
       />
+
+      <IntroSection />
 
       <div className="max-w-6xl mx-auto px-4 py-12">
         <CategoryButtons />
