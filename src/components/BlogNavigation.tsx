@@ -9,7 +9,7 @@ const BlogNavigation = () => {
   const [logoError, setLogoError] = useState(false);
 
   const handleLogoError = () => {
-    console.log("Logo failed to load from: /lovable-uploads/136e3191-2c26-49ed-a729-90454a8efcce.png");
+    console.log("Logo failed to load from: /lovable-uploads/3e00b04c-615f-4844-9c6b-aef28446924d.png");
     setLogoError(true);
   };
 
@@ -25,15 +25,15 @@ const BlogNavigation = () => {
             <Link to="/" className="flex items-center">
               {!logoError ? (
                 <img 
-                  src="/lovable-uploads/136e3191-2c26-49ed-a729-90454a8efcce.png" 
-                  alt="InsureMyHealth Logo" 
-                  className="h-10 w-auto mr-3"
+                  src="/lovable-uploads/3e00b04c-615f-4844-9c6b-aef28446924d.png" 
+                  alt="The Health Compass Logo" 
+                  className="h-12 w-auto mr-3"
                   onError={handleLogoError}
                   onLoad={handleLogoLoad}
                 />
               ) : (
-                <div className="h-10 w-10 bg-[#20466d] rounded mr-3 flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">IMH</span>
+                <div className="h-12 w-12 bg-[#20466d] rounded mr-3 flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">THC</span>
                 </div>
               )}
               <span className="text-2xl font-bold text-[#20466d]">
