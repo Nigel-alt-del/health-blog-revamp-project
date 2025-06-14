@@ -226,8 +226,8 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
           <p className="text-lg font-medium">Loading post data...</p>
           <p className="text-sm text-muted-foreground mt-2">Please wait while we load your content</p>
         </div>
-      );
-    }
+      </div>
+    );
   }
 
   return (
