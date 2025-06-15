@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { Edit, Trash2, Star, StarOff } from "lucide-react";
@@ -32,6 +32,10 @@ export const PostListView = ({ posts, onDeletePost, onEditPost, onToggleFeatured
   
   // Temporarily disable featured toggle UI
   const FEATURED_TOGGLE_ENABLED = false;
+
+  useEffect(() => {
+    console.log("[PostListView] Render. Posts prop:", posts.map(p => ({ id: p.id, title: p.title, featured: p.featured })));
+  }, [posts]);
 
   const handleDeletePost = (postId: string) => {
     onDeletePost(postId);

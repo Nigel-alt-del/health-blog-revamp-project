@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { addPostToStorage, updatePostInStorage, deletePostFromStorage } from "@/services/supabase/posts";
 import { addDeletedPostId } from "@/services/supabase/deletedPosts";
@@ -7,14 +8,20 @@ import { blogPosts } from "@/data/blogPosts";
 import { toast } from "@/components/ui/use-toast";
 import { logPostSaveAttempt } from "@/services/supabase/postSaveLogs";
 import { ToastAction } from "@/components/ui/toast";
+import { useCallback } from "react";
 
 export const usePostManagement = () => {
   const queryClient = useQueryClient();
 
   const { data: posts = [], isLoading: loading, isError, error } = useQuery<BlogPostSummary[], Error>({
     queryKey: ['posts'],
-    queryFn: loadAllPosts,
-    staleTime: 5 * 60 * 1000, // 5 minutes. Ensures data is fresh and not re-fetched unnecessarily
+    queryFn: async () => {
+      console.log("[usePostManagement] Fetching posts (from React Query 'posts' key)");
+      const result = await loadAllPosts();
+      console.log("[usePostManagement] Post fetch result:", result.map(p => ({ id: p.id, title: p.title, featured: p.featured })));
+      return result;
+    },
+    staleTime: 5 * 60 * 1000,
   });
 
   const generateId = (title: string): string => {
@@ -22,15 +29,15 @@ export const usePostManagement = () => {
       .replace(/[^a-z0-9\s]/g, '')
       .replace(/\s+/g, '-')
       .substring(0, 50);
-    
     const timestamp = Date.now();
     return `${baseId}-${timestamp}`;
   };
 
   const mutationOptions = {
-    onSuccess: () => {
+    onSuccess: (...args: any[]) => {
+      console.log("[usePostManagement] Mutation success! Invalidating posts queries...", args);
       queryClient.invalidateQueries({ queryKey: ['posts'] });
-      queryClient.invalidateQueries({ queryKey: ['post'] }); // Invalidate single post queries too
+      queryClient.invalidateQueries({ queryKey: ['post'] });
     },
     onError: (error: Error) => {
       console.error("Mutation failed:", error);
@@ -43,22 +50,34 @@ export const usePostManagement = () => {
   };
 
   const createPostMutation = useMutation({
-    mutationFn: (post: BlogPost) => addPostToStorage(post),
+    mutationFn: async (post: BlogPost) => {
+      console.log("[usePostManagement] Creating post...", post);
+      return addPostToStorage(post);
+    },
     ...mutationOptions,
   });
 
   const updatePostMutation = useMutation({
-    mutationFn: (post: BlogPost) => updatePostInStorage(post),
+    mutationFn: async (post: BlogPost) => {
+      console.log("[usePostManagement] Updating post...", post);
+      return updatePostInStorage(post);
+    },
     ...mutationOptions,
   });
 
   const deleteCustomPostMutation = useMutation({
-    mutationFn: (postId: string) => deletePostFromStorage(postId),
+    mutationFn: async (postId: string) => {
+      console.log("[usePostManagement] Deleting custom post...", postId);
+      return deletePostFromStorage(postId);
+    },
     ...mutationOptions,
   });
   
   const addDeletedIdMutation = useMutation({
-    mutationFn: (postId: string) => addDeletedPostId(postId),
+    mutationFn: async (postId: string) => {
+      console.log("[usePostManagement] Adding deleted ID for default post...", postId);
+      return addDeletedPostId(postId);
+    },
     ...mutationOptions,
   });
 
@@ -160,6 +179,8 @@ export const usePostManagement = () => {
 
     const postsToUpdate = posts.filter(p => p.featured || p.id === postId);
 
+    console.log("[usePostManagement] Toggling featured for:", postId, "New state:", newFeaturedState, "Posts affected:", postsToUpdate.map(p => p.id));
+
     const updatePromises = postsToUpdate.map(async p => {
         const fullPost = await getPostById(p.id);
         if (fullPost) {
@@ -172,6 +193,12 @@ export const usePostManagement = () => {
     console.log("FEATURED TOGGLE COMPLETE");
   };
 
+  // Diagnostic method to force refetch of posts
+  const forceRefreshPosts = useCallback(() => {
+    console.log("[usePostManagement] Forcing post list refresh via invalidateQueries('posts')");
+    queryClient.invalidateQueries({ queryKey: ['posts'], refetchType: "active" });
+  }, [queryClient]);
+
   return {
     posts,
     loading,
@@ -180,6 +207,8 @@ export const usePostManagement = () => {
     handleCreatePost,
     handleEditPost,
     handleDeletePost,
-    handleToggleFeatured
+    handleToggleFeatured,
+    forceRefreshPosts, // exposed for UI refresh button
   };
 };
+

@@ -1,7 +1,13 @@
+
 import { getStoredPosts, getPostFromStorage } from "@/services/supabase/posts";
 import { getDeletedPostIds, isPostDeleted } from "@/services/supabase/deletedPosts";
 import { type BlogPost, type BlogPostSummary } from "@/types/blog";
 import { blogPosts } from "@/data/blogPosts";
+
+// Diagnostic utility to log post IDs/status
+function logPostArray(label: string, arr: any[]) {
+  console.log(`[PostManager] ${label} count: ${arr.length}`, arr.map(p => ({ id: p.id, title: p.title, featured: p.featured })));
+}
 
 /**
  * OPTIMIZED SUPABASE POWERED: Fetch all posts from Supabase and merge with local data.
@@ -16,7 +22,8 @@ export const loadAllPosts = async (): Promise<BlogPostSummary[]> => {
       getStoredPosts(),
       getDeletedPostIds()
     ]);
-    
+    logPostArray("Got user created posts", userCreatedPosts);
+
     // Use Sets for O(1) lookups, which is much faster than array.includes()
     const deletedIdSet = new Set(deletedIds);
 
@@ -35,20 +42,17 @@ export const loadAllPosts = async (): Promise<BlogPostSummary[]> => {
         } as BlogPostSummary;
       });
 
+    logPostArray("Default posts available", availableDefaultPosts);
+
     const finalPosts: BlogPostSummary[] = [...availableUserCreatedPosts, ...availableDefaultPosts];
-    
-    console.log("PostManager - FINAL OPTIMIZED RESULT:", finalPosts.length, "posts");
+    logPostArray("FINAL OPTIMIZED RESULT (to be returned)", finalPosts);
     return finalPosts;
   } catch (error) {
     console.error("PostManager - Error loading posts:", error);
-    // In case of error, return an empty array. React Query will handle the error state.
     return [];
   }
 };
 
-/**
- * Get posts filtered by category.
- */
 export const getPostsByCategory = async (category: string): Promise<BlogPostSummary[]> => {
   const allPosts = await loadAllPosts();
   return allPosts.filter(
@@ -62,27 +66,29 @@ export const getPostsByCategory = async (category: string): Promise<BlogPostSumm
  */
 export const getPostById = async (id: string): Promise<BlogPost | undefined> => {
   console.log(`PostManager - Getting post by ID (Optimized): ${id}`);
-
   // 1. Check Supabase first for user-created or updated posts.
   const postFromSupabase = await getPostFromStorage(id);
   if (postFromSupabase) {
+    console.log(`[PostManager] Found post in Supabase: ${id}`);
     return postFromSupabase;
   }
 
   // 2. If not in Supabase, check the default posts array.
   const postFromDefaults = blogPosts.find(post => post.id === id);
   if (!postFromDefaults) {
-    return undefined; // Not found anywhere.
+    console.warn(`[PostManager] Post not found by ID: ${id}`);
+    return undefined;
   }
 
   // 3. It's a default post. Check if it has been deleted.
   const deleted = await isPostDeleted(id);
   if (deleted) {
+    console.log(`[PostManager] Post is marked deleted: ${id}`);
     return undefined;
   }
 
   // Map to ensure consistent object structure, same as in loadAllPosts
-  return {
+  const mapped = {
     id: postFromDefaults.id,
     title: postFromDefaults.title,
     excerpt: postFromDefaults.excerpt,
@@ -96,4 +102,7 @@ export const getPostById = async (id: string): Promise<BlogPost | undefined> => 
     seoKeywords: (postFromDefaults as any).seoKeywords || '',
     metaDescription: (postFromDefaults as any).metaDescription || postFromDefaults.excerpt
   };
+  console.log(`[PostManager] Returning mapped default post for ${id}:`, mapped);
+  return mapped;
 };
+
