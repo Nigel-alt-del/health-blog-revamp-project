@@ -3,7 +3,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addPostToStorage, updatePostInStorage, deletePostFromStorage } from "@/services/supabase/posts";
 import { addDeletedPostId } from "@/services/supabase/deletedPosts";
 import { logPostSaveAttempt } from "@/services/supabase/postSaveLogs";
-import { ToastAction, toast } from "@/components/ui/toast";
+import { ToastAction } from "@/components/ui/toast";
+import { toast } from "@/hooks/use-toast";
 import { type BlogPost } from "@/types/blog";
 import { blogPosts } from "@/data/blogPosts";
 import { getPostById } from "@/utils/postManager";
@@ -66,3 +67,4 @@ export function usePostMutations() {
     toggleFeatured,
   };
 }
+

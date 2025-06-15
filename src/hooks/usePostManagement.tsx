@@ -1,11 +1,14 @@
+
 import { useAllPosts } from "./usePostQueries";
 import { usePostMutations } from "./usePostMutations";
 import { type BlogPost, type BlogPostSummary } from "@/types/blog";
 import { blogPosts } from "@/data/blogPosts";
 import { logPostSaveAttempt } from "@/services/supabase/postSaveLogs";
-import { ToastAction, toast } from "@/components/ui/toast";
+import { ToastAction } from "@/components/ui/toast";
+import { toast } from "@/hooks/use-toast";
 import { useCallback } from "react";
 import { getPostById } from "@/utils/postManager";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const usePostManagement = () => {
   const { data: posts = [], isLoading: loading, isError, error } = useAllPosts();
@@ -16,6 +19,7 @@ export const usePostManagement = () => {
     addDeletedIdMutation,
     toggleFeatured
   } = usePostMutations();
+  const queryClient = useQueryClient();
 
   const generateId = (title: string): string => {
     const baseId = title
@@ -128,7 +132,7 @@ export const usePostManagement = () => {
   const forceRefreshPosts = useCallback(() => {
     console.log("[usePostManagement] Forcing post list refresh via invalidateQueries('posts')");
     queryClient.invalidateQueries({ queryKey: ['posts'], refetchType: "active" });
-  }, []);
+  }, [queryClient]);
 
   return {
     posts,
