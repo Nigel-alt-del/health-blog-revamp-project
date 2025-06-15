@@ -1,10 +1,11 @@
 
+
 import { useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import BlogLayout from "@/components/BlogLayout";
-import { type BlogPost as BlogPostType } from "@/utils/supabaseStorage";
+import { type BlogPost as BlogPostType } from "@/types/blog";
 import { getPostById, loadAllPosts } from "@/utils/postManager";
 import { BlogPostHeader } from "@/components/blog/BlogPostHeader";
 import { BlogPostImage } from "@/components/blog/BlogPostImage";

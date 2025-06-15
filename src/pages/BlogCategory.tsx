@@ -1,10 +1,11 @@
+
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Filter } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import BlogLayout from "@/components/BlogLayout";
 import BlogCard from "@/components/BlogCard";
-import { type BlogPost } from "@/utils/supabaseStorage";
+import { type BlogPost } from "@/types/blog";
 import { loadAllPosts } from "@/utils/postManager";
 import { slugToCategory, doesPostMatchCategory } from "@/utils/categoryManager";
 

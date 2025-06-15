@@ -1,6 +1,9 @@
 
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { addPostToStorage, updatePostInStorage, deletePostFromStorage, addDeletedPostId, type BlogPost } from "@/utils/supabaseStorage";
+import { addPostToStorage, updatePostInStorage, deletePostFromStorage } from "@/services/supabase/posts";
+import { addDeletedPostId } from "@/services/supabase/deletedPosts";
+import { type BlogPost } from "@/types/blog";
 import { loadAllPosts } from "@/utils/postManager";
 import { blogPosts } from "@/data/blogPosts";
 import { toast } from "@/components/ui/use-toast";

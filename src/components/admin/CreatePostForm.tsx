@@ -1,4 +1,5 @@
 
+
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { PostBasicInfo } from "./PostBasicInfo";
@@ -6,7 +7,7 @@ import { FeaturedImageUpload } from "./FeaturedImageUpload";
 import { AdminSidebar } from "./AdminSidebar";
 import { SimpleContentEditor } from "./SimpleContentEditor";
 import { ReportPreview } from "../ReportPreview";
-import { addPostToStorage } from "@/utils/supabaseStorage";
+import { addPostToStorage } from "@/services/supabase/posts";
 
 interface CreatePostFormProps {
   onSubmit: (post: any) => void;

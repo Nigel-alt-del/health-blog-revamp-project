@@ -1,5 +1,7 @@
 
-import { getStoredPosts, getDeletedPostIds, type BlogPost, getPostFromStorage, isPostDeleted } from "./supabaseStorage";
+import { getStoredPosts, getPostFromStorage } from "@/services/supabase/posts";
+import { getDeletedPostIds, isPostDeleted } from "@/services/supabase/deletedPosts";
+import { type BlogPost } from "@/types/blog";
 import { blogPosts } from "@/data/blogPosts";
 
 /**

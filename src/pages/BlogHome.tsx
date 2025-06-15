@@ -1,4 +1,5 @@
 
+
 import { useQuery } from "@tanstack/react-query";
 import BlogLayout from "@/components/BlogLayout";
 import HeroSection from "@/components/home/HeroSection";
@@ -6,7 +7,7 @@ import IntroSection from "@/components/home/IntroSection";
 import CategoryButtons from "@/components/home/CategoryButtons";
 import FilterBadges from "@/components/home/FilterBadges";
 import PostsGrid from "@/components/home/PostsGrid";
-import { type BlogPost } from "@/utils/supabaseStorage";
+import { type BlogPost } from "@/types/blog";
 import { loadAllPosts } from "@/utils/postManager";
 import { useCategoryFiltering } from "@/hooks/useCategoryFiltering";
 

@@ -1,35 +1,35 @@
+
 import { supabase } from "@/integrations/supabase/client";
+import type { BlogPost } from "@/types/blog";
 
-// Export the BlogPost type
-export interface BlogPost {
-  id: string;
-  title: string;
-  excerpt: string;
-  content: string;
-  publishedAt: string;
-  readTime: string;
-  category: string;
-  tags: string[];
-  featured: boolean;
-  image: string;
-  seoKeywords?: string;
-  metaDescription?: string;
-  author?: string;
-  authorRole?: string;
-  authorLinkedin?: string;
-  authorBio?: string;
-}
+const savePostToSupabase = async (post: BlogPost): Promise<void> => {
+  const result = await supabase
+    .from('blog_posts')
+    .upsert({
+      id: post.id,
+      title: post.title,
+      excerpt: post.excerpt,
+      content: post.content,
+      published_at: post.publishedAt,
+      read_time: post.readTime,
+      category: post.category,
+      tags: post.tags,
+      featured: post.featured,
+      image: post.image,
+      seo_keywords: post.seoKeywords || '',
+      meta_description: post.metaDescription || post.excerpt,
+      author: post.author || 'InsureMyHealth Team',
+      author_role: post.authorRole || 'Healthcare Policy Analyst',
+      author_linkedin: post.authorLinkedin || '',
+      author_bio: post.authorBio || '',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'id' });
 
-export const savePosts = async (posts: BlogPost[]): Promise<void> => {
-  try {
-    // We'll store each post individually in Supabase
-    console.log('💾 Saving posts to Supabase:', posts.length);
-    
-    for (const post of posts) {
-      await savePostToSupabase(post);
-    }
-  } catch (error) {
-    console.error('❌ Error saving posts to Supabase:', error);
+  const { error } = result;
+
+  if (error) {
+    console.error('❌ Error saving post to Supabase:', error);
     throw error;
   }
 };
@@ -69,6 +69,8 @@ export const loadPosts = async (): Promise<BlogPost[]> => {
     return [];
   }
 };
+
+export const getStoredPosts = loadPosts;
 
 export const getPostFromStorage = async (postId: string): Promise<BlogPost | undefined> => {
   try {
@@ -178,77 +180,4 @@ export const deletePostFromStorage = async (postId: string): Promise<void> => {
     console.error('❌ Error deleting post from Supabase:', error);
     throw error;
   }
-};
-
-export const getDeletedPostIds = async (): Promise<string[]> => {
-  try {
-    const result = await supabase
-      .from('deleted_posts')
-      .select('post_id');
-
-    console.log('📋 Retrieved deleted post IDs from Supabase:', result.data);
-    return result.data?.map(item => item.post_id) || [];
-  } catch (error) {
-    console.error('❌ Error reading deleted post IDs from Supabase:', error);
-    return [];
-  }
-};
-
-export const addDeletedPostId = async (postId: string): Promise<void> => {
-  try {
-    console.log('🚫 Adding post ID to deleted list in Supabase:', postId);
-    
-    const result = await supabase
-      .from('deleted_posts')
-      .upsert({ post_id: postId }, { onConflict: 'post_id' });
-
-    const { error } = result;
-
-    if (error) {
-      console.error('❌ Error adding deleted post ID to Supabase:', error);
-      throw error;
-    }
-  } catch (error) {
-    console.error('❌ Error adding deleted post ID to Supabase:', error);
-    throw error;
-  }
-};
-
-const savePostToSupabase = async (post: BlogPost): Promise<void> => {
-  const result = await supabase
-    .from('blog_posts')
-    .upsert({
-      id: post.id,
-      title: post.title,
-      excerpt: post.excerpt,
-      content: post.content,
-      published_at: post.publishedAt,
-      read_time: post.readTime,
-      category: post.category,
-      tags: post.tags,
-      featured: post.featured,
-      image: post.image,
-      seo_keywords: post.seoKeywords || '',
-      meta_description: post.metaDescription || post.excerpt,
-      author: post.author || 'InsureMyHealth Team',
-      author_role: post.authorRole || 'Healthcare Policy Analyst',
-      author_linkedin: post.authorLinkedin || '',
-      author_bio: post.authorBio || '',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }, { onConflict: 'id' });
-
-  const { error } = result;
-
-  if (error) {
-    console.error('❌ Error saving post to Supabase:', error);
-    throw error;
-  }
-};
-
-export const getStoredPosts = loadPosts;
-export const savePostsToStorage = savePosts;
-export const isPostDeleted = async (postId: string): Promise<boolean> => {
-  const deletedIds = await getDeletedPostIds();
-  return deletedIds.includes(postId);
 };
