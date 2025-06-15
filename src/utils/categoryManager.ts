@@ -1,5 +1,5 @@
 
-import { type BlogPost } from "@/utils/supabaseStorage";
+import { type BlogPost } from "@/types/blog";
 
 const categoryMappings: { [key: string]: string } = {
   "pmi insights": "PMI Insights",

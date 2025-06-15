@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import BlogCard from "@/components/BlogCard";
-import { type BlogPost } from "@/utils/supabaseStorage";
+import { type BlogPost } from "@/types/blog";
 
 interface PostsGridProps {
   posts: BlogPost[];

@@ -6,8 +6,8 @@ import { FeaturedImageUpload } from "./FeaturedImageUpload";
 import { AdminSidebar } from "./AdminSidebar";
 import { SimpleContentEditor } from "./SimpleContentEditor";
 import { ReportPreview } from "../ReportPreview";
-import { type BlogPost } from "@/utils/supabaseStorage";
-import { updatePostInStorage } from "@/utils/supabaseStorage";
+import { type BlogPost } from "@/types/blog";
+import { updatePostInStorage } from "@/services/supabase/posts";
 
 interface EditPostFormProps {
   post: any;

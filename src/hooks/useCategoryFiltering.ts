@@ -1,6 +1,6 @@
 
 import { useState, useMemo } from "react";
-import { type BlogPost } from "@/utils/supabaseStorage";
+import { type BlogPost } from "@/types/blog";
 import { doesPostMatchCategory, getUniqueDisplayCategories } from "@/utils/categoryManager";
 
 export const useCategoryFiltering = (allPosts: BlogPost[]) => {
