@@ -39,7 +39,7 @@ const BlogFooter = () => {
           </div>
         </div>
         <div className="border-t border-gray-600 pt-8 text-center text-sm text-gray-300">
-          <p>2025 Thehealthcompass #</p>
+          <p>&copy; 2025 The Health Compass. All rights reserved.</p>
         </div>
       </div>
     </footer>
