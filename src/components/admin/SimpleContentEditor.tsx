@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -12,6 +13,33 @@ interface SimpleContentEditorProps {
 
 export const SimpleContentEditor = ({ value, onChange, placeholder }: SimpleContentEditorProps) => {
   const [showPreview, setShowPreview] = useState(false);
+  const editorRef = useRef<HTMLDivElement>(null);
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Set initial content and handle external updates
+  useEffect(() => {
+    if (editorRef.current && editorRef.current.innerHTML !== value) {
+      editorRef.current.innerHTML = value;
+    }
+  }, [value]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, []);
+  
+  const debouncedOnChange = (content: string) => {
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+    debounceTimeoutRef.current = setTimeout(() => {
+      onChange(content);
+    }, 500); // 500ms debounce
+  };
 
   const handlePaste = (event: React.ClipboardEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -69,14 +97,41 @@ export const SimpleContentEditor = ({ value, onChange, placeholder }: SimpleCont
       console.log('ULTRA-PROCESSED content:', contentToPaste);
     }
     
-    if (contentToPaste) {
-      onChange(value + contentToPaste);
+    if (contentToPaste && editorRef.current) {
+      const selection = window.getSelection();
+      if (!selection || !selection.rangeCount) {
+        editorRef.current.innerHTML += contentToPaste;
+        debouncedOnChange(editorRef.current.innerHTML);
+        return;
+      }
+      
+      const range = selection.getRangeAt(0);
+      range.deleteContents();
+
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = contentToPaste;
+
+      const fragment = document.createDocumentFragment();
+      let lastNode;
+      while ((node = tempDiv.firstChild)) {
+        lastNode = fragment.appendChild(node);
+      }
+      range.insertNode(fragment);
+
+      if (lastNode) {
+        range.setStartAfter(lastNode);
+        range.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+      
+      debouncedOnChange(editorRef.current.innerHTML);
     }
   };
 
   const handleDirectEdit = (event: React.FormEvent<HTMLDivElement>) => {
     const content = event.currentTarget.innerHTML;
-    onChange(content);
+    debouncedOnChange(content);
   };
 
   return (
@@ -130,11 +185,11 @@ export const SimpleContentEditor = ({ value, onChange, placeholder }: SimpleCont
             <div className="space-y-2">
               <Label>Paste your formatted document here:</Label>
               <div
+                ref={editorRef}
                 className="min-h-[400px] border rounded-lg p-4 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 prose prose-lg max-w-none overflow-auto font-montserrat"
                 contentEditable
                 onPaste={handlePaste}
                 onInput={handleDirectEdit}
-                dangerouslySetInnerHTML={{ __html: value }}
                 style={{ 
                   minHeight: '400px',
                   fontFamily: '"Montserrat", sans-serif'
