@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -113,6 +112,7 @@ export const SimpleContentEditor = ({ value, onChange, placeholder }: SimpleCont
 
       const fragment = document.createDocumentFragment();
       let lastNode;
+      let node: Node | null;
       while ((node = tempDiv.firstChild)) {
         lastNode = fragment.appendChild(node);
       }
