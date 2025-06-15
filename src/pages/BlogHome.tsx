@@ -1,5 +1,3 @@
-
-
 import { useQuery } from "@tanstack/react-query";
 import BlogLayout from "@/components/BlogLayout";
 import HeroSection from "@/components/home/HeroSection";
@@ -7,12 +5,12 @@ import IntroSection from "@/components/home/IntroSection";
 import CategoryButtons from "@/components/home/CategoryButtons";
 import FilterBadges from "@/components/home/FilterBadges";
 import PostsGrid from "@/components/home/PostsGrid";
-import { type BlogPost } from "@/types/blog";
+import { type BlogPostSummary } from "@/types/blog";
 import { loadAllPosts } from "@/utils/postManager";
 import { useCategoryFiltering } from "@/hooks/useCategoryFiltering";
 
 const BlogHome = () => {
-  const { data: allPosts = [], isLoading } = useQuery<BlogPost[]>({
+  const { data: allPosts = [], isLoading } = useQuery<BlogPostSummary[]>({
     queryKey: ['posts'],
     queryFn: loadAllPosts,
     staleTime: 5 * 60 * 1000, // 5 minutes

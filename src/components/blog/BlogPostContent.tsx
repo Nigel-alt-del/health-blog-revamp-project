@@ -1,6 +1,6 @@
 
 import { Badge } from "@/components/ui/badge";
-import { type BlogPost } from "@/utils/localStorage";
+import { type BlogPost } from "@/types/blog";
 
 interface BlogPostContentProps {
   post: BlogPost;

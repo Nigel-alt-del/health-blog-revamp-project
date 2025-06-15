@@ -1,22 +1,11 @@
-
 import { Link } from "react-router-dom";
 import { Clock } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-
-interface BlogPost {
-  id: string;
-  title: string;
-  excerpt: string;
-  publishedAt: string;
-  readTime: string;
-  category: string;
-  tags: string[];
-  image?: string;
-}
+import { type BlogPostSummary } from "@/types/blog";
 
 interface FeaturedPostProps {
-  post: BlogPost;
+  post: BlogPostSummary;
 }
 
 const FeaturedPost = ({ post }: FeaturedPostProps) => {

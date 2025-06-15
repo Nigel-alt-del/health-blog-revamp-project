@@ -1,9 +1,9 @@
 
 import BlogCard from "@/components/BlogCard";
-import { type BlogPost } from "@/utils/localStorage";
+import { type BlogPostSummary } from "@/types/blog";
 
 interface RelatedPostsProps {
-  relatedPosts: BlogPost[];
+  relatedPosts: BlogPostSummary[];
 }
 
 export const RelatedPosts = ({ relatedPosts }: RelatedPostsProps) => {

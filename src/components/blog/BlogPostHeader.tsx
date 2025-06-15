@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowLeft, Share2, BookmarkPlus, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { type BlogPost } from "@/utils/localStorage";
+import { type BlogPost } from "@/types/blog";
 
 interface BlogPostHeaderProps {
   post: BlogPost;

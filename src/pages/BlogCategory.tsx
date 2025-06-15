@@ -5,7 +5,7 @@ import { Filter } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import BlogLayout from "@/components/BlogLayout";
 import BlogCard from "@/components/BlogCard";
-import { type BlogPost } from "@/types/blog";
+import { type BlogPost, type BlogPostSummary } from "@/types/blog";
 import { loadAllPosts } from "@/utils/postManager";
 import { slugToCategory, doesPostMatchCategory } from "@/utils/categoryManager";
 
@@ -14,12 +14,12 @@ const BlogCategory = () => {
 
   const categoryName = slugToCategory(categorySlug);
 
-  const { data: allPosts = [] } = useQuery<BlogPost[]>({
+  const { data: allPosts = [] } = useQuery<BlogPostSummary[]>({
     queryKey: ['posts'],
     queryFn: loadAllPosts,
   });
 
-  const categoryPosts = allPosts.filter(post => doesPostMatchCategory(post, categoryName));
+  const categoryPosts = allPosts.filter(post => doesPostMatchCategory(post as BlogPost, categoryName));
 
   const getHeroTitle = () => {
     if (categorySlug === 'pmi-insights') return 'PMI Insights';

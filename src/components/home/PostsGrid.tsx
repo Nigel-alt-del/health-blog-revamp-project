@@ -2,10 +2,10 @@
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import BlogCard from "@/components/BlogCard";
-import { type BlogPost } from "@/types/blog";
+import { type BlogPostSummary } from "@/types/blog";
 
 interface PostsGridProps {
-  posts: BlogPost[];
+  posts: BlogPostSummary[];
   selectedCategory: string;
   onClearFilters: () => void;
   isLoading?: boolean;

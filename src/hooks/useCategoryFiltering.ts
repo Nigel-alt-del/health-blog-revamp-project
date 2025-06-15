@@ -1,13 +1,13 @@
 
 import { useState, useMemo } from "react";
-import { type BlogPost } from "@/types/blog";
+import { type BlogPost, type BlogPostSummary } from "@/types/blog";
 import { doesPostMatchCategory, getUniqueDisplayCategories } from "@/utils/categoryManager";
 
-export const useCategoryFiltering = (allPosts: BlogPost[]) => {
+export const useCategoryFiltering = (allPosts: BlogPostSummary[]) => {
   const [selectedCategory, setSelectedCategory] = useState("All");
 
   const categories = useMemo(() => {
-    const displayCategories = getUniqueDisplayCategories(allPosts);
+    const displayCategories = getUniqueDisplayCategories(allPosts as BlogPost[]);
     return ["All", ...displayCategories];
   }, [allPosts]);
 
@@ -15,7 +15,7 @@ export const useCategoryFiltering = (allPosts: BlogPost[]) => {
     if (selectedCategory === "All") {
       return allPosts;
     }
-    const filtered = allPosts.filter(post => doesPostMatchCategory(post, selectedCategory));
+    const filtered = allPosts.filter(post => doesPostMatchCategory(post as BlogPost, selectedCategory));
     return filtered;
   }, [selectedCategory, allPosts]);
 

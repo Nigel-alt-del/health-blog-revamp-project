@@ -1,5 +1,5 @@
 
-import { type BlogPost } from "@/utils/localStorage";
+import { type BlogPost } from "@/types/blog";
 
 interface BlogPostImageProps {
   post: BlogPost;

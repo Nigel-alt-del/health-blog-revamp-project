@@ -1,8 +1,8 @@
-
 import { Link } from "react-router-dom";
 import { Clock } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { type BlogPostSummary } from "@/types/blog";
 
 interface BlogPost {
   id: string;
@@ -16,7 +16,7 @@ interface BlogPost {
 }
 
 interface BlogCardProps {
-  post: BlogPost;
+  post: BlogPostSummary;
 }
 
 const BlogCard = ({ post }: BlogCardProps) => {

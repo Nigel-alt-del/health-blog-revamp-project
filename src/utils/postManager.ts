@@ -49,7 +49,7 @@ export const loadAllPosts = async (): Promise<BlogPostSummary[]> => {
 /**
  * Get posts filtered by category.
  */
-export const getPostsByCategory = async (category: string): Promise<BlogPost[]> => {
+export const getPostsByCategory = async (category: string): Promise<BlogPostSummary[]> => {
   const allPosts = await loadAllPosts();
   return allPosts.filter(
     post => post.category.toLowerCase().replace(/\s+/g, '-') === category

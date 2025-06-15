@@ -1,11 +1,9 @@
-
-
 import { useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import BlogLayout from "@/components/BlogLayout";
-import { type BlogPost as BlogPostType } from "@/types/blog";
+import { type BlogPost as BlogPostType, type BlogPostSummary } from "@/types/blog";
 import { getPostById, loadAllPosts } from "@/utils/postManager";
 import { BlogPostHeader } from "@/components/blog/BlogPostHeader";
 import { BlogPostImage } from "@/components/blog/BlogPostImage";
@@ -23,14 +21,9 @@ const BlogPost = () => {
     queryKey: ['post', slug],
     queryFn: () => getPostById(slug!),
     enabled: !!slug,
-    initialData: () => {
-      // Use cached 'posts' data for instant loads from home/category pages
-      const allPosts = queryClient.getQueryData<BlogPostType[]>(['posts']);
-      return allPosts?.find(p => p.id === slug);
-    },
   });
 
-  const { data: allPosts = [] } = useQuery({
+  const { data: allPosts = [] } = useQuery<BlogPostSummary[]>({
     queryKey: ['posts'],
     queryFn: loadAllPosts,
   });
