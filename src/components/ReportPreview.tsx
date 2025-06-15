@@ -1,10 +1,10 @@
-import React from 'react';
+
+import React, { useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, Clock, User, Eye, ExternalLink } from 'lucide-react';
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 interface ReportPreviewProps {
   post: {
@@ -25,88 +25,24 @@ interface ReportPreviewProps {
 }
 
 export const ReportPreview = ({ post, onClose, onPublish }: ReportPreviewProps) => {
-  const renderChart = (chartElement: HTMLElement) => {
-    const chartData = JSON.parse(chartElement.getAttribute('data-chart') || '{}');
-    const colors = ['#22aee1', '#20466d', '#79858D', '#f59e0b', '#ef4444', '#10b981'];
-
-    switch (chartData.type) {
-      case 'bar':
-        return (
-          <div className="my-6">
-            {chartData.title && <h3 className="text-lg font-semibold text-center mb-4">{chartData.title}</h3>}
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData.data}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" label={{ value: chartData.xAxisLabel, position: 'insideBottom', offset: -10 }} />
-                <YAxis label={{ value: chartData.yAxisLabel, angle: -90, position: 'insideLeft' }} />
-                <Tooltip />
-                <Bar dataKey="value" fill="#22aee1" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        );
-      case 'line':
-        return (
-          <div className="my-6">
-            {chartData.title && <h3 className="text-lg font-semibold text-center mb-4">{chartData.title}</h3>}
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={chartData.data}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" label={{ value: chartData.xAxisLabel, position: 'insideBottom', offset: -10 }} />
-                <YAxis label={{ value: chartData.yAxisLabel, angle: -90, position: 'insideLeft' }} />
-                <Tooltip />
-                <Line type="monotone" dataKey="value" stroke="#22aee1" strokeWidth={3} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        );
-      case 'pie':
-        return (
-          <div className="my-6">
-            {chartData.title && <h3 className="text-lg font-semibold text-center mb-4">{chartData.title}</h3>}
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={chartData.data}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {chartData.data.map((entry: any, index: number) => (
-                    <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
-
-  const processContent = (content: string) => {
-    // Convert chart placeholders to actual charts
+  const processedContent = useMemo(() => {
+    // This function handles placeholders in the content. Memoizing it prevents
+    // unnecessary re-processing when the preview is opened.
     const parser = new DOMParser();
-    const doc = parser.parseFromString(content, 'text/html');
+    const doc = parser.parseFromString(post.content, 'text/html');
     const chartElements = doc.querySelectorAll('.chart-placeholder');
     
-    let processedContent = content;
+    let contentString = post.content;
     chartElements.forEach((element) => {
       const chartId = element.getAttribute('data-chart-id');
-      processedContent = processedContent.replace(
+      contentString = contentString.replace(
         element.outerHTML,
         `<div id="chart-${chartId}" class="chart-container"></div>`
       );
     });
     
-    return processedContent;
-  };
+    return contentString;
+  }, [post.content]);
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
@@ -189,7 +125,7 @@ export const ReportPreview = ({ post, onClose, onPublish }: ReportPreviewProps) 
             <CardContent className="pt-6">
               <div 
                 className="prose prose-lg max-w-none"
-                dangerouslySetInnerHTML={{ __html: processContent(post.content) }}
+                dangerouslySetInnerHTML={{ __html: processedContent }}
               />
             </CardContent>
           </Card>

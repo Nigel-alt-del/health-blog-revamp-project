@@ -1,6 +1,7 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { Edit, Trash2, Star, StarOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,6 +27,8 @@ interface PostListViewProps {
 
 export const PostListView = ({ posts, onDeletePost, onEditPost, onToggleFeatured }: PostListViewProps) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   
   // Temporarily disable featured toggle UI
   const FEATURED_TOGGLE_ENABLED = false;
@@ -43,17 +46,12 @@ export const PostListView = ({ posts, onDeletePost, onEditPost, onToggleFeatured
   };
 
   const handleViewPost = (postId: string) => {
-    // CRITICAL FIX: Set multiple flags to ensure fresh data load and indicate admin origin
+    console.log(`Navigating to view post: ${postId}`);
     sessionStorage.setItem('cameFromAdmin', 'true');
-    sessionStorage.setItem('forceRefresh', 'true');
-    sessionStorage.setItem('viewFromAdmin', postId); // Track which post was viewed from admin
-    
-    // Add timestamp to force fresh load and prevent caching
-    const timestamp = Date.now();
-    const url = `/post/${postId}?from=admin&t=${timestamp}&refresh=true`;
-    
-    console.log("Opening post from admin:", url);
-    window.open(url, '_blank');
+    // Invalidate the specific post query to force a refetch for the latest content
+    queryClient.invalidateQueries({ queryKey: ['post', postId] });
+    // Navigate to the post page in the same tab
+    navigate(`/post/${postId}`);
   };
 
   const handleToggleFeatured = (postId: string) => {
@@ -87,7 +85,7 @@ export const PostListView = ({ posts, onDeletePost, onEditPost, onToggleFeatured
                   variant="outline" 
                   size="sm"
                   onClick={() => handleViewPost(post.id)}
-                  title="View latest content (opens in new tab)"
+                  title="View latest content (opens in same tab)"
                 >
                   View
                 </Button>
