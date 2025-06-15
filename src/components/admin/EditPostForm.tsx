@@ -187,44 +187,6 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
     setFormData(newFormData);
   };
 
-  const insertFeaturedImage = () => {
-    if (!formData.image) {
-      toast({
-        title: "No Image",
-        description: "Please upload a featured image first",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      const sizeStyles = {
-        small: { width: "200px", height: "auto" },
-        medium: { width: "400px", height: "auto" },
-        large: { width: "600px", height: "auto" },
-        full: { width: "100%", height: "auto" }
-      };
-
-      const size = sizeStyles[formData.imageSize];
-      const imageHtml = `<div style="text-align: center; margin: 20px 0;"><img src="${formData.image}" alt="Featured image" style="width: ${size.width}; height: ${size.height}; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" /></div>`;
-      
-      const newContent = formData.content + imageHtml;
-      setFormData({ ...formData, content: newContent });
-
-      toast({
-        title: "Image Inserted",
-        description: "Featured image has been added to your content"
-      });
-    } catch (error) {
-      console.error("Error inserting featured image:", error);
-      toast({
-        title: "Insert Failed",
-        description: "Failed to insert image. Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
-
   const canPreview = !!(formData.title?.trim());
   const canPublish = !!(formData.title?.trim() && formData.excerpt?.trim());
 
@@ -253,7 +215,6 @@ export const EditPostForm = ({ post, onSubmit, onCancel }: EditPostFormProps) =>
             imageSize={formData.imageSize}
             onImageChange={(image) => handleFormDataChange({ ...formData, image })}
             onImageSizeChange={(size) => handleFormDataChange({ ...formData, imageSize: size })}
-            onInsertToContent={insertFeaturedImage}
           />
 
           <SimpleContentEditor
