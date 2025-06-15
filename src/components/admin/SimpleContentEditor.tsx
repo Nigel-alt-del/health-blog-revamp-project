@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,110 +16,57 @@ export const SimpleContentEditor = ({ value, onChange, placeholder }: SimpleCont
   const handlePaste = (event: React.ClipboardEvent<HTMLDivElement>) => {
     event.preventDefault();
     
-    // Get HTML content from clipboard (preserves formatting from Word/Google Docs)
+    // Get HTML content from clipboard
     const htmlData = event.clipboardData.getData('text/html');
     const textData = event.clipboardData.getData('text/plain');
     
-    // Use HTML if available (from Word/Google Docs), otherwise use plain text
     let contentToPaste = htmlData || textData;
     
     if (contentToPaste && htmlData) {
       console.log('Original pasted content:', contentToPaste);
       
-      // Enhanced cleanup that better preserves Word document formatting
+      // SUPER AGGRESSIVE CLEANUP to convert "fake" headings into real ones
       contentToPaste = contentToPaste
-        // Remove Word-specific comments and XML tags
-        .replace(/<!--[\s\S]*?-->/g, '')
-        .replace(/<\?xml[^>]*>/g, '')
+        // Remove Word-specific XML, comments, and classes
+        .replace(/<!--[\s\S]*?-->/gi, '')
+        .replace(/<\?xml[^>]*>/gi, '')
         .replace(/<o:p\s*\/?>/gi, '')
         .replace(/<\/o:p>/gi, '')
-        
-        // Remove Word-specific styling classes but keep inline styles
         .replace(/class="[^"]*Mso[^"]*"/gi, '')
-        .replace(/class="[^"]*Word[^"]*"/gi, '')
         
-        // Preserve and enhance font sizes - convert pt to px more accurately
-        .replace(/font-size:\s*(\d+(?:\.\d+)?)pt/gi, (match, size) => {
-          const ptSize = parseFloat(size);
-          // Preserve larger font sizes more accurately
-          if (ptSize >= 14) {
-            return `font-size: ${Math.round(ptSize * 1.33)}px; font-weight: bold`;
-          } else if (ptSize >= 12) {
-            return `font-size: ${Math.round(ptSize * 1.33)}px`;
-          } else {
-            return `font-size: ${Math.round(ptSize * 1.33)}px`;
-          }
+        // --- HEADING DETECTION LOGIC ---
+        // 1. Detect paragraphs that are just bold text and make them H2
+        .replace(/<p[^>]*>\s*<(strong|b)[^>]*>(.*?)<\/\1>\s*<\/p>/gi, '<h2>$2</h2>')
+        
+        // 2. Detect paragraphs with large font sizes (from Word/Docs) and make them H2
+        .replace(/<p[^>]*style="[^"]*font-size:\s*(1[4-9]pt|2\dpt|[1-9]\dpt|18px|19px|20px|22px|24px)[^"]*"[^>]*>(.*?)<\/p>/gi, (match, size, content) => {
+            return `<h2>${content.replace(/<[^>]+>/g, '').trim()}</h2>`;
+        })
+
+        // 3. Detect paragraphs that have bold style and make them H3
+        .replace(/<p[^>]*style="[^"]*font-weight:\s*(bold|700)[^"]*"[^>]*>(.*?)<\/p>/gi, (match, style, content) => {
+            const cleanContent = content.replace(/<[^>]+>/g, '').trim();
+            if (cleanContent.length > 0 && cleanContent.length < 150 && !cleanContent.endsWith('.') && !cleanContent.endsWith(';')) {
+                return `<h3>${cleanContent}</h3>`;
+            }
+            return `<p>${cleanContent}</p>`;
+        })
+
+        // 4. Simplify actual H tags and strip their styles
+        .replace(/<h([1-6])[^>]*>(.*?)<\/h\1>/gi, (match, level, content) => {
+            const cleanContent = content.replace(/<[^>]+>/g, '').trim();
+            if (level === '1' || level === '2') return `<h2>${cleanContent}</h2>`;
+            return `<h3>${cleanContent}</h3>`;
         })
         
-        // Handle explicit font-size in px and preserve bold
-        .replace(/font-size:\s*(\d+)px/gi, (match, size) => {
-          const pxSize = parseInt(size);
-          if (pxSize >= 18) {
-            return `font-size: ${pxSize}px; font-weight: bold`;
-          }
-          return match;
-        })
-        
-        // Better detection and preservation of headings (H1, H2, etc)
-        .replace(/<h([1-6])([^>]*)>(.*?)<\/h[1-6]>/gi, (match, level, attrs, content) => {
-          const fontSize = level === '1' ? '24px' : level === '2' ? '20px' : '18px';
-          return `<h${level} style="font-size: ${fontSize}; font-weight: bold; font-family: 'Montserrat', sans-serif; margin: 20px 0 16px 0; line-height: 1.4;">${content}</h${level}>`;
-        })
-        
-        // Preserve paragraphs with font-weight bold as headings
-        .replace(/<p([^>]*style="[^"]*font-weight:\s*(?:bold|700)[^"]*")([^>]*)>(.*?)<\/p>/gi, (match, style1, style2, content) => {
-          // Check if this looks like a heading (short text, no punctuation at end)
-          const isHeading = content.length < 100 && !content.trim().endsWith('.') && !content.trim().endsWith(',');
-          if (isHeading) {
-            return `<h3 style="font-size: 18px; font-weight: bold; font-family: 'Montserrat', sans-serif; margin: 20px 0 16px 0; line-height: 1.4;">${content}</h3>`;
-          }
-          return `<p style="font-weight: bold; font-family: 'Montserrat', sans-serif; line-height: 1.6; margin: 16px 0;">${content}</p>`;
-        })
-        
-        // Better bullet point handling - preserve various bullet styles
-        .replace(/<p[^>]*>\s*[·•▪▫◦‣⁃]\s*(.*?)<\/p>/gi, '<li style="font-family: \'Montserrat\', sans-serif; line-height: 1.6; margin: 8px 0;">$1</li>')
-        .replace(/<p[^>]*>\s*\d+\.\s*(.*?)<\/p>/gi, '<li style="font-family: \'Montserrat\', sans-serif; line-height: 1.6; margin: 8px 0;">$1</li>')
-        
-        // Convert bold/italic tags consistently
-        .replace(/<b\b[^>]*>/gi, '<strong>')
-        .replace(/<\/b>/gi, '</strong>')
-        .replace(/<i\b[^>]*>/gi, '<em>')
-        .replace(/<\/i>/gi, '</em>')
-        
-        // Handle font-weight and font-style in spans - preserve as bold
-        .replace(/<span([^>]*style="[^"]*font-weight:\s*(?:bold|700)[^"]*")([^>]*)>(.*?)<\/span>/gi, '<strong style="font-family: \'Montserrat\', sans-serif;">$3</strong>')
-        .replace(/<span([^>]*style="[^"]*font-style:\s*italic[^"]*")([^>]*)>(.*?)<\/span>/gi, '<em style="font-family: \'Montserrat\', sans-serif;">$3</em>')
-        
-        // Preserve line breaks and spacing - convert double <br> or <p></p> to proper paragraphs
-        .replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '</p><p style="font-family: \'Montserrat\', sans-serif; line-height: 1.6; margin: 16px 0;">')
-        .replace(/<p[^>]*>\s*<\/p>/gi, '<p style="font-family: \'Montserrat\', sans-serif; line-height: 1.6; margin: 16px 0;">&nbsp;</p>')
-        
-        // Wrap consecutive list items properly
-        .replace(/(<li[^>]*>.*?<\/li>\s*)+/gs, (match) => {
-          const listItems = match.trim();
-          if (!listItems.includes('<ul>') && !listItems.includes('<ol>')) {
-            return `<ul style="margin: 16px 0; padding-left: 24px;">${listItems}</ul>`;
-          }
-          return match;
-        })
-        
-        // Apply Montserrat font to paragraphs while preserving existing styles
-        .replace(/<p([^>]*style="[^"]*")([^>]*)>/gi, (match, style, rest) => {
-          if (!style.includes('font-family')) {
-            return match.replace(/style="([^"]*)"/, 'style="$1; font-family: \'Montserrat\', sans-serif;"');
-          }
-          return match;
-        })
-        .replace(/<p(?![^>]*style=)([^>]*)>/gi, '<p$1 style="font-family: \'Montserrat\', sans-serif; line-height: 1.6; margin: 16px 0;">')
-        
-        // Clean up empty elements but preserve intentional spacing
-        .replace(/<span[^>]*>\s*<\/span>/gi, '')
-        
-        // Remove extra whitespace but preserve intentional line breaks
+        // Cleanup and normalization
+        .replace(/<b\b[^>]*>/gi, '<strong>').replace(/<\/b>/gi, '</strong>')
+        .replace(/<i\b[^>]*>/gi, '<em>').replace(/<\/i>/gi, '</em>')
+        .replace(/<p[^>]*>\s*(<br\s*\/?>|&nbsp;)\s*<\/p>/gi, '<p><br></p>') // Preserve empty lines
         .replace(/\s+/g, ' ')
-        .replace(/>\s+</g, '><');
-      
-      console.log('Enhanced processed content:', contentToPaste);
+        .replace(/> </g, '><');
+
+      console.log('ULTRA-PROCESSED content:', contentToPaste);
     }
     
     if (contentToPaste) {
