@@ -4,6 +4,7 @@ import BlogLayout from "@/components/BlogLayout";
 import HeroSection from "@/components/home/HeroSection";
 import IntroSection from "@/components/home/IntroSection";
 import CategoryButtons from "@/components/home/CategoryButtons";
+import FilterBadges from "@/components/home/FilterBadges";
 import PostsGrid from "@/components/home/PostsGrid";
 import { type BlogPost } from "@/utils/supabaseStorage";
 import { loadAllPosts } from "@/utils/postManager";
@@ -37,6 +38,12 @@ const BlogHome = () => {
 
       <div className="max-w-6xl mx-auto px-4 py-12">
         <CategoryButtons />
+
+        <FilterBadges
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onCategorySelect={setSelectedCategory}
+        />
 
         <PostsGrid
           posts={filteredPosts}

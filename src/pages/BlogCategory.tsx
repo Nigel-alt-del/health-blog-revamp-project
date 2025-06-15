@@ -6,68 +6,12 @@ import BlogLayout from "@/components/BlogLayout";
 import BlogCard from "@/components/BlogCard";
 import { type BlogPost } from "@/utils/supabaseStorage";
 import { loadAllPosts } from "@/utils/postManager";
+import { slugToCategory, doesPostMatchCategory } from "@/utils/categoryManager";
 
 const BlogCategory = () => {
   const { category: categorySlug } = useParams<{ category: string }>();
 
-  // Map URL slugs to category names and handle variations
-  const getCategoryNameFromSlug = (slug: string = '') => {
-    switch (slug) {
-      case 'pmi-insights':
-        return 'PMI Insights';
-      case 'healthcare':
-        return 'Healthcare';
-      case 'digital-health':
-        return 'Digital Health';
-      case 'mental-health':
-        return 'Mental Health';
-      default:
-        return slug;
-    }
-  };
-
-  const categoryName = getCategoryNameFromSlug(categorySlug);
-
-  // Enhanced category matching function
-  const doesPostMatchCategory = (post: BlogPost, targetCategory: string): boolean => {
-    const postCategory = post.category.toLowerCase().trim();
-    const target = targetCategory.toLowerCase();
-
-    console.log("BlogCategory - Checking post category:", postCategory, "against target:", target);
-
-    // Direct match
-    if (postCategory === target) {
-      return true;
-    }
-
-    // Handle category variations
-    switch (target) {
-      case 'pmi insights':
-        return postCategory.includes('pmi') || 
-               postCategory.includes('insurance') || 
-               postCategory === 'insurance tips';
-      
-      case 'healthcare':
-        return postCategory.includes('healthcare') || 
-               postCategory.includes('health policy') || 
-               postCategory === 'health' ||
-               postCategory.includes('mental health') ||
-               postCategory.includes('workplace wellbeing');
-      
-      case 'digital health':
-        return postCategory.includes('digital') || 
-               postCategory.includes('benefits technology') || 
-               postCategory === 'digital transformation';
-      
-      case 'mental health':
-        return postCategory.includes('mental health') || 
-               postCategory.includes('workplace wellbeing') || 
-               postCategory.includes('employee support');
-      
-      default:
-        return false;
-    }
-  };
+  const categoryName = slugToCategory(categorySlug);
 
   const { data: allPosts = [] } = useQuery<BlogPost[]>({
     queryKey: ['posts'],
