@@ -1,4 +1,3 @@
-
 import { getStoredPosts, getDeletedPostIds, type BlogPost } from "./supabaseStorage";
 import { blogPosts } from "@/data/blogPosts";
 
@@ -16,12 +15,15 @@ export const loadAllPosts = async (): Promise<BlogPost[]> => {
       getDeletedPostIds()
     ]);
     
+    // Use Sets for O(1) lookups, which is much faster than array.includes()
+    const deletedIdSet = new Set(deletedIds);
+
     // Filter and process in one pass for better performance
-    const availableUserCreatedPosts = userCreatedPosts.filter(post => !deletedIds.includes(post.id));
+    const availableUserCreatedPosts = userCreatedPosts.filter(post => !deletedIdSet.has(post.id));
     const userCreatedPostIds = new Set(availableUserCreatedPosts.map(p => p.id));
     
     const availableDefaultPosts = blogPosts
-      .filter(post => !deletedIds.includes(post.id) && !userCreatedPostIds.has(post.id))
+      .filter(post => !deletedIdSet.has(post.id) && !userCreatedPostIds.has(post.id))
       .map(post => ({
         id: post.id,
         title: post.title,

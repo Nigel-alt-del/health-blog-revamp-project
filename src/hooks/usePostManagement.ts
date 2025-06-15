@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { addPostToStorage, updatePostInStorage, deletePostFromStorage, addDeletedPostId, type BlogPost } from "@/utils/supabaseStorage";
 import { loadAllPosts } from "@/utils/postManager";
@@ -10,6 +11,7 @@ export const usePostManagement = () => {
   const { data: posts = [], isLoading: loading } = useQuery<BlogPost[]>({
     queryKey: ['posts'],
     queryFn: loadAllPosts,
+    staleTime: 5 * 60 * 1000, // 5 minutes. Ensures data is fresh and not re-fetched unnecessarily
   });
 
   const generateId = (title: string): string => {
