@@ -1,64 +1,16 @@
-
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { addPostToStorage, updatePostInStorage, deletePostFromStorage, addDeletedPostId, type BlogPost } from "@/utils/supabaseStorage";
-import { loadAllPosts, forceRefreshPosts } from "@/utils/postManager";
+import { loadAllPosts } from "@/utils/postManager";
 import { blogPosts } from "@/data/blogPosts";
+import { toast } from "@/components/ui/use-toast";
 
 export const usePostManagement = () => {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [loading, setLoading] = useState(true);
-  const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const isRefreshingRef = useRef(false);
+  const queryClient = useQueryClient();
 
-  // Debounced refresh to prevent multiple simultaneous refreshes
-  const debouncedRefresh = useCallback(async () => {
-    if (refreshTimeoutRef.current) {
-      clearTimeout(refreshTimeoutRef.current);
-    }
-
-    refreshTimeoutRef.current = setTimeout(async () => {
-      if (isRefreshingRef.current) return;
-      
-      console.log("usePostManagement - DEBOUNCED REFRESH (SUPABASE)");
-      isRefreshingRef.current = true;
-      
-      try {
-        setLoading(true);
-        const allPosts = await loadAllPosts();
-        console.log("usePostManagement - NEW POSTS STATE:", allPosts);
-        setPosts(allPosts);
-      } catch (error) {
-        console.error("usePostManagement - Error refreshing posts:", error);
-      } finally {
-        setLoading(false);
-        isRefreshingRef.current = false;
-      }
-    }, 300); // 300ms debounce
-  }, []);
-
-  // Optimized refresh function
-  const refreshPosts = useCallback(async () => {
-    await debouncedRefresh();
-  }, [debouncedRefresh]);
-
-  useEffect(() => {
-    console.log("usePostManagement - INITIAL LOAD (SUPABASE)");
-    refreshPosts();
-    
-    const handlePostsRefreshed = () => {
-      console.log("usePostManagement - HANDLING REFRESH EVENT");
-      refreshPosts();
-    };
-
-    window.addEventListener('postsRefreshed', handlePostsRefreshed);
-    
-    return () => {
-      window.removeEventListener('postsRefreshed', handlePostsRefreshed);
-      if (refreshTimeoutRef.current) {
-        clearTimeout(refreshTimeoutRef.current);
-      }
-    };
-  }, [refreshPosts]);
+  const { data: posts = [], isLoading: loading } = useQuery<BlogPost[]>({
+    queryKey: ['posts'],
+    queryFn: loadAllPosts,
+  });
 
   const generateId = (title: string): string => {
     const baseId = title.toLowerCase()
@@ -70,137 +22,99 @@ export const usePostManagement = () => {
     return `${baseId}-${timestamp}`;
   };
 
-  const handleCreatePost = async (newPost: any) => {
-    console.log("📝 SUPABASE SAVE - Starting creation process for:", newPost.title);
-    console.log("📝 TIME:", new Date().toISOString());
-    
-    try {
-      // Generate the new post data
-      const post: BlogPost = {
-        id: generateId(newPost.title),
-        title: newPost.title,
-        excerpt: newPost.excerpt,
-        content: newPost.content || '',
-        publishedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-        readTime: "5 min read",
-        category: newPost.category,
-        tags: Array.isArray(newPost.tags) ? newPost.tags : (newPost.tags || '').split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag),
-        featured: false,
-        image: newPost.image || "/placeholder.svg",
-        seoKeywords: newPost.seoKeywords || '',
-        metaDescription: newPost.metaDescription || newPost.excerpt
-      };
+  const mutationOptions = {
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      queryClient.invalidateQueries({ queryKey: ['post'] }); // Invalidate single post queries too
+    },
+    onError: (error: Error) => {
+      console.error("Mutation failed:", error);
+      toast({
+        title: "Error",
+        description: `An error occurred: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  };
 
-      console.log("📝 NEW POST DATA CREATED:", post);
-      console.log("📝 SAVING TO SUPABASE...");
-      
-      await addPostToStorage(post);
-      
-      console.log("📝 ✅ POST SUCCESSFULLY SAVED TO SUPABASE");
-      
-      // Optimized refresh - only refresh once
-      await refreshPosts();
-      
-      console.log("📝 POST CREATION PROCESS COMPLETE");
-    } catch (error) {
-      console.error("📝 ❌ ERROR CREATING POST:", error);
-      throw error;
-    }
+  const createPostMutation = useMutation({
+    mutationFn: (post: BlogPost) => addPostToStorage(post),
+    ...mutationOptions,
+  });
+
+  const updatePostMutation = useMutation({
+    mutationFn: (post: BlogPost) => updatePostInStorage(post),
+    ...mutationOptions,
+  });
+
+  const deleteCustomPostMutation = useMutation({
+    mutationFn: (postId: string) => deletePostFromStorage(postId),
+    ...mutationOptions,
+  });
+  
+  const addDeletedIdMutation = useMutation({
+    mutationFn: (postId: string) => addDeletedPostId(postId),
+    ...mutationOptions,
+  });
+
+  const handleCreatePost = async (newPost: any) => {
+    console.log("📝 Starting creation process for:", newPost.title);
+    const post: BlogPost = {
+      id: generateId(newPost.title),
+      title: newPost.title,
+      excerpt: newPost.excerpt,
+      content: newPost.content || '',
+      publishedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      readTime: "5 min read",
+      category: newPost.category,
+      tags: Array.isArray(newPost.tags) ? newPost.tags : (newPost.tags || '').split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag),
+      featured: false,
+      image: newPost.image || "/placeholder.svg",
+      seoKeywords: newPost.seoKeywords || '',
+      metaDescription: newPost.metaDescription || newPost.excerpt
+    };
+    await createPostMutation.mutateAsync(post);
+    console.log("📝 POST CREATION PROCESS COMPLETE");
   };
 
   const handleEditPost = async (updatedPost: any) => {
-    console.log("usePostManagement - EDITING POST:", updatedPost);
-    
-    try {
-      const formattedPost: BlogPost = {
-        ...updatedPost,
-        tags: Array.isArray(updatedPost.tags) ? updatedPost.tags : (updatedPost.tags || '').split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag)
-      };
-
-      await updatePostInStorage(formattedPost);
-      console.log("usePostManagement - UPDATED IN SUPABASE");
-      
-      // Optimized refresh - only refresh once
-      await refreshPosts();
-      
-      console.log("usePostManagement - POST EDIT COMPLETE");
-      sessionStorage.setItem('cameFromAdmin', 'true');
-    } catch (error) {
-      console.error("usePostManagement - Error editing post:", error);
-      throw error;
-    }
+    console.log("Editing post:", updatedPost);
+    const formattedPost: BlogPost = {
+      ...updatedPost,
+      tags: Array.isArray(updatedPost.tags) ? updatedPost.tags : (updatedPost.tags || '').split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag)
+    };
+    await updatePostMutation.mutateAsync(formattedPost);
+    sessionStorage.setItem('cameFromAdmin', 'true');
+    console.log("POST EDIT COMPLETE");
   };
 
   const handleDeletePost = async (postId: string) => {
-    console.log("🚨 SUPABASE DELETION - STARTING FOR POST:", postId);
-    console.log("🚨 TIME:", new Date().toISOString());
-    
-    try {
-      const isDefaultPost = blogPosts.some(p => p.id === postId);
-      console.log("🚨 IS DEFAULT POST?", isDefaultPost);
-      
-      if (isDefaultPost) {
-        console.log("🚨 MARKING DEFAULT POST AS DELETED IN SUPABASE");
-        await addDeletedPostId(postId);
-      } else {
-        console.log("🚨 DELETING CUSTOM POST FROM SUPABASE");
-        await deletePostFromStorage(postId);
-      }
-      
-      console.log("🚨 ✅ DELETION COMPLETED IN SUPABASE");
-      
-      // Optimized refresh - only refresh once
-      await refreshPosts();
-      
-      console.log("🚨 DELETION PROCESS COMPLETE");
-    } catch (error) {
-      console.error("🚨 ❌ ERROR DELETING POST:", error);
-      throw error;
+    console.log("🚨 DELETION - STARTING FOR POST:", postId);
+    const isDefaultPost = blogPosts.some(p => p.id === postId);
+    if (isDefaultPost) {
+      await addDeletedIdMutation.mutateAsync(postId);
+    } else {
+      await deleteCustomPostMutation.mutateAsync(postId);
     }
+    console.log("🚨 DELETION PROCESS COMPLETE");
   };
 
   const handleToggleFeatured = async (postId: string) => {
-    console.log("usePostManagement - TOGGLING FEATURED FOR POST:", postId);
-    
-    try {
-      // Get current post
-      const currentPost = posts.find(p => p.id === postId);
-      if (!currentPost) {
-        console.error("usePostManagement - Post not found:", postId);
-        return;
-      }
+    const currentPost = posts.find(p => p.id === postId);
+    if (!currentPost) return;
 
-      console.log("usePostManagement - Current featured state:", currentPost.featured);
-      const newFeaturedState = !currentPost.featured;
-      
-      // Update the clicked post and unfeature all others in Supabase
-      const postsToUpdate = posts.filter(post => 
-        post.id === postId || post.featured
-      );
-      
-      // Batch update all posts that need changes in Supabase
-      const updatePromises = postsToUpdate.map(post => {
-        const updatedPost = {
-          ...post,
-          featured: post.id === postId ? newFeaturedState : false
-        };
-        
-        console.log("usePostManagement - Updating post in Supabase:", post.id, "featured:", updatedPost.featured);
-        return updatePostInStorage(updatedPost);
+    const newFeaturedState = !currentPost.featured;
+
+    // Unfeature all other posts and feature the selected one
+    const updatePromises = posts
+      .filter(p => p.featured || p.id === postId)
+      .map(p => {
+        const updatedPost = { ...p, featured: p.id === postId ? newFeaturedState : false };
+        return updatePostMutation.mutateAsync(updatedPost);
       });
-      
-      await Promise.all(updatePromises);
-      
-      console.log("usePostManagement - All Supabase updates complete, refreshing UI");
-      
-      // Single refresh after all updates are complete
-      await refreshPosts();
-      
-      console.log("usePostManagement - FEATURED TOGGLE COMPLETE");
-    } catch (error) {
-      console.error("usePostManagement - Error toggling featured:", error);
-      throw error;
-    }
+
+    await Promise.all(updatePromises);
+    console.log("FEATURED TOGGLE COMPLETE");
   };
 
   return {

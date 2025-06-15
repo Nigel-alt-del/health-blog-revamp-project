@@ -1,6 +1,5 @@
-
 import { useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Filter } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import BlogLayout from "@/components/BlogLayout";
@@ -9,11 +8,10 @@ import { type BlogPost } from "@/utils/supabaseStorage";
 import { loadAllPosts } from "@/utils/postManager";
 
 const BlogCategory = () => {
-  const { category } = useParams();
-  const [categoryPosts, setCategoryPosts] = useState<BlogPost[]>([]);
+  const { category: categorySlug } = useParams<{ category: string }>();
 
   // Map URL slugs to category names and handle variations
-  const getCategoryNameFromSlug = (slug: string) => {
+  const getCategoryNameFromSlug = (slug: string = '') => {
     switch (slug) {
       case 'pmi-insights':
         return 'PMI Insights';
@@ -27,6 +25,8 @@ const BlogCategory = () => {
         return slug;
     }
   };
+
+  const categoryName = getCategoryNameFromSlug(categorySlug);
 
   // Enhanced category matching function
   const doesPostMatchCategory = (post: BlogPost, targetCategory: string): boolean => {
@@ -69,40 +69,18 @@ const BlogCategory = () => {
     }
   };
 
-  // Load posts and filter by category
-  useEffect(() => {
-    const loadCategoryPosts = async () => {
-      if (category) {
-        console.log("BlogCategory - Loading posts for category:", category);
-        const allPosts = await loadAllPosts();
-        const categoryName = getCategoryNameFromSlug(category);
-        
-        console.log("BlogCategory - All posts:", allPosts);
-        console.log("BlogCategory - Looking for category:", categoryName);
-        console.log("BlogCategory - Post categories:", allPosts.map(p => p.category));
-        
-        // Filter posts that match the category using enhanced matching
-        const filteredPosts = allPosts.filter(post => {
-          const matches = doesPostMatchCategory(post, categoryName);
-          console.log(`BlogCategory - Post "${post.title}" (${post.category}) matches ${categoryName}:`, matches);
-          return matches;
-        });
-        
-        console.log("BlogCategory - Filtered posts:", filteredPosts);
-        setCategoryPosts(filteredPosts);
-      }
-    };
-    
-    loadCategoryPosts();
-  }, [category]);
-  
-  const categoryName = getCategoryNameFromSlug(category || '');
+  const { data: allPosts = [] } = useQuery<BlogPost[]>({
+    queryKey: ['posts'],
+    queryFn: loadAllPosts,
+  });
+
+  const categoryPosts = allPosts.filter(post => doesPostMatchCategory(post, categoryName));
 
   const getHeroTitle = () => {
-    if (category === 'pmi-insights') return 'PMI Insights';
-    if (category === 'healthcare') return 'Healthcare Intelligence';
-    if (category === 'digital-health') return 'Digital Health';
-    if (category === 'mental-health') return 'Mental Health';
+    if (categorySlug === 'pmi-insights') return 'PMI Insights';
+    if (categorySlug === 'healthcare') return 'Healthcare Intelligence';
+    if (categorySlug === 'digital-health') return 'Digital Health';
+    if (categorySlug === 'mental-health') return 'Mental Health';
     return `${categoryName} Intelligence`;
   };
 

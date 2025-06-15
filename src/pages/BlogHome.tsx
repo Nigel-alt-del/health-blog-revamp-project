@@ -1,74 +1,20 @@
 
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import BlogLayout from "@/components/BlogLayout";
 import HeroSection from "@/components/home/HeroSection";
 import IntroSection from "@/components/home/IntroSection";
 import CategoryButtons from "@/components/home/CategoryButtons";
 import PostsGrid from "@/components/home/PostsGrid";
 import { type BlogPost } from "@/utils/supabaseStorage";
-import { loadAllPosts, preloadPosts } from "@/utils/postManager";
+import { loadAllPosts } from "@/utils/postManager";
 import { useCategoryFiltering } from "@/hooks/useCategoryFiltering";
 
 const BlogHome = () => {
-  const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const refreshPosts = async (useCache = true) => {
-    console.log("BlogHome - OPTIMIZED REFRESH");
-    try {
-      const posts = await loadAllPosts(useCache);
-      console.log("BlogHome - LOADED POSTS:", posts.length);
-      setAllPosts(posts);
-    } catch (error) {
-      console.error("BlogHome - Error loading posts:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    console.log("BlogHome - INITIAL LOAD WITH OPTIMIZATION");
-    
-    // Start preloading immediately
-    preloadPosts();
-    
-    // Load posts with cache
-    refreshPosts(true);
-
-    const handlePostsRefreshed = () => {
-      console.log("BlogHome - HANDLING REFRESH EVENT");
-      refreshPosts(false); // Force fresh data on refresh events
-    };
-
-    window.addEventListener('postsRefreshed', handlePostsRefreshed);
-    
-    return () => {
-      window.removeEventListener('postsRefreshed', handlePostsRefreshed);
-    };
-  }, []);
-
-  // Optimized visibility change handler with debouncing
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        console.log("BlogHome - PAGE VISIBLE, OPTIMIZED REFRESH");
-        // Debounce the refresh to avoid multiple rapid calls
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-          refreshPosts(true); // Use cache for visibility changes
-        }, 100);
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      clearTimeout(timeoutId);
-    };
-  }, []);
+  const { data: allPosts = [], isLoading } = useQuery<BlogPost[]>({
+    queryKey: ['posts'],
+    queryFn: loadAllPosts,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
   const {
     filteredPosts,
@@ -77,7 +23,7 @@ const BlogHome = () => {
     categories
   } = useCategoryFiltering(allPosts);
 
-  console.log("BlogHome - Filtered posts count:", filteredPosts.length);
+  console.log("BlogHome - Render. isLoading:", isLoading, "Posts count:", allPosts.length);
 
   return (
     <BlogLayout>

@@ -1,11 +1,10 @@
-
 import { useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import BlogLayout from "@/components/BlogLayout";
 import { type BlogPost as BlogPostType } from "@/utils/localStorage";
-import { loadAllPosts, getPostById } from "@/utils/postManager";
+import { getPostById, loadAllPosts } from "@/utils/postManager";
 import { BlogPostHeader } from "@/components/blog/BlogPostHeader";
 import { BlogPostImage } from "@/components/blog/BlogPostImage";
 import { BlogPostContent } from "@/components/blog/BlogPostContent";
@@ -14,61 +13,23 @@ import { BlogPostNotFound } from "@/components/blog/BlogPostNotFound";
 import { useBlogPostActions } from "@/hooks/useBlogPostActions";
 
 const BlogPost = () => {
-  const { slug } = useParams();
+  const { slug } = useParams<{ slug: string }>();
   const { handleShare, handleBookmark } = useBlogPostActions();
-  const [post, setPost] = useState<BlogPostType | null>(null);
-  const [relatedPosts, setRelatedPosts] = useState<BlogPostType[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   
-  // Optimized post loading with better error handling
-  useEffect(() => {
-    const loadPostData = async () => {
-      if (!slug) {
-        setIsLoading(false);
-        return;
-      }
+  const { data: post, isLoading } = useQuery({
+    queryKey: ['post', slug],
+    queryFn: () => getPostById(slug!),
+    enabled: !!slug,
+  });
 
-      console.log("BlogPost - Loading post for slug:", slug);
-      
-      try {
-        // Check for admin view flags
-        const forceRefresh = sessionStorage.getItem('forceRefresh');
-        const viewFromAdmin = sessionStorage.getItem('viewFromAdmin');
-        
-        if (forceRefresh || viewFromAdmin === slug) {
-          console.log("BlogPost - Force refreshing from admin for:", slug);
-          sessionStorage.removeItem('forceRefresh');
-          if (viewFromAdmin === slug) {
-            sessionStorage.removeItem('viewFromAdmin');
-          }
-        }
-        
-        // Parallel loading for better performance
-        const [foundPost, allPosts] = await Promise.all([
-          getPostById(slug),
-          loadAllPosts(true) // Use cache for related posts
-        ]);
-        
-        console.log("BlogPost - Found post:", foundPost);
-        
-        if (foundPost) {
-          setPost(foundPost);
-          
-          // Find related posts efficiently
-          const related = allPosts
-            .filter(p => p.id !== foundPost.id && p.category === foundPost.category)
-            .slice(0, 3);
-          setRelatedPosts(related);
-        }
-      } catch (error) {
-        console.error("BlogPost - Error loading post:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    loadPostData();
-  }, [slug]);
+  const { data: allPosts = [] } = useQuery({
+    queryKey: ['posts'],
+    queryFn: loadAllPosts,
+  });
+  
+  const relatedPosts = post
+    ? allPosts.filter(p => p.id !== post.id && p.category === post.category).slice(0, 3)
+    : [];
   
   // Check if user came from admin
   const cameFromAdmin = document.referrer.includes('/admin') || 
