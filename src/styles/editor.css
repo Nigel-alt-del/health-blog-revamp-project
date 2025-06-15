@@ -1,5 +1,4 @@
 
-
 /* Enhanced ReactQuill image support with proper sizing */
 .ql-editor img {
   border-radius: 8px !important;
@@ -55,30 +54,65 @@
   clear: both;
 }
 
-/* Enhanced formatting preservation for pasted content */
+/* MUCH LARGER HEADINGS - Make them really prominent */
 .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
   font-family: 'Montserrat', sans-serif !important;
   font-weight: bold !important;
   line-height: 1.4 !important;
   margin: 24px 0 16px 0 !important;
+  color: #1a1a1a !important;
 }
 
-/* Specific heading sizes */
+/* Much larger heading sizes - significantly increased */
 .prose h1 {
-  font-size: 24px !important;
+  font-size: 32px !important;
+  font-weight: 700 !important;
 }
 
 .prose h2 {
-  font-size: 20px !important;
+  font-size: 26px !important;
+  font-weight: 700 !important;
 }
 
 .prose h3 {
-  font-size: 18px !important;
+  font-size: 22px !important;
+  font-weight: 700 !important;
 }
 
-/* Preserve bold text formatting */
+.prose h4 {
+  font-size: 19px !important;
+  font-weight: 700 !important;
+}
+
+/* Force large font sizes to be treated as headings with much bigger display */
+.prose [style*="font-size: 18px"], 
+.prose [style*="font-size: 19px"],
+.prose [style*="font-size: 20px"],
+.prose [style*="font-size: 21px"],
+.prose [style*="font-size: 22px"],
+.prose [style*="font-size: 23px"],
+.prose [style*="font-size: 24px"] {
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  line-height: 1.4 !important;
+  margin: 20px 0 16px 0 !important;
+  color: #1a1a1a !important;
+  display: block !important;
+}
+
+/* Ensure 14pt font (converted to ~19px) displays prominently */
+.prose [style*="font-size: 19px"] {
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  line-height: 1.4 !important;
+  margin: 20px 0 16px 0 !important;
+  color: #1a1a1a !important;
+  display: block !important;
+}
+
+/* Preserve bold text formatting with larger size */
 .prose strong, .prose b {
-  font-weight: bold !important;
+  font-weight: 700 !important;
   font-family: 'Montserrat', sans-serif !important;
 }
 
@@ -93,19 +127,6 @@
   margin: 8px 0 !important;
   line-height: 1.6 !important;
   font-family: 'Montserrat', sans-serif !important;
-}
-
-/* Preserve font sizes from pasted content - especially larger ones */
-.prose [style*="font-size: 18px"], 
-.prose [style*="font-size: 19px"],
-.prose [style*="font-size: 20px"],
-.prose [style*="font-size: 21px"],
-.prose [style*="font-size: 22px"],
-.prose [style*="font-size: 23px"],
-.prose [style*="font-size: 24px"] {
-  font-weight: bold !important;
-  line-height: 1.4 !important;
-  margin: 20px 0 16px 0 !important;
 }
 
 /* Ensure paragraphs maintain proper spacing */
@@ -123,7 +144,7 @@
 
 /* Better handling of content with mixed formatting */
 .prose [style*="font-weight: bold"] {
-  font-weight: bold !important;
+  font-weight: 700 !important;
 }
 
 /* Ensure inline styles are preserved */
@@ -131,3 +152,21 @@
   font-family: 'Montserrat', sans-serif !important;
 }
 
+/* Force any element with font-weight bold to be more prominent if it's short text */
+.prose p strong,
+.prose strong {
+  font-weight: 700 !important;
+  font-size: 1.1em !important;
+}
+
+/* Make headings even more prominent in the editor itself */
+[contenteditable] h1,
+[contenteditable] h2,
+[contenteditable] h3,
+[contenteditable] h4 {
+  font-size: inherit !important;
+  font-weight: 700 !important;
+  margin: 20px 0 16px 0 !important;
+  line-height: 1.4 !important;
+  color: #1a1a1a !important;
+}
