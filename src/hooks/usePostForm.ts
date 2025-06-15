@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { type BlogPost } from "@/types/blog";
@@ -160,9 +159,7 @@ export const usePostForm = ({ initialPost, onSubmit }: UsePostFormProps) => {
         title: "Save Failed",
         description: "Failed to save draft. Please try again.",
         variant: "destructive",
-        action: (
-          <ToastAction onClick={handleSaveDraft}>Retry</ToastAction>
-        )
+        action: <ToastAction onClick={handleSaveDraft}>Retry</ToastAction>
       });
     } finally {
       setIsSaving(false);
@@ -208,9 +205,7 @@ export const usePostForm = ({ initialPost, onSubmit }: UsePostFormProps) => {
         title: "Failed",
         description: `Failed to ${isEditMode ? 'update' : 'create'} report. Please try again.`,
         variant: "destructive",
-        action: (
-          <ToastAction onClick={handleSubmit}>Retry</ToastAction>
-        )
+        action: <ToastAction onClick={handleSubmit}>Retry</ToastAction>
       });
     } finally {
       setIsSaving(false);

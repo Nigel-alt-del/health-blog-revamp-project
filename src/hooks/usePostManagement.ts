@@ -99,9 +99,7 @@ export const usePostManagement = () => {
         title: "Failed to Create",
         description: "Could not create report. Please try again.",
         variant: "destructive",
-        action: (
-          <ToastAction onClick={() => handleCreatePost(newPost)}>Retry</ToastAction>
-        )
+        action: <ToastAction onClick={() => handleCreatePost(newPost)}>Retry</ToastAction>
       });
     }
     console.log("📝 POST CREATION PROCESS COMPLETE");
@@ -133,9 +131,7 @@ export const usePostManagement = () => {
         title: "Failed to Update",
         description: "Could not update report. Please try again.",
         variant: "destructive",
-        action: (
-          <ToastAction onClick={() => handleEditPost(updatedPost)}>Retry</ToastAction>
-        )
+        action: <ToastAction onClick={() => handleEditPost(updatedPost)}>Retry</ToastAction>
       });
     }
     sessionStorage.setItem('cameFromAdmin', 'true');
