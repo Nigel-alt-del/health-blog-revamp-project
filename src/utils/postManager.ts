@@ -1,4 +1,5 @@
-import { getStoredPosts, getDeletedPostIds, type BlogPost } from "./supabaseStorage";
+
+import { getStoredPosts, getDeletedPostIds, type BlogPost, getPostFromStorage, isPostDeleted } from "./supabaseStorage";
 import { blogPosts } from "@/data/blogPosts";
 
 /**
@@ -62,8 +63,42 @@ export const getPostsByCategory = async (category: string): Promise<BlogPost[]> 
 
 /**
  * Get a single post by ID.
+ * OPTIMIZED to fetch a single record instead of all posts.
  */
 export const getPostById = async (id: string): Promise<BlogPost | undefined> => {
-  const allPosts = await loadAllPosts();
-  return allPosts.find(post => post.id === id);
+  console.log(`PostManager - Getting post by ID (Optimized): ${id}`);
+
+  // 1. Check Supabase first for user-created or updated posts.
+  const postFromSupabase = await getPostFromStorage(id);
+  if (postFromSupabase) {
+    return postFromSupabase;
+  }
+
+  // 2. If not in Supabase, check the default posts array.
+  const postFromDefaults = blogPosts.find(post => post.id === id);
+  if (!postFromDefaults) {
+    return undefined; // Not found anywhere.
+  }
+
+  // 3. It's a default post. Check if it has been deleted.
+  const deleted = await isPostDeleted(id);
+  if (deleted) {
+    return undefined;
+  }
+
+  // Map to ensure consistent object structure, same as in loadAllPosts
+  return {
+    id: postFromDefaults.id,
+    title: postFromDefaults.title,
+    excerpt: postFromDefaults.excerpt,
+    content: postFromDefaults.content,
+    publishedAt: postFromDefaults.publishedAt,
+    readTime: postFromDefaults.readTime,
+    category: postFromDefaults.category,
+    tags: postFromDefaults.tags,
+    featured: postFromDefaults.featured,
+    image: postFromDefaults.image,
+    seoKeywords: (postFromDefaults as any).seoKeywords || '',
+    metaDescription: (postFromDefaults as any).metaDescription || postFromDefaults.excerpt
+  };
 };

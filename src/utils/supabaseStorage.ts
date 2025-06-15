@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 // Export the BlogPost type
@@ -68,6 +67,49 @@ export const loadPosts = async (): Promise<BlogPost[]> => {
   } catch (error) {
     console.error('❌ Error reading from Supabase:', error);
     return [];
+  }
+};
+
+export const getPostFromStorage = async (postId: string): Promise<BlogPost | undefined> => {
+  try {
+    console.log(`🔎 Fetching single post from Supabase by ID: ${postId}`);
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .select('*')
+      .eq('id', postId)
+      .maybeSingle();
+
+    if (error) {
+      console.error('❌ Error fetching single post from Supabase:', error);
+      throw error;
+    }
+
+    if (!data) {
+      return undefined;
+    }
+
+    // Map database format to BlogPost interface format
+    return {
+      id: data.id,
+      title: data.title,
+      excerpt: data.excerpt,
+      content: data.content,
+      publishedAt: data.published_at,
+      readTime: data.read_time,
+      category: data.category,
+      tags: data.tags,
+      featured: data.featured,
+      image: data.image,
+      seoKeywords: data.seo_keywords,
+      metaDescription: data.meta_description,
+      author: data.author,
+      authorRole: data.author_role,
+      authorLinkedin: data.author_linkedin,
+      authorBio: data.author_bio
+    };
+  } catch (error) {
+    console.error('❌ Error in getPostFromStorage:', error);
+    throw error;
   }
 };
 
