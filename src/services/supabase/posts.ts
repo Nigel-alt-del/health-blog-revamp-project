@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import type { BlogPost } from "@/types/blog";
 
@@ -35,39 +34,37 @@ const savePostToSupabase = async (post: BlogPost): Promise<void> => {
 };
 
 export const loadPosts = async (): Promise<BlogPost[]> => {
-  try {
-    const result = await supabase
-      .from('blog_posts')
-      .select('*')
-      .order('created_at', { ascending: false });
+  const { data, error } = await supabase
+    .from('blog_posts')
+    .select('*')
+    .order('created_at', { ascending: false });
 
-    console.log('📖 Retrieved posts from Supabase:', result.data);
-    
-    // Map database format to BlogPost interface format
-    const mappedPosts = (result.data || []).map(post => ({
-      id: post.id,
-      title: post.title,
-      excerpt: post.excerpt,
-      content: post.content,
-      publishedAt: post.published_at,
-      readTime: post.read_time,
-      category: post.category,
-      tags: post.tags,
-      featured: post.featured,
-      image: post.image,
-      seoKeywords: post.seo_keywords,
-      metaDescription: post.meta_description,
-      author: post.author,
-      authorRole: post.author_role,
-      authorLinkedin: post.author_linkedin,
-      authorBio: post.author_bio
-    }));
-    
-    return mappedPosts;
-  } catch (error) {
+  if (error) {
     console.error('❌ Error reading from Supabase:', error);
-    return [];
+    throw error;
   }
+
+  console.log('📖 Retrieved posts from Supabase:', data);
+  
+  // Map database format to BlogPost interface format
+  return (data || []).map(post => ({
+    id: post.id,
+    title: post.title,
+    excerpt: post.excerpt,
+    content: post.content,
+    publishedAt: post.published_at,
+    readTime: post.read_time,
+    category: post.category,
+    tags: post.tags,
+    featured: post.featured,
+    image: post.image,
+    seoKeywords: post.seo_keywords,
+    metaDescription: post.meta_description,
+    author: post.author,
+    authorRole: post.author_role,
+    authorLinkedin: post.author_linkedin,
+    authorBio: post.author_bio
+  }));
 };
 
 export const getStoredPosts = loadPosts;

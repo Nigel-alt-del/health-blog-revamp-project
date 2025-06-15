@@ -1,5 +1,4 @@
 
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { addPostToStorage, updatePostInStorage, deletePostFromStorage } from "@/services/supabase/posts";
 import { addDeletedPostId } from "@/services/supabase/deletedPosts";
@@ -11,7 +10,7 @@ import { toast } from "@/components/ui/use-toast";
 export const usePostManagement = () => {
   const queryClient = useQueryClient();
 
-  const { data: posts = [], isLoading: loading } = useQuery<BlogPost[]>({
+  const { data: posts = [], isLoading: loading, isError, error } = useQuery<BlogPost[], Error>({
     queryKey: ['posts'],
     queryFn: loadAllPosts,
     staleTime: 5 * 60 * 1000, // 5 minutes. Ensures data is fresh and not re-fetched unnecessarily
@@ -125,6 +124,8 @@ export const usePostManagement = () => {
   return {
     posts,
     loading,
+    isError,
+    error,
     handleCreatePost,
     handleEditPost,
     handleDeletePost,
