@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { type BlogPost } from "@/types/blog";
@@ -24,6 +25,7 @@ export const usePostForm = ({ initialPost, onSubmit }: UsePostFormProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [savedDraftId, setSavedDraftId] = useState<string | null>(initialPost?.id || null);
+  const [submitLock, setSubmitLock] = useState(false); // ===> ADD THIS LINE
   const { toast } = useToast();
 
   const isEditMode = !!initialPost?.id;
@@ -168,6 +170,7 @@ export const usePostForm = ({ initialPost, onSubmit }: UsePostFormProps) => {
     }
   };
 
+  // Prevent double-publishing with a submit lock
   const handleSubmit = () => {
     if (!formData.title?.trim() || !formData.excerpt?.trim()) {
       toast({
@@ -177,6 +180,12 @@ export const usePostForm = ({ initialPost, onSubmit }: UsePostFormProps) => {
       });
       return;
     }
+    if (submitLock) {
+      // Already submitting, block duplicate submit
+      console.warn("Double submit detected, aborting.");
+      return;
+    }
+    setSubmitLock(true);
     setIsSaving(true);
     try {
       const updatedPost = formatPostData(formData);
@@ -213,6 +222,7 @@ export const usePostForm = ({ initialPost, onSubmit }: UsePostFormProps) => {
       });
     } finally {
       setIsSaving(false);
+      setTimeout(() => setSubmitLock(false), 1000); // Release lock after a second (or after mutation promise resolves if async)
     }
   };
 
