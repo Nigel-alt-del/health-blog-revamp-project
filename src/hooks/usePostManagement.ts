@@ -2,15 +2,15 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { addPostToStorage, updatePostInStorage, deletePostFromStorage } from "@/services/supabase/posts";
 import { addDeletedPostId } from "@/services/supabase/deletedPosts";
-import { type BlogPost } from "@/types/blog";
-import { loadAllPosts } from "@/utils/postManager";
+import { type BlogPost, type BlogPostSummary } from "@/types/blog";
+import { loadAllPosts, getPostById } from "@/utils/postManager";
 import { blogPosts } from "@/data/blogPosts";
 import { toast } from "@/components/ui/use-toast";
 
 export const usePostManagement = () => {
   const queryClient = useQueryClient();
 
-  const { data: posts = [], isLoading: loading, isError, error } = useQuery<BlogPost[], Error>({
+  const { data: posts = [], isLoading: loading, isError, error } = useQuery<BlogPostSummary[], Error>({
     queryKey: ['posts'],
     queryFn: loadAllPosts,
     staleTime: 5 * 60 * 1000, // 5 minutes. Ensures data is fresh and not re-fetched unnecessarily
@@ -104,18 +104,20 @@ export const usePostManagement = () => {
   };
 
   const handleToggleFeatured = async (postId: string) => {
-    const currentPost = posts.find(p => p.id === postId);
-    if (!currentPost) return;
+    const postSummary = posts.find(p => p.id === postId);
+    if (!postSummary) return;
 
-    const newFeaturedState = !currentPost.featured;
+    const newFeaturedState = !postSummary.featured;
 
-    // Unfeature all other posts and feature the selected one
-    const updatePromises = posts
-      .filter(p => p.featured || p.id === postId)
-      .map(p => {
-        const updatedPost = { ...p, featured: p.id === postId ? newFeaturedState : false };
-        return updatePostMutation.mutateAsync(updatedPost);
-      });
+    const postsToUpdate = posts.filter(p => p.featured || p.id === postId);
+
+    const updatePromises = postsToUpdate.map(async p => {
+        const fullPost = await getPostById(p.id);
+        if (fullPost) {
+            const updatedPost = { ...fullPost, featured: p.id === postId ? newFeaturedState : false };
+            return updatePostMutation.mutateAsync(updatedPost);
+        }
+    });
 
     await Promise.all(updatePromises);
     console.log("FEATURED TOGGLE COMPLETE");

@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { BlogPost } from "@/types/blog";
+import type { BlogPost, BlogPostSummary } from "@/types/blog";
 
 const savePostToSupabase = async (post: BlogPost): Promise<void> => {
   const result = await supabase
@@ -33,25 +33,24 @@ const savePostToSupabase = async (post: BlogPost): Promise<void> => {
   }
 };
 
-export const loadPosts = async (): Promise<BlogPost[]> => {
+export const loadPosts = async (): Promise<BlogPostSummary[]> => {
   const { data, error } = await supabase
     .from('blog_posts')
-    .select('*')
+    .select('id, title, excerpt, published_at, read_time, category, tags, featured, image, seo_keywords, meta_description, author, author_role, author_linkedin, author_bio')
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('❌ Error reading from Supabase:', error);
+    console.error('❌ Error reading post summaries from Supabase:', error);
     throw error;
   }
 
-  console.log('📖 Retrieved posts from Supabase:', data);
+  console.log('📖 Retrieved post summaries from Supabase:', data);
   
-  // Map database format to BlogPost interface format
+  // Map database format to BlogPostSummary interface format
   return (data || []).map(post => ({
     id: post.id,
     title: post.title,
     excerpt: post.excerpt,
-    content: post.content,
     publishedAt: post.published_at,
     readTime: post.read_time,
     category: post.category,

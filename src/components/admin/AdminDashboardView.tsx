@@ -2,10 +2,10 @@
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { PostListView } from "./PostListView";
-import { type BlogPost } from "@/utils/localStorage";
+import { type BlogPostSummary } from "@/types/blog";
 
 interface AdminDashboardViewProps {
-  posts: BlogPost[];
+  posts: BlogPostSummary[];
   onCreateNew: () => void;
   onDeletePost: (postId: string) => void;
   onEditPost: (postId: string) => void;

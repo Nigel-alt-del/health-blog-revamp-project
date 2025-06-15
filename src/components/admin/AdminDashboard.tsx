@@ -1,13 +1,16 @@
 
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import BlogLayout from "@/components/BlogLayout";
 import { AdminDashboardView } from "./AdminDashboardView";
 import { AdminCreateView } from "./AdminCreateView";
 import { AdminEditView } from "./AdminEditView";
 import { usePostManagement } from "@/hooks/usePostManagement";
+import { getPostById } from "@/utils/postManager";
 import AdminLogout from "../AdminLogout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import { Terminal } from "lucide-react";
 
 const AdminDashboard = () => {
@@ -24,6 +27,17 @@ const AdminDashboard = () => {
     handleDeletePost,
     handleToggleFeatured
   } = usePostManagement();
+
+  const {
+    data: editingPost,
+    isLoading: isEditingPostLoading,
+    isError: isEditingPostError
+  } = useQuery({
+    queryKey: ['post', editingPostId],
+    queryFn: () => getPostById(editingPostId!),
+    enabled: !!editingPostId,
+    staleTime: 5 * 60 * 1000,
+  });
 
   const onCreatePost = (newPost: any) => {
     handleCreatePost(newPost);
@@ -43,8 +57,6 @@ const AdminDashboard = () => {
   const onCancelEdit = () => {
     setEditingPostId(null);
   };
-
-  const editingPost = editingPostId ? posts.find(post => post.id === editingPostId) : null;
 
   if (loading) {
     return (
@@ -98,7 +110,44 @@ const AdminDashboard = () => {
     );
   }
 
-  if (editingPostId && editingPost) {
+  if (editingPostId) {
+    if (isEditingPostLoading) {
+      return (
+        <BlogLayout>
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold text-[#20466d]">Edit Post</h1>
+            <AdminLogout />
+          </div>
+          <div className="space-y-4 p-4">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-48 w-full" />
+            <Skeleton className="h-96 w-full" />
+          </div>
+        </BlogLayout>
+      );
+    }
+
+    if (isEditingPostError || !editingPost) {
+      return (
+        <BlogLayout>
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold text-[#20466d]">Edit Post</h1>
+            <AdminLogout />
+          </div>
+          <Alert variant="destructive">
+            <Terminal className="h-4 w-4" />
+            <AlertTitle>Error Loading Report for Editing</AlertTitle>
+            <AlertDescription>
+              There was a problem fetching the report. Please go back and try again.
+              <Button onClick={onCancelEdit} variant="link" className="ml-2">
+                Go Back
+              </Button>
+            </AlertDescription>
+          </Alert>
+        </BlogLayout>
+      );
+    }
+    
     return (
       <BlogLayout>
         <div className="flex justify-between items-center mb-6">

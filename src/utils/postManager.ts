@@ -1,14 +1,13 @@
-
 import { getStoredPosts, getPostFromStorage } from "@/services/supabase/posts";
 import { getDeletedPostIds, isPostDeleted } from "@/services/supabase/deletedPosts";
-import { type BlogPost } from "@/types/blog";
+import { type BlogPost, type BlogPostSummary } from "@/types/blog";
 import { blogPosts } from "@/data/blogPosts";
 
 /**
  * OPTIMIZED SUPABASE POWERED: Fetch all posts from Supabase and merge with local data.
  * This is now the single source of truth for data fetching, to be used with React Query.
  */
-export const loadAllPosts = async (): Promise<BlogPost[]> => {
+export const loadAllPosts = async (): Promise<BlogPostSummary[]> => {
   console.log("PostManager - Loading all posts (React Query optimized)");
 
   try {
@@ -27,22 +26,16 @@ export const loadAllPosts = async (): Promise<BlogPost[]> => {
     
     const availableDefaultPosts = blogPosts
       .filter(post => !deletedIdSet.has(post.id) && !userCreatedPostIds.has(post.id))
-      .map(post => ({
-        id: post.id,
-        title: post.title,
-        excerpt: post.excerpt,
-        content: post.content,
-        publishedAt: post.publishedAt,
-        readTime: post.readTime,
-        category: post.category,
-        tags: post.tags,
-        featured: post.featured,
-        image: post.image,
-        seoKeywords: (post as any).seoKeywords || '',
-        metaDescription: (post as any).metaDescription || post.excerpt
-      }));
+      .map(post => {
+        const { content, ...summary } = post;
+        return {
+          ...summary,
+          seoKeywords: (post as any).seoKeywords || '',
+          metaDescription: (post as any).metaDescription || post.excerpt
+        } as BlogPostSummary;
+      });
 
-    const finalPosts = [...availableUserCreatedPosts, ...availableDefaultPosts];
+    const finalPosts: BlogPostSummary[] = [...availableUserCreatedPosts, ...availableDefaultPosts];
     
     console.log("PostManager - FINAL OPTIMIZED RESULT:", finalPosts.length, "posts");
     return finalPosts;

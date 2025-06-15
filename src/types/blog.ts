@@ -17,3 +17,5 @@ export interface BlogPost {
   authorLinkedin?: string;
   authorBio?: string;
 }
+
+export type BlogPostSummary = Omit<BlogPost, 'content'>;
