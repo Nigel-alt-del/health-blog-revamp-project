@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -27,76 +26,64 @@ export const SimpleContentEditor = ({ value, onChange, placeholder }: SimpleCont
     if (contentToPaste && htmlData) {
       console.log('Original pasted content:', contentToPaste);
       
-      // Enhanced cleanup that preserves more formatting
+      // More targeted cleanup that preserves formatting better
       contentToPaste = contentToPaste
-        // Remove Word-specific comments and namespaces
+        // Remove Word-specific comments and XML tags
         .replace(/<!--[\s\S]*?-->/g, '')
+        .replace(/<\?xml[^>]*>/g, '')
         .replace(/<o:p\s*\/?>/gi, '')
         .replace(/<\/o:p>/gi, '')
-        // Remove Word-specific classes but preserve structure
+        
+        // Remove Word-specific styling classes but keep inline styles
         .replace(/class="[^"]*Mso[^"]*"/gi, '')
         .replace(/class="[^"]*Word[^"]*"/gi, '')
-        // Preserve font sizes - extract and convert to inline styles
+        
+        // Preserve and enhance font sizes - convert pt to px more accurately
         .replace(/font-size:\s*(\d+(?:\.\d+)?)pt/gi, (match, size) => {
-          const pxSize = Math.round(parseFloat(size) * 1.33); // Convert pt to px
+          const pxSize = Math.round(parseFloat(size) * 1.33);
           return `font-size: ${pxSize}px`;
         })
-        // Preserve existing pixel font sizes
-        .replace(/font-size:\s*(\d+)px/gi, 'font-size: $1px')
-        // Convert Word bullet lists to proper HTML lists
-        .replace(/<p[^>]*>(\s*[·•▪▫◦‣⁃]\s*)(.*?)<\/p>/gi, '<li>$2</li>')
-        .replace(/<p[^>]*>(\s*\d+\.\s*)(.*?)<\/p>/gi, '<li>$2</li>')
-        // Wrap consecutive list items in ul/ol tags
-        .replace(/(<li>.*?<\/li>)/gs, (match) => {
-          // Check if it's already wrapped in a list
-          if (!match.includes('<ul>') && !match.includes('<ol>')) {
-            return `<ul>${match}</ul>`;
-          }
-          return match;
-        })
-        // Clean up multiple consecutive ul/ol tags
-        .replace(/<\/ul>\s*<ul>/gi, '')
-        .replace(/<\/ol>\s*<ol>/gi, '')
-        // Preserve bold/italic formatting
+        
+        // Better bullet point handling - preserve various bullet styles
+        .replace(/<p[^>]*>\s*[·•▪▫◦‣⁃]\s*(.*?)<\/p>/gi, '<li>$1</li>')
+        .replace(/<p[^>]*>\s*\d+\.\s*(.*?)<\/p>/gi, '<li>$1</li>')
+        
+        // Convert bold/italic tags consistently
         .replace(/<b\b[^>]*>/gi, '<strong>')
         .replace(/<\/b>/gi, '</strong>')
         .replace(/<i\b[^>]*>/gi, '<em>')
         .replace(/<\/i>/gi, '</em>')
-        // Convert font-weight and font-style to proper tags
-        .replace(/<span[^>]*font-weight:\s*bold[^>]*>(.*?)<\/span>/gi, '<strong>$1</strong>')
-        .replace(/<span[^>]*font-weight:\s*700[^>]*>(.*?)<\/span>/gi, '<strong>$1</strong>')
-        .replace(/<span[^>]*font-style:\s*italic[^>]*>(.*?)<\/span>/gi, '<em>$1</em>')
-        // Preserve headings with their font sizes
-        .replace(/<h([1-6])[^>]*style="[^"]*font-size:\s*(\d+)px[^"]*"[^>]*>/gi, 
-          '<h$1 style="font-size: $2px; font-family: \'Montserrat\', sans-serif;">')
-        // Ensure paragraphs have Montserrat font but preserve other styles
-        .replace(/<p([^>]*)>/gi, (match, attributes) => {
-          if (attributes.includes('style=')) {
-            // Add font-family to existing style
-            return match.replace(/style="([^"]*)"/, 'style="$1; font-family: \'Montserrat\', sans-serif;"');
-          } else {
-            // Add style attribute with font-family
-            return `<p${attributes} style="font-family: 'Montserrat', sans-serif;">`;
+        
+        // Handle font-weight and font-style in spans
+        .replace(/<span([^>]*style="[^"]*font-weight:\s*(?:bold|700)[^"]*")([^>]*)>(.*?)<\/span>/gi, '<strong>$3</strong>')
+        .replace(/<span([^>]*style="[^"]*font-style:\s*italic[^"]*")([^>]*)>(.*?)<\/span>/gi, '<em>$3</em>')
+        
+        // Wrap consecutive list items properly
+        .replace(/(<li>.*?<\/li>\s*)+/gs, (match) => {
+          const listItems = match.trim();
+          if (!listItems.includes('<ul>') && !listItems.includes('<ol>')) {
+            return `<ul>${listItems}</ul>`;
           }
+          return match;
         })
-        // Ensure spans preserve their font-size while adding Montserrat
-        .replace(/<span([^>]*style="[^"]*font-size:[^"]*")([^>]*)>/gi, (match, style, rest) => {
-          if (style.includes('font-family:')) {
-            return match.replace(/font-family:[^;"]*(;|")/, 'font-family: "Montserrat", sans-serif$1');
-          } else {
+        
+        // Apply Montserrat font to paragraphs while preserving existing styles
+        .replace(/<p([^>]*style="[^"]*")([^>]*)>/gi, (match, style, rest) => {
+          if (!style.includes('font-family')) {
             return match.replace(/style="([^"]*)"/, 'style="$1; font-family: \'Montserrat\', sans-serif;"');
           }
+          return match;
         })
-        // Remove empty paragraphs and spans
+        .replace(/<p(?![^>]*style=)([^>]*)>/gi, '<p$1 style="font-family: \'Montserrat\', sans-serif;">')
+        
+        // Clean up empty elements
         .replace(/<p[^>]*>\s*<\/p>/gi, '')
-        .replace(/<span[^>]*>\s*<\/span>/gi, '');
+        .replace(/<span[^>]*>\s*<\/span>/gi, '')
+        
+        // Remove extra whitespace
+        .replace(/\s+/g, ' ');
       
       console.log('Processed content:', contentToPaste);
-      
-      // If no existing font-family was preserved, wrap in a div with Montserrat
-      if (!contentToPaste.includes('font-family') && !contentToPaste.includes('Montserrat')) {
-        contentToPaste = `<div style="font-family: 'Montserrat', sans-serif;">${contentToPaste}</div>`;
-      }
     }
     
     if (contentToPaste) {
@@ -141,7 +128,7 @@ export const SimpleContentEditor = ({ value, onChange, placeholder }: SimpleCont
                   <li>Font sizes, bullet points, and formatting will be preserved</li>
                   <li>Use Preview to see exactly how it will appear</li>
                 </ol>
-                <p className="mt-2 text-sm">✓ Now preserves: Font sizes, bullet points, numbered lists, bold, italic formatting</p>
+                <p className="mt-2 text-sm">✓ Preserves: Font sizes, bullet points, numbered lists, bold, italic formatting</p>
               </div>
             </div>
           </div>

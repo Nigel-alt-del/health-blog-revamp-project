@@ -54,11 +54,7 @@
   clear: both;
 }
 
-/* Enhanced support for pasted content formatting */
-.prose p[style*="font-size"] {
-  line-height: 1.6 !important;
-}
-
+/* Better support for pasted content formatting - more conservative approach */
 .prose ul, .prose ol {
   margin: 16px 0 !important;
   padding-left: 24px !important;
@@ -69,39 +65,19 @@
   line-height: 1.6 !important;
 }
 
-/* Preserve font sizes in pasted content while ensuring readability */
-.prose [style*="font-size: 8px"], .prose [style*="font-size: 9px"], .prose [style*="font-size: 10px"] {
-  font-size: 12px !important;
-  min-font-size: 12px !important;
+/* Preserve inline font sizes from pasted content */
+.prose [style*="font-size"] {
+  line-height: 1.6 !important;
 }
 
-.prose [style*="font-size: 11px"], .prose [style*="font-size: 12px"] {
-  font-size: 12px !important;
-}
-
-.prose [style*="font-size: 13px"], .prose [style*="font-size: 14px"] {
-  font-size: 14px !important;
-}
-
-.prose [style*="font-size: 15px"], .prose [style*="font-size: 16px"] {
-  font-size: 16px !important;
-}
-
-.prose [style*="font-size: 17px"], .prose [style*="font-size: 18px"] {
-  font-size: 18px !important;
-}
-
-.prose [style*="font-size: 19px"], .prose [style*="font-size: 20px"], .prose [style*="font-size: 21px"], .prose [style*="font-size: 22px"] {
-  font-size: 20px !important;
-}
-
-.prose [style*="font-size: 23px"], .prose [style*="font-size: 24px"], .prose [style*="font-size: 25px"], .prose [style*="font-size: 26px"] {
-  font-size: 24px !important;
+/* Ensure paragraphs maintain proper line height */
+.prose p {
+  line-height: 1.6 !important;
+  margin: 16px 0 !important;
 }
 
 /* Ensure headings with custom font sizes are respected */
-.prose h1[style*="font-size"], .prose h2[style*="font-size"], .prose h3[style*="font-size"], 
-.prose h4[style*="font-size"], .prose h5[style*="font-size"], .prose h6[style*="font-size"] {
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
   line-height: 1.4 !important;
   margin: 24px 0 16px 0 !important;
 }
