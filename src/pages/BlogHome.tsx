@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import BlogLayout from "@/components/BlogLayout";
 import HeroSection from "@/components/home/HeroSection";
@@ -53,4 +52,3 @@ const BlogHome = () => {
 };
 
 export default BlogHome;
-

@@ -47,6 +47,7 @@ const FeaturedPost = ({ post }: FeaturedPostProps) => {
                 src={post.image} 
                 alt={post.title}
                 className="w-full h-full object-cover"
+                loading="lazy"
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-[#22aee1] to-[#20466d] flex items-center justify-center">

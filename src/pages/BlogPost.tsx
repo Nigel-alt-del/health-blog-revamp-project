@@ -1,3 +1,4 @@
+
 import { useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Separator } from "@/components/ui/separator";
@@ -16,18 +17,24 @@ const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
   const { handleShare, handleBookmark } = useBlogPostActions();
   const queryClient = useQueryClient();
-  
+
+  // Use cache for the posts list if available
+  const initialAllPosts = queryClient.getQueryData<BlogPostSummary[]>(['posts']);
+
   const { data: post, isLoading } = useQuery({
     queryKey: ['post', slug],
     queryFn: () => getPostById(slug!),
     enabled: !!slug,
+    staleTime: 5 * 60 * 1000,
   });
 
   const { data: allPosts = [] } = useQuery<BlogPostSummary[]>({
     queryKey: ['posts'],
     queryFn: loadAllPosts,
+    staleTime: 5 * 60 * 1000,
+    initialData: initialAllPosts,
   });
-  
+
   const relatedPosts = post
     ? allPosts.filter(p => p.id !== post.id && p.category === post.category).slice(0, 3)
     : [];
@@ -65,7 +72,6 @@ const BlogPost = () => {
 
   if (!post) {
     console.error("BlogPost - Post not found for slug:", slug);
-    
     return (
       <BlogLayout>
         <BlogPostNotFound slug={slug} cameFromAdmin={cameFromAdmin} />
@@ -96,3 +102,4 @@ const BlogPost = () => {
 };
 
 export default BlogPost;
+
