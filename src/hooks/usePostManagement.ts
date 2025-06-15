@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { addPostToStorage, updatePostInStorage, deletePostFromStorage } from "@/services/supabase/posts";
 import { addDeletedPostId } from "@/services/supabase/deletedPosts";
@@ -6,6 +7,7 @@ import { loadAllPosts, getPostById } from "@/utils/postManager";
 import { blogPosts } from "@/data/blogPosts";
 import { toast } from "@/components/ui/use-toast";
 import { logPostSaveAttempt } from "@/services/supabase/postSaveLogs";
+import { ToastAction } from "@/components/ui/toast";
 
 export const usePostManagement = () => {
   const queryClient = useQueryClient();
@@ -97,10 +99,9 @@ export const usePostManagement = () => {
         title: "Failed to Create",
         description: "Could not create report. Please try again.",
         variant: "destructive",
-        action: {
-          label: "Retry",
-          onClick: () => handleCreatePost(newPost),
-        }
+        action: (
+          <ToastAction onClick={() => handleCreatePost(newPost)}>Retry</ToastAction>
+        )
       });
     }
     console.log("📝 POST CREATION PROCESS COMPLETE");
@@ -132,10 +133,9 @@ export const usePostManagement = () => {
         title: "Failed to Update",
         description: "Could not update report. Please try again.",
         variant: "destructive",
-        action: {
-          label: "Retry",
-          onClick: () => handleEditPost(updatedPost),
-        }
+        action: (
+          <ToastAction onClick={() => handleEditPost(updatedPost)}>Retry</ToastAction>
+        )
       });
     }
     sessionStorage.setItem('cameFromAdmin', 'true');

@@ -1,8 +1,10 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { type BlogPost } from "@/types/blog";
 import { addPostToStorage, updatePostInStorage } from "@/services/supabase/posts";
 import { logPostSaveAttempt } from "@/services/supabase/postSaveLogs";
+import { ToastAction } from "@/components/ui/toast";
 
 interface UsePostFormProps {
   initialPost?: BlogPost | null;
@@ -158,10 +160,9 @@ export const usePostForm = ({ initialPost, onSubmit }: UsePostFormProps) => {
         title: "Save Failed",
         description: "Failed to save draft. Please try again.",
         variant: "destructive",
-        action: {
-          label: "Retry",
-          onClick: handleSaveDraft,
-        }
+        action: (
+          <ToastAction onClick={handleSaveDraft}>Retry</ToastAction>
+        )
       });
     } finally {
       setIsSaving(false);
@@ -192,8 +193,12 @@ export const usePostForm = ({ initialPost, onSubmit }: UsePostFormProps) => {
         description: `Report ${isEditMode ? 'updated' : 'created'} successfully!`
       });
     } catch (error: any) {
+      // FIX #2: For the report ID, use the right source
+      const reportId =
+        savedDraftId ||
+        (isEditMode ? initialPost?.id : generateId(formData.title));
       logPostSaveAttempt({
-        reportId: formData.id,
+        reportId: reportId,
         action: isEditMode ? "edit" : "create",
         title: formData.title,
         status: "fail",
@@ -203,10 +208,9 @@ export const usePostForm = ({ initialPost, onSubmit }: UsePostFormProps) => {
         title: "Failed",
         description: `Failed to ${isEditMode ? 'update' : 'create'} report. Please try again.`,
         variant: "destructive",
-        action: {
-          label: "Retry",
-          onClick: handleSubmit,
-        }
+        action: (
+          <ToastAction onClick={handleSubmit}>Retry</ToastAction>
+        )
       });
     } finally {
       setIsSaving(false);
