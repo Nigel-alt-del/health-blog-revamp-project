@@ -1,4 +1,5 @@
 
+
 /* Enhanced ReactQuill image support with proper sizing */
 .ql-editor img {
   border-radius: 8px !important;
@@ -54,30 +55,79 @@
   clear: both;
 }
 
-/* Better support for pasted content formatting - more conservative approach */
+/* Enhanced formatting preservation for pasted content */
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  font-family: 'Montserrat', sans-serif !important;
+  font-weight: bold !important;
+  line-height: 1.4 !important;
+  margin: 24px 0 16px 0 !important;
+}
+
+/* Specific heading sizes */
+.prose h1 {
+  font-size: 24px !important;
+}
+
+.prose h2 {
+  font-size: 20px !important;
+}
+
+.prose h3 {
+  font-size: 18px !important;
+}
+
+/* Preserve bold text formatting */
+.prose strong, .prose b {
+  font-weight: bold !important;
+  font-family: 'Montserrat', sans-serif !important;
+}
+
+/* Better list formatting */
 .prose ul, .prose ol {
   margin: 16px 0 !important;
   padding-left: 24px !important;
+  font-family: 'Montserrat', sans-serif !important;
 }
 
 .prose li {
   margin: 8px 0 !important;
   line-height: 1.6 !important;
+  font-family: 'Montserrat', sans-serif !important;
 }
 
-/* Preserve inline font sizes from pasted content */
-.prose [style*="font-size"] {
-  line-height: 1.6 !important;
+/* Preserve font sizes from pasted content - especially larger ones */
+.prose [style*="font-size: 18px"], 
+.prose [style*="font-size: 19px"],
+.prose [style*="font-size: 20px"],
+.prose [style*="font-size: 21px"],
+.prose [style*="font-size: 22px"],
+.prose [style*="font-size: 23px"],
+.prose [style*="font-size: 24px"] {
+  font-weight: bold !important;
+  line-height: 1.4 !important;
+  margin: 20px 0 16px 0 !important;
 }
 
-/* Ensure paragraphs maintain proper line height */
+/* Ensure paragraphs maintain proper spacing */
 .prose p {
   line-height: 1.6 !important;
   margin: 16px 0 !important;
+  font-family: 'Montserrat', sans-serif !important;
 }
 
-/* Ensure headings with custom font sizes are respected */
-.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
-  line-height: 1.4 !important;
-  margin: 24px 0 16px 0 !important;
+/* Preserve intentional spacing (like after "Only 59.8%") */
+.prose p:empty {
+  margin: 16px 0 !important;
+  min-height: 1em !important;
 }
+
+/* Better handling of content with mixed formatting */
+.prose [style*="font-weight: bold"] {
+  font-weight: bold !important;
+}
+
+/* Ensure inline styles are preserved */
+.prose * {
+  font-family: 'Montserrat', sans-serif !important;
+}
+

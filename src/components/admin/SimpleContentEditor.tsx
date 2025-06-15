@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -26,7 +27,7 @@ export const SimpleContentEditor = ({ value, onChange, placeholder }: SimpleCont
     if (contentToPaste && htmlData) {
       console.log('Original pasted content:', contentToPaste);
       
-      // More targeted cleanup that preserves formatting better
+      // Enhanced cleanup that better preserves Word document formatting
       contentToPaste = contentToPaste
         // Remove Word-specific comments and XML tags
         .replace(/<!--[\s\S]*?-->/g, '')
@@ -40,13 +41,45 @@ export const SimpleContentEditor = ({ value, onChange, placeholder }: SimpleCont
         
         // Preserve and enhance font sizes - convert pt to px more accurately
         .replace(/font-size:\s*(\d+(?:\.\d+)?)pt/gi, (match, size) => {
-          const pxSize = Math.round(parseFloat(size) * 1.33);
-          return `font-size: ${pxSize}px`;
+          const ptSize = parseFloat(size);
+          // Preserve larger font sizes more accurately
+          if (ptSize >= 14) {
+            return `font-size: ${Math.round(ptSize * 1.33)}px; font-weight: bold`;
+          } else if (ptSize >= 12) {
+            return `font-size: ${Math.round(ptSize * 1.33)}px`;
+          } else {
+            return `font-size: ${Math.round(ptSize * 1.33)}px`;
+          }
+        })
+        
+        // Handle explicit font-size in px and preserve bold
+        .replace(/font-size:\s*(\d+)px/gi, (match, size) => {
+          const pxSize = parseInt(size);
+          if (pxSize >= 18) {
+            return `font-size: ${pxSize}px; font-weight: bold`;
+          }
+          return match;
+        })
+        
+        // Better detection and preservation of headings (H1, H2, etc)
+        .replace(/<h([1-6])([^>]*)>(.*?)<\/h[1-6]>/gi, (match, level, attrs, content) => {
+          const fontSize = level === '1' ? '24px' : level === '2' ? '20px' : '18px';
+          return `<h${level} style="font-size: ${fontSize}; font-weight: bold; font-family: 'Montserrat', sans-serif; margin: 20px 0 16px 0; line-height: 1.4;">${content}</h${level}>`;
+        })
+        
+        // Preserve paragraphs with font-weight bold as headings
+        .replace(/<p([^>]*style="[^"]*font-weight:\s*(?:bold|700)[^"]*")([^>]*)>(.*?)<\/p>/gi, (match, style1, style2, content) => {
+          // Check if this looks like a heading (short text, no punctuation at end)
+          const isHeading = content.length < 100 && !content.trim().endsWith('.') && !content.trim().endsWith(',');
+          if (isHeading) {
+            return `<h3 style="font-size: 18px; font-weight: bold; font-family: 'Montserrat', sans-serif; margin: 20px 0 16px 0; line-height: 1.4;">${content}</h3>`;
+          }
+          return `<p style="font-weight: bold; font-family: 'Montserrat', sans-serif; line-height: 1.6; margin: 16px 0;">${content}</p>`;
         })
         
         // Better bullet point handling - preserve various bullet styles
-        .replace(/<p[^>]*>\s*[·•▪▫◦‣⁃]\s*(.*?)<\/p>/gi, '<li>$1</li>')
-        .replace(/<p[^>]*>\s*\d+\.\s*(.*?)<\/p>/gi, '<li>$1</li>')
+        .replace(/<p[^>]*>\s*[·•▪▫◦‣⁃]\s*(.*?)<\/p>/gi, '<li style="font-family: \'Montserrat\', sans-serif; line-height: 1.6; margin: 8px 0;">$1</li>')
+        .replace(/<p[^>]*>\s*\d+\.\s*(.*?)<\/p>/gi, '<li style="font-family: \'Montserrat\', sans-serif; line-height: 1.6; margin: 8px 0;">$1</li>')
         
         // Convert bold/italic tags consistently
         .replace(/<b\b[^>]*>/gi, '<strong>')
@@ -54,15 +87,19 @@ export const SimpleContentEditor = ({ value, onChange, placeholder }: SimpleCont
         .replace(/<i\b[^>]*>/gi, '<em>')
         .replace(/<\/i>/gi, '</em>')
         
-        // Handle font-weight and font-style in spans
-        .replace(/<span([^>]*style="[^"]*font-weight:\s*(?:bold|700)[^"]*")([^>]*)>(.*?)<\/span>/gi, '<strong>$3</strong>')
-        .replace(/<span([^>]*style="[^"]*font-style:\s*italic[^"]*")([^>]*)>(.*?)<\/span>/gi, '<em>$3</em>')
+        // Handle font-weight and font-style in spans - preserve as bold
+        .replace(/<span([^>]*style="[^"]*font-weight:\s*(?:bold|700)[^"]*")([^>]*)>(.*?)<\/span>/gi, '<strong style="font-family: \'Montserrat\', sans-serif;">$3</strong>')
+        .replace(/<span([^>]*style="[^"]*font-style:\s*italic[^"]*")([^>]*)>(.*?)<\/span>/gi, '<em style="font-family: \'Montserrat\', sans-serif;">$3</em>')
+        
+        // Preserve line breaks and spacing - convert double <br> or <p></p> to proper paragraphs
+        .replace(/<br\s*\/?>\s*<br\s*\/?>/gi, '</p><p style="font-family: \'Montserrat\', sans-serif; line-height: 1.6; margin: 16px 0;">')
+        .replace(/<p[^>]*>\s*<\/p>/gi, '<p style="font-family: \'Montserrat\', sans-serif; line-height: 1.6; margin: 16px 0;">&nbsp;</p>')
         
         // Wrap consecutive list items properly
-        .replace(/(<li>.*?<\/li>\s*)+/gs, (match) => {
+        .replace(/(<li[^>]*>.*?<\/li>\s*)+/gs, (match) => {
           const listItems = match.trim();
           if (!listItems.includes('<ul>') && !listItems.includes('<ol>')) {
-            return `<ul>${listItems}</ul>`;
+            return `<ul style="margin: 16px 0; padding-left: 24px;">${listItems}</ul>`;
           }
           return match;
         })
@@ -74,16 +111,16 @@ export const SimpleContentEditor = ({ value, onChange, placeholder }: SimpleCont
           }
           return match;
         })
-        .replace(/<p(?![^>]*style=)([^>]*)>/gi, '<p$1 style="font-family: \'Montserrat\', sans-serif;">')
+        .replace(/<p(?![^>]*style=)([^>]*)>/gi, '<p$1 style="font-family: \'Montserrat\', sans-serif; line-height: 1.6; margin: 16px 0;">')
         
-        // Clean up empty elements
-        .replace(/<p[^>]*>\s*<\/p>/gi, '')
+        // Clean up empty elements but preserve intentional spacing
         .replace(/<span[^>]*>\s*<\/span>/gi, '')
         
-        // Remove extra whitespace
-        .replace(/\s+/g, ' ');
+        // Remove extra whitespace but preserve intentional line breaks
+        .replace(/\s+/g, ' ')
+        .replace(/>\s+</g, '><');
       
-      console.log('Processed content:', contentToPaste);
+      console.log('Enhanced processed content:', contentToPaste);
     }
     
     if (contentToPaste) {
@@ -125,10 +162,10 @@ export const SimpleContentEditor = ({ value, onChange, placeholder }: SimpleCont
                   <li>Create your report in Word or Google Docs with formatting</li>
                   <li>Select all content (Ctrl+A) and copy it (Ctrl+C)</li>
                   <li>Click in the content area below and paste (Ctrl+V)</li>
-                  <li>Font sizes, bullet points, and formatting will be preserved</li>
+                  <li>Font sizes, bold headings, line spacing, and formatting will be preserved</li>
                   <li>Use Preview to see exactly how it will appear</li>
                 </ol>
-                <p className="mt-2 text-sm">✓ Preserves: Font sizes, bullet points, numbered lists, bold, italic formatting</p>
+                <p className="mt-2 text-sm">✓ Now preserves: Large headings (H1), font size 14+ bold text, line spacing, bullet points</p>
               </div>
             </div>
           </div>
@@ -159,7 +196,7 @@ export const SimpleContentEditor = ({ value, onChange, placeholder }: SimpleCont
               />
               {!value && (
                 <p className="text-sm text-gray-500 mt-2">
-                  Click here and paste your content from Word or Google Docs. Font sizes, bullet points, and all formatting will be preserved with Montserrat font.
+                  Click here and paste your content from Word or Google Docs. Large headings, font size 14+ bold text, and line spacing will be preserved with Montserrat font.
                 </p>
               )}
             </div>
