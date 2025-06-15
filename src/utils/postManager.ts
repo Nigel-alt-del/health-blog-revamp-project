@@ -1,33 +1,40 @@
 
 import { getStoredPosts, getDeletedPostIds, type BlogPost } from "./supabaseStorage";
 import { blogPosts } from "@/data/blogPosts";
+import { postCache } from "./postCache";
 
 /**
- * SUPABASE POWERED: Database is the boss. Default posts only show if not deleted.
+ * OPTIMIZED SUPABASE POWERED: Database with caching for better performance
  */
-export const loadAllPosts = async (): Promise<BlogPost[]> => {
-  console.log("PostManager - Loading all posts (SUPABASE POWERED)");
+export const loadAllPosts = async (useCache = true): Promise<BlogPost[]> => {
+  console.log("PostManager - Loading all posts (OPTIMIZED SUPABASE)");
+  
+  // Check cache first
+  if (useCache) {
+    const cachedPosts = postCache.get('allPosts');
+    if (cachedPosts) {
+      console.log("PostManager - Returning cached posts");
+      return cachedPosts;
+    }
+  }
   
   try {
-    // Step 1: Get all custom/user-created posts from Supabase (THE BOSS)
-    const userCreatedPosts = await getStoredPosts(); 
-    console.log("PostManager - User-created posts from Supabase (THE BOSS):", userCreatedPosts);
+    // Parallel fetch for better performance
+    const [userCreatedPosts, deletedIds] = await Promise.all([
+      getStoredPosts(),
+      getDeletedPostIds()
+    ]);
     
-    // Step 2: Get deleted post IDs (both custom and default)
-    const deletedIds = await getDeletedPostIds();
+    console.log("PostManager - User-created posts from Supabase:", userCreatedPosts);
     console.log("PostManager - Deleted post IDs:", deletedIds);
     
-    // Step 3: Filter out any user-created posts that have been explicitly deleted
+    // Filter and process in one pass for better performance
     const availableUserCreatedPosts = userCreatedPosts.filter(post => !deletedIds.includes(post.id));
-    console.log("PostManager - User-created posts AFTER filtering deleted:", availableUserCreatedPosts);
-
-    // Step 4: Get default posts that haven't been deleted AND don't conflict with available user-created posts
     const userCreatedPostIds = new Set(availableUserCreatedPosts.map(p => p.id));
     
     const availableDefaultPosts = blogPosts
-      .filter(post => !deletedIds.includes(post.id)) // Filter out default posts that are marked as deleted
-      .filter(post => !userCreatedPostIds.has(post.id)) // Filter out default posts if a user-created post with the same ID exists
-      .map(post => ({ // Ensure consistency in structure
+      .filter(post => !deletedIds.includes(post.id) && !userCreatedPostIds.has(post.id))
+      .map(post => ({
         id: post.id,
         title: post.title,
         excerpt: post.excerpt,
@@ -42,18 +49,19 @@ export const loadAllPosts = async (): Promise<BlogPost[]> => {
         metaDescription: (post as any).metaDescription || post.excerpt
       }));
 
-    console.log("PostManager - Available default posts (after all filtering):", availableDefaultPosts);
-
-    // Step 5: Combine available user-created posts first, then the available, non-conflicting default posts
     const finalPosts = [...availableUserCreatedPosts, ...availableDefaultPosts];
     
-    console.log("PostManager - FINAL RESULT (should include new and exclude deleted):", finalPosts);
+    // Cache the result
+    if (useCache) {
+      postCache.set('allPosts', finalPosts);
+    }
     
+    console.log("PostManager - FINAL OPTIMIZED RESULT:", finalPosts.length, "posts");
     return finalPosts;
   } catch (error) {
     console.error("PostManager - Error loading posts:", error);
     // Fallback to default posts only
-    return blogPosts.map(post => ({
+    const fallbackPosts = blogPosts.map(post => ({
       id: post.id,
       title: post.title,
       excerpt: post.excerpt,
@@ -67,31 +75,67 @@ export const loadAllPosts = async (): Promise<BlogPost[]> => {
       seoKeywords: (post as any).seoKeywords || '',
       metaDescription: (post as any).metaDescription || post.excerpt
     }));
+    
+    if (useCache) {
+      postCache.set('allPosts', fallbackPosts);
+    }
+    
+    return fallbackPosts;
   }
 };
 
 /**
- * Get posts filtered by category
+ * Get posts filtered by category (optimized)
  */
 export const getPostsByCategory = async (category: string): Promise<BlogPost[]> => {
+  const cacheKey = `category:${category}`;
+  const cached = postCache.get(cacheKey);
+  if (cached) return cached;
+
   const allPosts = await loadAllPosts();
-  return allPosts.filter(
+  const filteredPosts = allPosts.filter(
     post => post.category.toLowerCase().replace(/\s+/g, '-') === category
   );
+  
+  postCache.set(cacheKey, filteredPosts);
+  return filteredPosts;
 };
 
 /**
- * Get a single post by ID
+ * Get a single post by ID (optimized with cache)
  */
 export const getPostById = async (id: string): Promise<BlogPost | undefined> => {
+  const cacheKey = `post:${id}`;
+  const cached = postCache.get(cacheKey);
+  if (cached) return cached;
+
   const allPosts = await loadAllPosts();
-  return allPosts.find(post => post.id === id);
+  const post = allPosts.find(post => post.id === id);
+  
+  if (post) {
+    postCache.set(cacheKey, post);
+  }
+  
+  return post;
 };
 
 /**
- * Force refresh all post data
+ * Force refresh all post data and clear cache
  */
 export const forceRefreshPosts = (): void => {
-  console.log("PostManager - Dispatching posts refresh event");
+  console.log("PostManager - Force refresh: clearing cache and dispatching event");
+  postCache.clear(); // Clear cache on refresh
   window.dispatchEvent(new CustomEvent('postsRefreshed'));
+};
+
+/**
+ * Preload posts for better perceived performance
+ */
+export const preloadPosts = async (): Promise<void> => {
+  console.log("PostManager - Preloading posts");
+  try {
+    await loadAllPosts(true); // Use cache if available
+  } catch (error) {
+    console.error("PostManager - Error preloading posts:", error);
+  }
 };
