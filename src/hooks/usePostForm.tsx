@@ -160,7 +160,7 @@ export const usePostForm = ({ initialPost, onSubmit }: UsePostFormProps) => {
         description: "Failed to save draft. Please try again.",
         variant: "destructive",
         action: (
-          <ToastAction onClick={handleSaveDraft}>Retry</ToastAction>
+          <ToastAction altText="Retry" onClick={handleSaveDraft}>Retry</ToastAction>
         ),
       });
     } finally {
@@ -208,7 +208,7 @@ export const usePostForm = ({ initialPost, onSubmit }: UsePostFormProps) => {
         description: `Failed to ${isEditMode ? 'update' : 'create'} report. Please try again.`,
         variant: "destructive",
         action: (
-          <ToastAction onClick={handleSubmit}>Retry</ToastAction>
+          <ToastAction altText="Retry" onClick={handleSubmit}>Retry</ToastAction>
         ),
       });
     } finally {

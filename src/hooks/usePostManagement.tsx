@@ -99,7 +99,7 @@ export const usePostManagement = () => {
         description: "Could not create report. Please try again.",
         variant: "destructive",
         action: (
-          <ToastAction onClick={() => handleCreatePost(newPost)}>Retry</ToastAction>
+          <ToastAction altText="Retry" onClick={() => handleCreatePost(newPost)}>Retry</ToastAction>
         ),
       });
     }
@@ -133,7 +133,7 @@ export const usePostManagement = () => {
         description: "Could not update report. Please try again.",
         variant: "destructive",
         action: (
-          <ToastAction onClick={() => handleEditPost(updatedPost)}>Retry</ToastAction>
+          <ToastAction altText="Retry" onClick={() => handleEditPost(updatedPost)}>Retry</ToastAction>
         ),
       });
     }
