@@ -7,7 +7,7 @@ const BlogFooter = () => {
       <div className="max-w-6xl mx-auto">
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           <div>
-            <h3 className="text-xl font-bold mb-4 text-[#22aee1]">InsureMyHealth</h3>
+            <h3 className="text-xl font-bold mb-4 text-[#22aee1]">The Health Compass</h3>
             <p className="text-gray-300 text-sm">
               Your trusted source for UK employee benefits intelligence and market analysis.
             </p>
@@ -39,7 +39,7 @@ const BlogFooter = () => {
           </div>
         </div>
         <div className="border-t border-gray-600 pt-8 text-center text-sm text-gray-300">
-          <p>&copy; 2024 InsureMyHealth. All rights reserved.</p>
+          <p>2025 Thehealthcompass #</p>
         </div>
       </div>
     </footer>
@@ -47,3 +47,4 @@ const BlogFooter = () => {
 };
 
 export default BlogFooter;
+
