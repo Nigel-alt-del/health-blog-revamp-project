@@ -54,38 +54,45 @@
   clear: both;
 }
 
-/* MASSIVE HEADINGS - Make them really stand out */
+/* ULTRA MASSIVE HEADINGS - Override everything */
 .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
   font-family: 'Montserrat', sans-serif !important;
-  font-weight: 700 !important;
-  line-height: 1.3 !important;
-  margin: 28px 0 20px 0 !important;
+  font-weight: 900 !important;
+  line-height: 1.2 !important;
+  margin: 32px 0 24px 0 !important;
   color: #1a1a1a !important;
   display: block !important;
 }
 
-/* Much larger heading sizes - significantly increased */
+/* GIGANTIC heading sizes */
 .prose h1 {
-  font-size: 36px !important;
-  font-weight: 700 !important;
+  font-size: 48px !important;
+  font-weight: 900 !important;
 }
 
 .prose h2 {
-  font-size: 28px !important;
-  font-weight: 700 !important;
+  font-size: 36px !important;
+  font-weight: 900 !important;
 }
 
 .prose h3 {
-  font-size: 24px !important;
-  font-weight: 700 !important;
+  font-size: 32px !important;
+  font-weight: 900 !important;
 }
 
 .prose h4 {
-  font-size: 21px !important;
-  font-weight: 700 !important;
+  font-size: 28px !important;
+  font-weight: 900 !important;
 }
 
-/* AGGRESSIVE detection of Word document headings - catch ANY large or bold text */
+/* NUCLEAR-LEVEL detection of ANY text that should be a heading */
+.prose p, .prose div, .prose span {
+  font-family: 'Montserrat', sans-serif !important;
+}
+
+/* Target EVERY possible font size that could be a heading */
+.prose [style*="font-size: 12px"],
+.prose [style*="font-size: 13px"],
 .prose [style*="font-size: 14px"],
 .prose [style*="font-size: 15px"],
 .prose [style*="font-size: 16px"],
@@ -98,113 +105,121 @@
 .prose [style*="font-size: 23px"],
 .prose [style*="font-size: 24px"],
 .prose [style*="font-size: 25px"],
-.prose [style*="font-size: 26px"] {
-  font-size: 24px !important;
-  font-weight: 700 !important;
-  line-height: 1.3 !important;
-  margin: 24px 0 18px 0 !important;
+.prose [style*="font-size: 26px"],
+.prose [style*="font-size: 27px"],
+.prose [style*="font-size: 28px"] {
+  font-size: 32px !important;
+  font-weight: 900 !important;
+  line-height: 1.2 !important;
+  margin: 32px 0 24px 0 !important;
   color: #1a1a1a !important;
   display: block !important;
   font-family: 'Montserrat', sans-serif !important;
 }
 
-/* Special targeting for font-size 14pt from Word (converts to ~19px) */
-.prose [style*="font-size: 19px"] {
-  font-size: 26px !important;
-  font-weight: 700 !important;
-  line-height: 1.3 !important;
-  margin: 26px 0 18px 0 !important;
+/* EXTREME targeting for Word's 14pt font (19px) */
+.prose [style*="font-size: 19px"],
+.prose [style*="font-size:19px"] {
+  font-size: 36px !important;
+  font-weight: 900 !important;
+  line-height: 1.2 !important;
+  margin: 36px 0 24px 0 !important;
   color: #1a1a1a !important;
   display: block !important;
   font-family: 'Montserrat', sans-serif !important;
 }
 
-/* Catch ANY bold text that might be a heading - be very aggressive */
+/* CATCH EVERYTHING BOLD - Make it HUGE */
+.prose *[style*="font-weight: bold"],
+.prose *[style*="font-weight: 700"],
+.prose *[style*="font-weight:bold"],
+.prose *[style*="font-weight:700"],
 .prose p[style*="font-weight: bold"],
 .prose p[style*="font-weight: 700"],
 .prose span[style*="font-weight: bold"],
 .prose span[style*="font-weight: 700"],
 .prose div[style*="font-weight: bold"],
 .prose div[style*="font-weight: 700"] {
-  font-size: 24px !important;
-  font-weight: 700 !important;
-  line-height: 1.3 !important;
-  margin: 24px 0 18px 0 !important;
+  font-size: 32px !important;
+  font-weight: 900 !important;
+  line-height: 1.2 !important;
+  margin: 32px 0 24px 0 !important;
   color: #1a1a1a !important;
   display: block !important;
   font-family: 'Montserrat', sans-serif !important;
 }
 
-/* Make ANY strong or b tag much more prominent */
+/* Make ALL strong and b tags MASSIVE */
 .prose strong, .prose b {
-  font-weight: 700 !important;
-  font-size: 1.3em !important;
+  font-weight: 900 !important;
+  font-size: 2em !important;
   font-family: 'Montserrat', sans-serif !important;
   color: #1a1a1a !important;
+  display: block !important;
+  margin: 24px 0 !important;
 }
 
 /* Better list formatting */
 .prose ul, .prose ol {
-  margin: 16px 0 !important;
-  padding-left: 24px !important;
+  margin: 20px 0 !important;
+  padding-left: 28px !important;
   font-family: 'Montserrat', sans-serif !important;
 }
 
 .prose li {
-  margin: 8px 0 !important;
+  margin: 12px 0 !important;
   line-height: 1.6 !important;
   font-family: 'Montserrat', sans-serif !important;
+  font-size: 16px !important;
 }
 
 /* Ensure paragraphs maintain proper spacing */
 .prose p {
   line-height: 1.6 !important;
-  margin: 16px 0 !important;
+  margin: 20px 0 !important;
   font-family: 'Montserrat', sans-serif !important;
+  font-size: 16px !important;
 }
 
-/* Preserve intentional spacing (like after "Only 59.8%") */
+/* Preserve intentional spacing */
 .prose p:empty {
-  margin: 16px 0 !important;
-  min-height: 1em !important;
+  margin: 20px 0 !important;
+  min-height: 1.5em !important;
 }
 
-/* Better handling of content with mixed formatting */
-.prose [style*="font-weight: bold"] {
-  font-weight: 700 !important;
-}
-
-/* Ensure inline styles are preserved */
+/* Apply Montserrat to everything */
 .prose * {
   font-family: 'Montserrat', sans-serif !important;
 }
 
-/* Force any element with font-weight bold to be more prominent */
+/* ULTRA-aggressive bold detection */
 .prose p strong,
 .prose strong {
-  font-weight: 700 !important;
-  font-size: 1.4em !important;
+  font-weight: 900 !important;
+  font-size: 2em !important;
   color: #1a1a1a !important;
+  display: block !important;
+  margin: 24px 0 !important;
 }
 
-/* Make headings even more prominent in the editor itself */
+/* Editor-specific styling */
 [contenteditable] h1,
 [contenteditable] h2,
 [contenteditable] h3,
 [contenteditable] h4 {
   font-size: inherit !important;
-  font-weight: 700 !important;
-  margin: 24px 0 18px 0 !important;
-  line-height: 1.3 !important;
+  font-weight: 900 !important;
+  margin: 32px 0 24px 0 !important;
+  line-height: 1.2 !important;
   color: #1a1a1a !important;
 }
 
-/* Catch any text that looks like it should be a heading based on content pattern */
+/* Catch paragraphs that only contain bold text */
 .prose p:has(strong:only-child),
 .prose div:has(strong:only-child) {
-  font-size: 24px !important;
-  font-weight: 700 !important;
-  margin: 24px 0 18px 0 !important;
-  line-height: 1.3 !important;
+  font-size: 32px !important;
+  font-weight: 900 !important;
+  margin: 32px 0 24px 0 !important;
+  line-height: 1.2 !important;
   color: #1a1a1a !important;
 }
