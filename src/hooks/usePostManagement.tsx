@@ -1,31 +1,25 @@
-
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { addPostToStorage, updatePostInStorage, deletePostFromStorage } from "@/services/supabase/posts";
-import { addDeletedPostId } from "@/services/supabase/deletedPosts";
+import { useAllPosts } from "./usePostQueries";
+import { usePostMutations } from "./usePostMutations";
 import { type BlogPost, type BlogPostSummary } from "@/types/blog";
-import { loadAllPosts, getPostById } from "@/utils/postManager";
 import { blogPosts } from "@/data/blogPosts";
-import { toast } from "@/components/ui/use-toast";
 import { logPostSaveAttempt } from "@/services/supabase/postSaveLogs";
-import { ToastAction } from "@/components/ui/toast";
+import { ToastAction, toast } from "@/components/ui/toast";
 import { useCallback } from "react";
+import { getPostById } from "@/utils/postManager";
 
 export const usePostManagement = () => {
-  const queryClient = useQueryClient();
-
-  const { data: posts = [], isLoading: loading, isError, error } = useQuery<BlogPostSummary[], Error>({
-    queryKey: ['posts'],
-    queryFn: async () => {
-      console.log("[usePostManagement] Fetching posts (from React Query 'posts' key)");
-      const result = await loadAllPosts();
-      console.log("[usePostManagement] Post fetch result:", result.map(p => ({ id: p.id, title: p.title, featured: p.featured })));
-      return result;
-    },
-    staleTime: 5 * 60 * 1000,
-  });
+  const { data: posts = [], isLoading: loading, isError, error } = useAllPosts();
+  const {
+    createPostMutation,
+    updatePostMutation,
+    deleteCustomPostMutation,
+    addDeletedIdMutation,
+    toggleFeatured
+  } = usePostMutations();
 
   const generateId = (title: string): string => {
-    const baseId = title.toLowerCase()
+    const baseId = title
+      .toLowerCase()
       .replace(/[^a-z0-9\s]/g, '')
       .replace(/\s+/g, '-')
       .substring(0, 50);
@@ -33,56 +27,7 @@ export const usePostManagement = () => {
     return `${baseId}-${timestamp}`;
   };
 
-  const mutationOptions = {
-    onSuccess: (...args: any[]) => {
-      console.log("[usePostManagement] Mutation success! Invalidating posts queries...", args);
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-      queryClient.invalidateQueries({ queryKey: ['post'] });
-    },
-    onError: (error: Error) => {
-      console.error("Mutation failed:", error);
-      toast({
-        title: "Error",
-        description: `An error occurred: ${error.message}`,
-        variant: "destructive",
-      });
-    },
-  };
-
-  const createPostMutation = useMutation({
-    mutationFn: async (post: BlogPost) => {
-      console.log("[usePostManagement] Creating post...", post);
-      return addPostToStorage(post);
-    },
-    ...mutationOptions,
-  });
-
-  const updatePostMutation = useMutation({
-    mutationFn: async (post: BlogPost) => {
-      console.log("[usePostManagement] Updating post...", post);
-      return updatePostInStorage(post);
-    },
-    ...mutationOptions,
-  });
-
-  const deleteCustomPostMutation = useMutation({
-    mutationFn: async (postId: string) => {
-      console.log("[usePostManagement] Deleting custom post...", postId);
-      return deletePostFromStorage(postId);
-    },
-    ...mutationOptions,
-  });
-  
-  const addDeletedIdMutation = useMutation({
-    mutationFn: async (postId: string) => {
-      console.log("[usePostManagement] Adding deleted ID for default post...", postId);
-      return addDeletedPostId(postId);
-    },
-    ...mutationOptions,
-  });
-
   const handleCreatePost = async (newPost: any) => {
-    console.log("📝 Starting creation process for:", newPost.title);
     const post: BlogPost = {
       id: generateId(newPost.title),
       title: newPost.title,
@@ -126,7 +71,6 @@ export const usePostManagement = () => {
   };
 
   const handleEditPost = async (updatedPost: any) => {
-    console.log("Editing post:", updatedPost);
     const formattedPost: BlogPost = {
       ...updatedPost,
       tags: Array.isArray(updatedPost.tags) ? updatedPost.tags : (updatedPost.tags || '').split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag)
@@ -161,7 +105,6 @@ export const usePostManagement = () => {
   };
 
   const handleDeletePost = async (postId: string) => {
-    console.log("🚨 DELETION - STARTING FOR POST:", postId);
     const isDefaultPost = blogPosts.some(p => p.id === postId);
     if (isDefaultPost) {
       await addDeletedIdMutation.mutateAsync(postId);
@@ -172,32 +115,20 @@ export const usePostManagement = () => {
   };
 
   const handleToggleFeatured = async (postId: string) => {
-    const postSummary = posts.find(p => p.id === postId);
-    if (!postSummary) return;
-
-    const newFeaturedState = !postSummary.featured;
-
-    const postsToUpdate = posts.filter(p => p.featured || p.id === postId);
-
-    console.log("[usePostManagement] Toggling featured for:", postId, "New state:", newFeaturedState, "Posts affected:", postsToUpdate.map(p => p.id));
-
-    const updatePromises = postsToUpdate.map(async p => {
-        const fullPost = await getPostById(p.id);
-        if (fullPost) {
-            const updatedPost = { ...fullPost, featured: p.id === postId ? newFeaturedState : false };
-            return updatePostMutation.mutateAsync(updatedPost);
-        }
-    });
-
-    await Promise.all(updatePromises);
+    const postSummaries = posts;
+    const postsFull: BlogPost[] = [];
+    for (const p of postSummaries) {
+      const fullPost = await getPostById(p.id);
+      if (fullPost) postsFull.push(fullPost);
+    }
+    await toggleFeatured(postsFull, postId);
     console.log("FEATURED TOGGLE COMPLETE");
   };
 
-  // Diagnostic method to force refetch of posts
   const forceRefreshPosts = useCallback(() => {
     console.log("[usePostManagement] Forcing post list refresh via invalidateQueries('posts')");
     queryClient.invalidateQueries({ queryKey: ['posts'], refetchType: "active" });
-  }, [queryClient]);
+  }, []);
 
   return {
     posts,
@@ -208,7 +139,6 @@ export const usePostManagement = () => {
     handleEditPost,
     handleDeletePost,
     handleToggleFeatured,
-    forceRefreshPosts, // exposed for UI refresh button
+    forceRefreshPosts,
   };
 };
-
