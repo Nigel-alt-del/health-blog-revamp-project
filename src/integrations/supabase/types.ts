@@ -87,6 +87,36 @@ export type Database = {
         }
         Relationships: []
       }
+      post_save_logs: {
+        Row: {
+          action: string
+          attempted_at: string
+          error: string | null
+          id: string
+          report_id: string | null
+          status: string
+          title: string | null
+        }
+        Insert: {
+          action: string
+          attempted_at?: string
+          error?: string | null
+          id?: string
+          report_id?: string | null
+          status: string
+          title?: string | null
+        }
+        Update: {
+          action?: string
+          attempted_at?: string
+          error?: string | null
+          id?: string
+          report_id?: string | null
+          status?: string
+          title?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

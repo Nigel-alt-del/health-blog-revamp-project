@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { PostBasicInfo } from "./PostBasicInfo";
 import { FeaturedImageUpload } from "./FeaturedImageUpload";
@@ -6,6 +5,7 @@ import { AdminSidebar } from "./AdminSidebar";
 import { SimpleContentEditor } from "./SimpleContentEditor";
 import { ReportPreview } from "../ReportPreview";
 import { useToast } from "@/hooks/use-toast";
+import BrowserLogInstructions from "./BrowserLogInstructions";
 
 export const PostForm = ({
   formData,
@@ -94,7 +94,7 @@ export const PostForm = ({
           hasUnsavedChanges={false} // This can be enhanced later if needed
         />
       </div>
-
+      <BrowserLogInstructions />
       {showPreview && (
         <ReportPreview
           post={formatPostData(formData)}

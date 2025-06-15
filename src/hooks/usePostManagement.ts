@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { addPostToStorage, updatePostInStorage, deletePostFromStorage } from "@/services/supabase/posts";
 import { addDeletedPostId } from "@/services/supabase/deletedPosts";
@@ -6,6 +5,7 @@ import { type BlogPost, type BlogPostSummary } from "@/types/blog";
 import { loadAllPosts, getPostById } from "@/utils/postManager";
 import { blogPosts } from "@/data/blogPosts";
 import { toast } from "@/components/ui/use-toast";
+import { logPostSaveAttempt } from "@/services/supabase/postSaveLogs";
 
 export const usePostManagement = () => {
   const queryClient = useQueryClient();
@@ -77,7 +77,32 @@ export const usePostManagement = () => {
       seoKeywords: newPost.seoKeywords || '',
       metaDescription: newPost.metaDescription || newPost.excerpt
     };
-    await createPostMutation.mutateAsync(post);
+    try {
+      await createPostMutation.mutateAsync(post);
+      await logPostSaveAttempt({
+        reportId: post.id,
+        action: "create",
+        title: post.title,
+        status: "success"
+      });
+    } catch (error: any) {
+      await logPostSaveAttempt({
+        reportId: post.id,
+        action: "create",
+        title: post.title,
+        status: "fail",
+        error: error?.message || String(error),
+      });
+      toast({
+        title: "Failed to Create",
+        description: "Could not create report. Please try again.",
+        variant: "destructive",
+        action: {
+          label: "Retry",
+          onClick: () => handleCreatePost(newPost),
+        }
+      });
+    }
     console.log("📝 POST CREATION PROCESS COMPLETE");
   };
 
@@ -87,7 +112,32 @@ export const usePostManagement = () => {
       ...updatedPost,
       tags: Array.isArray(updatedPost.tags) ? updatedPost.tags : (updatedPost.tags || '').split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag)
     };
-    await updatePostMutation.mutateAsync(formattedPost);
+    try {
+      await updatePostMutation.mutateAsync(formattedPost);
+      await logPostSaveAttempt({
+        reportId: formattedPost.id,
+        action: "edit",
+        title: formattedPost.title,
+        status: "success"
+      });
+    } catch (error: any) {
+      await logPostSaveAttempt({
+        reportId: formattedPost.id,
+        action: "edit",
+        title: formattedPost.title,
+        status: "fail",
+        error: error?.message || String(error),
+      });
+      toast({
+        title: "Failed to Update",
+        description: "Could not update report. Please try again.",
+        variant: "destructive",
+        action: {
+          label: "Retry",
+          onClick: () => handleEditPost(updatedPost),
+        }
+      });
+    }
     sessionStorage.setItem('cameFromAdmin', 'true');
     console.log("POST EDIT COMPLETE");
   };

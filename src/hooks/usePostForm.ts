@@ -1,8 +1,8 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { type BlogPost } from "@/types/blog";
 import { addPostToStorage, updatePostInStorage } from "@/services/supabase/posts";
+import { logPostSaveAttempt } from "@/services/supabase/postSaveLogs";
 
 interface UsePostFormProps {
   initialPost?: BlogPost | null;
@@ -121,13 +121,24 @@ export const usePostForm = ({ initialPost, onSubmit }: UsePostFormProps) => {
 
     setIsSaving(true);
     const draftPost = formatPostData(formData, true);
-    
     try {
       if (savedDraftId) {
         await updatePostInStorage(draftPost as BlogPost);
+        await logPostSaveAttempt({
+          reportId: draftPost.id,
+          action: "edit",
+          title: draftPost.title,
+          status: "success",
+        });
       } else {
         await addPostToStorage(draftPost as BlogPost);
         setSavedDraftId(draftPost.id);
+        await logPostSaveAttempt({
+          reportId: draftPost.id,
+          action: "create",
+          title: draftPost.title,
+          status: "success",
+        });
       }
       setLastSaved(new Date());
       toast({
@@ -135,12 +146,22 @@ export const usePostForm = ({ initialPost, onSubmit }: UsePostFormProps) => {
         description: "Your changes have been saved successfully."
       });
       window.dispatchEvent(new CustomEvent('postsRefreshed'));
-    } catch (error) {
-      console.error("Error saving draft:", error);
+    } catch (error: any) {
+      await logPostSaveAttempt({
+        reportId: draftPost.id,
+        action: savedDraftId ? "edit" : "create",
+        title: draftPost.title,
+        status: "fail",
+        error: error?.message || String(error),
+      });
       toast({
         title: "Save Failed",
         description: "Failed to save draft. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
+        action: {
+          label: "Retry",
+          onClick: handleSaveDraft,
+        }
       });
     } finally {
       setIsSaving(false);
@@ -156,21 +177,36 @@ export const usePostForm = ({ initialPost, onSubmit }: UsePostFormProps) => {
       });
       return;
     }
-
     setIsSaving(true);
     try {
       const updatedPost = formatPostData(formData);
       onSubmit(updatedPost);
+      logPostSaveAttempt({
+        reportId: updatedPost.id,
+        action: isEditMode ? "edit" : "create",
+        title: updatedPost.title,
+        status: "success",
+      });
       toast({
         title: "Success",
         description: `Report ${isEditMode ? 'updated' : 'created'} successfully!`
       });
-    } catch (error) {
-      console.error(`Error ${isEditMode ? 'updating' : 'creating'} post:`, error);
+    } catch (error: any) {
+      logPostSaveAttempt({
+        reportId: formData.id,
+        action: isEditMode ? "edit" : "create",
+        title: formData.title,
+        status: "fail",
+        error: error?.message || String(error),
+      });
       toast({
         title: "Failed",
         description: `Failed to ${isEditMode ? 'update' : 'create'} report. Please try again.`,
-        variant: "destructive"
+        variant: "destructive",
+        action: {
+          label: "Retry",
+          onClick: handleSubmit,
+        }
       });
     } finally {
       setIsSaving(false);
