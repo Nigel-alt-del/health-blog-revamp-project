@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Image, Plus } from "lucide-react";
+import { Image } from "lucide-react";
 import { uploadImageToStorage, deleteImageFromStorage, isSupabaseStorageUrl } from "@/utils/supabaseImageStorage";
 import { useToast } from "@/hooks/use-toast";
 
@@ -12,15 +12,13 @@ interface FeaturedImageUploadProps {
   imageSize?: "small" | "medium" | "large" | "full";
   onImageChange: (image: string) => void;
   onImageSizeChange?: (size: "small" | "medium" | "large" | "full") => void;
-  onInsertToContent?: () => void;
 }
 
 export const FeaturedImageUpload = ({ 
   image, 
   imageSize = "medium", 
   onImageChange, 
-  onImageSizeChange,
-  onInsertToContent 
+  onImageSizeChange
 }: FeaturedImageUploadProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -101,17 +99,6 @@ export const FeaturedImageUpload = ({
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           Featured Image
-          {image && onInsertToContent && !isLoading && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onInsertToContent}
-              className="ml-auto"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Insert to Content
-            </Button>
-          )}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">

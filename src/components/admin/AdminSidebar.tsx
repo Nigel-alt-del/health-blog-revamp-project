@@ -94,22 +94,6 @@ export const AdminSidebar = ({
           </Button>
         </CardContent>
       </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Publishing Guidelines</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ul className="text-sm text-gray-600 space-y-2">
-            <li>• Title is required for preview and publishing</li>
-            <li>• Excerpt is required for publishing</li>
-            <li>• Add relevant tags for better discovery</li>
-            <li>• Choose appropriate category</li>
-            <li>• Use font controls to enhance readability</li>
-            <li>• {isEditing ? 'Review changes carefully' : 'Preview before publishing'}</li>
-          </ul>
-        </CardContent>
-      </Card>
     </div>
   );
 };
