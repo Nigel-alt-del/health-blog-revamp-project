@@ -1,5 +1,5 @@
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { loadPostsPaginated, loadPostSummaries } from "@/utils/optimizedPostManager";
 import { getPostById } from "@/utils/postManager";
 import { type BlogPost, type BlogPostSummary } from "@/types/blog";
@@ -13,7 +13,7 @@ export function useOptimizedPosts(page: number = 1, limit: number = 20) {
     queryKey: ['posts-paginated', page, limit],
     queryFn: () => loadPostsPaginated({ page, limit }),
     staleTime: 10 * 60 * 1000, // 10 minutes
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 }
 
