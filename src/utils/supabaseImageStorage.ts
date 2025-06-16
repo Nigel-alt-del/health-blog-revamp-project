@@ -1,19 +1,32 @@
-
 import { supabase } from "@/integrations/supabase/client";
+import { optimizeImage } from "@/utils/imageOptimization";
 
-export const uploadImageToStorage = async (file: File): Promise<string> => {
+export const uploadImageToStorage = async (file: File, optimize: boolean = true): Promise<string> => {
   try {
+    let fileToUpload = file;
+    
+    // Optimize image before upload if requested
+    if (optimize && file.type.startsWith('image/')) {
+      console.log('Optimizing image before upload...');
+      fileToUpload = await optimizeImage(file, {
+        maxWidth: 1200,
+        maxHeight: 800,
+        quality: 0.8,
+        format: 'webp'
+      });
+    }
+
     // Generate a unique filename
-    const fileExt = file.name.split('.').pop();
+    const fileExt = fileToUpload.name.split('.').pop();
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
     const filePath = `blog-images/${fileName}`;
 
-    console.log('Uploading image to Supabase Storage:', fileName);
+    console.log('Uploading optimized image to Supabase Storage:', fileName, `(${Math.round(fileToUpload.size/1024)}KB)`);
 
     // Upload the file to Supabase Storage
     const { data, error } = await supabase.storage
       .from('blog-images')
-      .upload(filePath, file, {
+      .upload(filePath, fileToUpload, {
         cacheControl: '3600',
         upsert: false
       });
@@ -28,7 +41,7 @@ export const uploadImageToStorage = async (file: File): Promise<string> => {
       .from('blog-images')
       .getPublicUrl(filePath);
 
-    console.log('Image uploaded successfully:', publicUrl);
+    console.log('Optimized image uploaded successfully:', publicUrl);
     return publicUrl;
   } catch (error) {
     console.error('Error in uploadImageToStorage:', error);

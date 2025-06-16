@@ -1,19 +1,19 @@
+
 import { useQuery } from "@tanstack/react-query";
 import BlogLayout from "@/components/BlogLayout";
 import HeroSection from "@/components/home/HeroSection";
 import IntroSection from "@/components/home/IntroSection";
 import CategoryButtons from "@/components/home/CategoryButtons";
-// import FilterBadges from "@/components/home/FilterBadges";
-import PostsGrid from "@/components/home/PostsGrid";
+import OptimizedPostsGrid from "@/components/home/OptimizedPostsGrid";
 import { type BlogPostSummary } from "@/types/blog";
-import { loadAllPosts } from "@/utils/postManager";
+import { loadOptimizedPostSummaries } from "@/services/supabase/optimizedPosts";
 import { useCategoryFiltering } from "@/hooks/useCategoryFiltering";
 
 const BlogHome = () => {
   const { data: allPosts = [], isLoading } = useQuery<BlogPostSummary[]>({
-    queryKey: ['posts'],
-    queryFn: loadAllPosts,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    queryKey: ['posts-optimized'],
+    queryFn: loadOptimizedPostSummaries,
+    staleTime: 10 * 60 * 1000, // 10 minutes - longer cache for better performance
   });
 
   const {
@@ -23,7 +23,7 @@ const BlogHome = () => {
     categories
   } = useCategoryFiltering(allPosts);
 
-  console.log("BlogHome - Render. isLoading:", isLoading, "Posts count:", allPosts.length);
+  console.log("BlogHome - Optimized render. isLoading:", isLoading, "Posts count:", allPosts.length);
 
   return (
     <BlogLayout>
@@ -38,13 +38,9 @@ const BlogHome = () => {
       <div className="max-w-6xl mx-auto px-4 py-12">
         <CategoryButtons />
 
-        {/* FilterBadges removed as requested */}
-
-        <PostsGrid
-          posts={filteredPosts}
+        <OptimizedPostsGrid
           selectedCategory={selectedCategory}
           onClearFilters={() => setSelectedCategory("All")}
-          isLoading={isLoading}
         />
       </div>
     </BlogLayout>
