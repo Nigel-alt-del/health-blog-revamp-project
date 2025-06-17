@@ -15,7 +15,7 @@ const AboutPage = () => {
       >
         <div className="max-w-4xl mx-auto text-center text-white">
           <h1 className="text-5xl font-bold mb-6 leading-tight">
-            About <span className="text-[#22aee1]">Insure My Health</span>
+            About <span className="text-[#22aee1]">The Health Compass</span>
           </h1>
           <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
             Your trusted source for UK employee benefits intelligence, market analysis, and strategic insights for small and medium enterprises.
