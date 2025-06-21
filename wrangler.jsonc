@@ -1,0 +1,8 @@
+{
+  "name": "my-cool-website",
+  "compatibility_date": "2025-06-21",
+  "assets": {
+    "directory": "./dist",
+    "include": ["**/*"]
+  }
+}
