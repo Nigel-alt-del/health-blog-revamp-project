@@ -1,11 +1,12 @@
 
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { VirtualizedPostGrid } from "@/components/VirtualizedPostGrid";
+import { ProgressiveImage } from "@/components/ProgressiveImage";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
-import { ChevronDown, Zap } from "lucide-react";
-import BlogCard from "@/components/BlogCard";
-import { useOptimizedPosts } from "@/hooks/useOptimizedPosts";
+import { loadOptimizedPostSummaries } from "@/services/supabase/optimizedPosts";
+import { useCategoryFiltering } from "@/hooks/useCategoryFiltering";
+import { useMemoryOptimization } from "@/hooks/useMemoryOptimization";
 import { type BlogPostSummary } from "@/types/blog";
 
 interface OptimizedPostsGridProps {
@@ -14,15 +15,22 @@ interface OptimizedPostsGridProps {
 }
 
 const OptimizedPostsGrid = ({ selectedCategory, onClearFilters }: OptimizedPostsGridProps) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const POSTS_PER_PAGE = 12;
-  
-  const { data, isLoading, isFetching } = useOptimizedPosts(currentPage, POSTS_PER_PAGE);
-  
-  // Filter posts by category
-  const filteredPosts = data?.posts.filter(post => 
-    selectedCategory === "All" || post.category === selectedCategory
-  ) || [];
+  const { getMemoryStats } = useMemoryOptimization();
+
+  const { data: allPosts = [], isLoading } = useQuery<BlogPostSummary[]>({
+    queryKey: ['posts-optimized'],
+    queryFn: loadOptimizedPostSummaries,
+    staleTime: 15 * 60 * 1000, // 15 minutes cache
+  });
+
+  const { filteredPosts } = useCategoryFiltering(allPosts);
+
+  // Filter by selected category
+  const displayPosts = selectedCategory === "All" 
+    ? filteredPosts 
+    : filteredPosts.filter(post => 
+        post.category.toLowerCase().replace(/\s+/g, '-') === selectedCategory.toLowerCase()
+      );
 
   const LoadingSkeleton = () => (
     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -39,58 +47,24 @@ const OptimizedPostsGrid = ({ selectedCategory, onClearFilters }: OptimizedPosts
     </div>
   );
 
-  const loadMorePosts = () => {
-    setCurrentPage(prev => prev + 1);
-  };
+  // Debug memory usage
+  const memStats = getMemoryStats();
+  console.log('Memory usage:', memStats ? `${Math.round(memStats.usedJSHeapSize / 1024 / 1024)}MB` : 'N/A');
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-3xl font-bold text-[#20466d]">
-          {selectedCategory !== "All" ? `${selectedCategory}` : "Latest"} Reports
-        </h2>
-        <Badge variant="outline" className="flex items-center gap-1">
-          <Zap className="h-3 w-3" />
-          Optimized Loading
-        </Badge>
-      </div>
+      <h2 className="text-3xl font-bold text-[#20466d] mb-8">
+        {selectedCategory !== "All" ? `${selectedCategory}` : "Latest"} Reports
+      </h2>
       
       {isLoading ? (
         <LoadingSkeleton />
-      ) : filteredPosts.length > 0 ? (
-        <>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredPosts.map((post) => (
-              <BlogCard key={post.id} post={post} />
-            ))}
-          </div>
-          
-          {data?.hasMore && (
-            <div className="text-center mt-12">
-              <Button
-                variant="outline"
-                onClick={loadMorePosts}
-                disabled={isFetching}
-                className="flex items-center gap-2"
-              >
-                {isFetching ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
-                    Loading...
-                  </>
-                ) : (
-                  <>
-                    <ChevronDown className="h-4 w-4" />
-                    Load More Posts
-                  </>
-                )}
-              </Button>
-              <p className="text-sm text-gray-500 mt-2">
-                Showing {filteredPosts.length} of {data?.total} total posts
-              </p>
-            </div>
-          )}
-        </>
+      ) : displayPosts.length > 0 ? (
+        <VirtualizedPostGrid 
+          posts={displayPosts}
+          itemHeight={320}
+          containerHeight={800}
+        />
       ) : (
         <div className="text-center py-12">
           <p className="text-[#79858D] text-lg">No reports found matching your criteria.</p>
