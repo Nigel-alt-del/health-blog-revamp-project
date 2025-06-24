@@ -32,9 +32,9 @@ const BlogFooter = () => {
           <div>
             <h4 className="font-semibold mb-4">Legal</h4>
             <ul className="space-y-2 text-sm text-gray-300">
-              <li><a href="https://insure-health-made-simple.lovable.app/cookies-policy" target="_blank" rel="noopener noreferrer" className="hover:text-[#22aee1] transition-colors">Cookies</a></li>
-              <li><a href="https://insure-health-made-simple.lovable.app/terms-of-service" target="_blank" rel="noopener noreferrer" className="hover:text-[#22aee1] transition-colors">Terms</a></li>
-              <li><a href="https://insure-health-made-simple.lovable.app/privacy-policy" target="_blank" rel="noopener noreferrer" className="hover:text-[#22aee1] transition-colors">Privacy</a></li>
+              <li><Link to="/cookies-policy" className="hover:text-[#22aee1] transition-colors">Cookies</Link></li>
+              <li><Link to="/terms-of-service" className="hover:text-[#22aee1] transition-colors">Terms</Link></li>
+              <li><Link to="/privacy-policy" className="hover:text-[#22aee1] transition-colors">Privacy</Link></li>
             </ul>
           </div>
         </div>
@@ -47,4 +47,3 @@ const BlogFooter = () => {
 };
 
 export default BlogFooter;
-
