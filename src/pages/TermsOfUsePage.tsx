@@ -1,4 +1,3 @@
-
 import BlogLayout from "@/components/BlogLayout";
 
 const TermsOfUsePage = () => {
@@ -11,19 +10,19 @@ const TermsOfUsePage = () => {
 
           <h2>Agreement to Our Legal Terms</h2>
           <p>
-            We are The Health Compass ('Company', 'we', 'us', or 'our'), a company registered in United Kingdom at 8 Dudley Road, Bournemouth, Dorset BH10 6BS.
+            We are Healthcare Insights ('Company', 'we', 'us', or 'our'), a company registered in United Kingdom at 8 Dudley Road, Bournemouth, Dorset BH10 6BS.
           </p>
 
           <p>
-            We operate the website thehealthcompass.co.uk (the 'Site'), as well as any other related products and services that refer or link to these legal terms (the 'Legal Terms') (collectively, the 'Services').
+            We operate the website healthcareinsights.co.uk (the 'Site'), as well as any other related products and services that refer or link to these legal terms (the 'Legal Terms') (collectively, the 'Services').
           </p>
 
           <p>
-            You can contact us by email at nigel@thehealthcompass.co.uk or by mail to 8 Dudley Road, Bournemouth, Dorset BH10 6BS, United Kingdom.
+            You can contact us by email at nigel@healthcareinsights.co.uk or by mail to 8 Dudley Road, Bournemouth, Dorset BH10 6BS, United Kingdom.
           </p>
 
           <p>
-            These Legal Terms constitute a legally binding agreement made between you, whether personally or on behalf of an entity ('you'), and The Health Compass, concerning your access to and use of the Services. You agree that by accessing the Services, you have read, understood, and agreed to be bound by all of these Legal Terms. IF YOU DO NOT AGREE WITH ALL OF THESE LEGAL TERMS, THEN YOU ARE EXPRESSLY PROHIBITED FROM USING THE SERVICES AND YOU MUST DISCONTINUE USE IMMEDIATELY.
+            These Legal Terms constitute a legally binding agreement made between you, whether personally or on behalf of an entity ('you'), and Healthcare Insights, concerning your access to and use of the Services. You agree that by accessing the Services, you have read, understood, and agreed to be bound by all of these Legal Terms. IF YOU DO NOT AGREE WITH ALL OF THESE LEGAL TERMS, THEN YOU ARE EXPRESSLY PROHIBITED FROM USING THE SERVICES AND YOU MUST DISCONTINUE USE IMMEDIATELY.
           </p>
 
           <p>
@@ -102,7 +101,7 @@ const TermsOfUsePage = () => {
           </p>
 
           <p>
-            If you wish to make any use of the Services, Content, or Marks other than as set out in this section or elsewhere in our Legal Terms, please address your request to: nigel@thehealthcompass.co.uk. If we ever grant you the permission to post, reproduce, or publicly display any part of our Services or Content, you must identify us as the owners or licensors of the Services, Content, or Marks and ensure that any copyright or proprietary notice appears or is visible on posting, reproducing, or displaying our Content.
+            If you wish to make any use of the Services, Content, or Marks other than as set out in this section or elsewhere in our Legal Terms, please address your request to: nigel@healthcareinsights.co.uk. If we ever grant you the permission to post, reproduce, or publicly display any part of our Services or Content, you must identify us as the owners or licensors of the Services, Content, or Marks and ensure that any copyright or proprietary notice appears or is visible on posting, reproducing, or displaying our Content.
           </p>
 
           <p>
@@ -167,11 +166,11 @@ const TermsOfUsePage = () => {
 
           <div className="bg-gray-50 p-4 rounded-lg">
             <p>
-              The Health Compass<br />
+              Healthcare Insights<br />
               8 Dudley Road<br />
               Bournemouth, Dorset BH10 6BS<br />
               United Kingdom<br />
-              nigel@thehealthcompass.co.uk
+              nigel@healthcareinsights.co.uk
             </p>
           </div>
         </div>

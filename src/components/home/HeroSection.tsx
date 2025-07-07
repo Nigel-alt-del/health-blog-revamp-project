@@ -14,13 +14,6 @@ const HeroSection = ({ title, subtitle, backgroundImage }: HeroSectionProps) => 
       }}
     >
       <div className="max-w-4xl mx-auto text-center text-white">
-        <div className="flex justify-center mb-6">
-          <img 
-            src="/lovable-uploads/3e00b04c-615f-4844-9c6b-aef28446924d.png" 
-            alt="The Health Compass Logo" 
-            className="h-20 w-auto"
-          />
-        </div>
         <h1 className="text-4xl font-bold mb-6 leading-tight">
           {title.split(' ').map((word, index) => 
             word === 'Reports' ? (

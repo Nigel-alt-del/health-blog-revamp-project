@@ -1,4 +1,3 @@
-
 import BlogLayout from "@/components/BlogLayout";
 
 const CookiePolicyPage = () => {
@@ -10,7 +9,7 @@ const CookiePolicyPage = () => {
           <p className="text-gray-600 mb-8">Last updated June 17, 2025</p>
 
           <p>
-            This Cookie Policy explains how The Health Compass ("we", "us", or "our") uses cookies and similar technologies to recognize you when you visit our website at thehealthcompass.co.uk ("Website"). It explains what these technologies are and why we use them, as well as your rights to control our use of them.
+            This Cookie Policy explains how Healthcare Insights ("we", "us", or "our") uses cookies and similar technologies to recognize you when you visit our website at healthcareinsights.co.uk ("Website"). It explains what these technologies are and why we use them, as well as your rights to control our use of them.
           </p>
 
           <p>
@@ -23,7 +22,7 @@ const CookiePolicyPage = () => {
           </p>
 
           <p>
-            Cookies set by the website owner (in this case, The Health Compass) are called "first party cookies". Cookies set by parties other than the website owner are called "third party cookies". Third party cookies enable third party features or functionality to be provided on or through the website (e.g. like advertising, interactive content and analytics). The parties that set these third party cookies can recognise your computer both when it visits the website in question and also when it visits certain other websites.
+            Cookies set by the website owner (in this case, Healthcare Insights) are called "first party cookies". Cookies set by parties other than the website owner are called "third party cookies". Third party cookies enable third party features or functionality to be provided on or through the website (e.g. like advertising, interactive content and analytics). The parties that set these third party cookies can recognise your computer both when it visits the website in question and also when it visits certain other websites.
           </p>
 
           <h2>Why do we use cookies?</h2>
